@@ -15,101 +15,150 @@ public:
 	{
 	public:
 		int s, h;
-		bool rev;
-		std::array<Node*, 2> c;
-		Node(): s(1), h(1), rev(0), c{} {}
-
-		/* Customizable portion
-		 */
-		void do_rev()
+		std::array<int, 2> c;
+		Node(): s(1), h(1), c{-1, -1} {}
+		/* Customize */
+		void up()
 		{
-			rev ^= 1;
-			std::swap(c[0], c[1]);
 		}
-		void up() {}
-		void down() {}
-		/* Customizable portion (end)
-		 */
+		void down()
+		{
+		}
+		/* Customize */
 	};
 private:
-	static int gh(Node *n) {return n ? n->h : 0;}
-	static int gs(Node *n) {return n ? n->s : 0;}
-	static void up(Node *n)
+	static std::vector<Node> N;
+	static std::vector<int> bank;
+	static int gh(int n) {return n != -1 ? N[n].h : 0;}
+	static int gs(int n) {return n != -1 ? N[n].s : 0;}
+	static void up(int n)
 	{
-		n->h = std::max(gh(n->c[0]), gh(n->c[1])) + 1;
-		n->s = gs(n->c[0]) + gs(n->c[1]) + 1;
-		n->up(); // Other utilities
+		N[n].h = std::max(gh(N[n].c[0]), gh(N[n].c[1])) + 1;
+		N[n].s = gs(N[n].c[0]) + gs(N[n].c[1]) + 1;
+		N[n].up(); // Other utilities
 	}
-	static void down(Node *n)
+	static void down(int n)
 	{
-		if(n->rev)
-		{
-			if(n->c[0]) n->c[0]->do_rev();
-			if(n->c[1]) n->c[1]->do_rev();
-			n->rev = 0;
-		}
-		n->down(); // Other utilities
+		N[n].down(); // Other utilities
 	}
-	static Node* rotate(Node *n, int d)
+	static int rotate(int n, int d)
 	{
-		Node *o = n->c[d];
-		down(o); n->c[d] = o->c[!d], o->c[!d] = n;
+		int o = N[n].c[d];
+		down(o); N[n].c[d] = N[o].c[!d], N[o].c[!d] = n;
 		up(n), up(o);
 		return o;
 	}
-	static Node* balance(Node *n)
+	static int balance(int n)
 	{
 		up(n);
-		int diff = gh(n->c[0]) - gh(n->c[1]);
+		int diff = gh(N[n].c[0]) - gh(N[n].c[1]);
 		bool d;
 		if(diff >= 2) d = 0;
 		else if(diff <= -2) d = 1;
 		else return n;
-		down(n->c[d]);
-		if(gh(n->c[d]->c[d]) + 1 < gh(n->c[d])) n->c[d] = rotate(n->c[d], !d);
+		down(N[n].c[d]);
+		if(gh(N[N[n].c[d]].c[d]) + 1 < gh(N[n].c[d])) N[n].c[d] = rotate(N[n].c[d], !d);
 		return rotate(n, d);
 	}
-	static Node *merge_root(Node *l, Node *n, Node *r)
+	static int merge_root(int l, int n, int r)
 	{
 		if(gh(l) + 1 < gh(r))
-			return down(r), r->c[0] = merge_root(l, n, r->c[0]), balance(r);
+			return down(r), N[r].c[0] = merge_root(l, n, N[r].c[0]), balance(r);
 		else if(gh(r) + 1 < gh(l))
-			return down(l), l->c[1] = merge_root(l->c[1], n, r), balance(l);
+			return down(l), N[l].c[1] = merge_root(N[l].c[1], n, r), balance(l);
 		else
-			return n->c = {l, r}, balance(n);
+			return N[n].c = {l, r}, balance(n);
 	}
-	static std::tuple<Node*, Node*> split(Node *n, int k)
+	static std::tuple<int, int> split(int n, int k)
 	{
-		if(n) down(n);
-		if(k == 0) return {nullptr, n};
-		if(k == n->s) return {n, nullptr};
-		if(k <= gs(n->c[0]))
+		if(n != -1) down(n);
+		if(k == 0) return {-1, n};
+		if(k == N[n].s) return {n, -1};
+		if(k <= gs(N[n].c[0]))
 		{
-			auto [l, r] = split(n->c[0], k);
-			return {l, merge_root(r, n, n->c[1])};
+			auto [l, r] = split(N[n].c[0], k);
+			return {l, merge_root(r, n, N[n].c[1])};
 		}
 		else
 		{
-			auto [l, r] = split(n->c[1], k - gs(n->c[0]) - 1);
-			return {merge_root(n->c[0], n, l), r};
+			auto [l, r] = split(N[n].c[1], k - gs(N[n].c[0]) - 1);
+			return {merge_root(N[n].c[0], n, l), r};
 		}
 	}
-	static Node* merge(Node* l, Node* r)
+	static int merge(int l, int r)
 	{
-		if(!r) return l;
+		if(r == -1) return l;
 		auto [x, nr] = split(r, 1);
 		return merge_root(l, x, nr);
 	}
-public:
-	Node *root;
-	AVL(Node* _root=nullptr): root(_root) {}
-	static AVL merge(AVL a, AVL b)
+	static void clear(int n)
 	{
-		return AVL(merge(a.root, b.root));
+		if(n == -1)
+			return;
+		clear(N[n].c[0]);
+		clear(N[n].c[1]);
+		bank.push_back(n);
 	}
+	AVL(int v): root(v) {}
+public:
+	int root;
+	AVL(): root(-1) {}
+	AVL& operator += (AVL const& o) {root = merge(root, o.root); return *this;}
+	friend AVL operator + (AVL a, AVL const& b) {return a += b;}
 	std::tuple<AVL, AVL> split(int k)
 	{
 		auto [l, r] = split(root, k);
 		return {AVL(l), AVL(r)};
 	}
+	void clear()
+	{
+		clear(root);
+		root = -1;
+	}
+	Node& get_root() {return N[root];}
+
+	/* Optional creators */
+	static AVL make_avl(Node n)
+	{
+		int root;
+		if(bank.empty()) root = N.size(), N.push_back(n);
+		else root = bank.back(), bank.pop_back(), N[root] = n;
+		return AVL(root);
+	}
+	static AVL make_avl(std::vector<Node> const& n)
+	{
+		auto dfs=[&](auto const& dfs, int l, int r)->int
+		{
+			if(r-l==0) return -1;
+			if(r-l==1) return make_avl(n[l]).root;
+			int m=l+(r-l)/2;
+			return merge_root(dfs(dfs, l, m), make_avl(n[m]).root, dfs(dfs, m+1, r));
+		};
+		return AVL(dfs(dfs, 0, n.size()));
+	}
+	/* End optional creators */
 };
+typedef AVL::Node Node;
+std::vector<Node> AVL::N;
+std::vector<int> AVL::bank;
+
+/* Begin optional creators v2 */
+AVL make_avl()
+{
+	Node n = Node();
+	return AVL::make_avl(n);
+}
+template<typename T>
+AVL make_avl(std::vector<T> const& v)
+{
+	std::vector<Node> n(v.size());
+	for(int i=0;i<v.size();++i)
+		n[i] = Node(v[i]);
+	return AVL::make_avl(n);
+}
+/* End optional creators v2 */
+
+int main()
+{
+	return 0;
+}

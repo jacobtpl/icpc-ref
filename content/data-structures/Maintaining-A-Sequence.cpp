@@ -1,3 +1,7 @@
+#define USE_POINTER
+
+#ifdef USE_POINTER
+
 #include <cstdio>
 #include <algorithm>
 #include <numeric>
@@ -315,3 +319,320 @@ int main()
 	}
 	return 0;
 }
+
+#else
+
+/*
+ * Pointer implementation
+ */
+
+#include <cstdio>
+#include <algorithm>
+#include <numeric>
+#include <iostream>
+#include <cassert>
+#include <ostream>
+#include <vector>
+#include <tuple>
+#include <array>
+
+template<typename T> bool ckmax(T& a, T const& b) {return b>a?a=b:1;}
+template<typename T> bool ckmin(T& a, T const& b) {return b<a?a=b:1;}
+
+struct AVL
+{
+public:
+	struct Node
+	{
+	public:
+		int s, h;
+		std::array<int, 2> c;
+		Node(): s(1), h(1), c{-1, -1} {}
+		/* Customize */
+		bool rev;
+		int val, sum;
+		bool set;
+		int set_val;
+		int bl, b, br;
+
+		void do_rev()
+		{
+			rev ^= 1;
+			std::swap(c[0], c[1]);
+			std::swap(bl, br);
+		}
+		void do_set(int v)
+		{
+			val = v;
+			sum = v * s;
+			set = 1;
+			set_val = v;
+			if(v > 0) bl=sum, b=sum, br=sum;
+			else bl=v, b=v, br=v;
+		}
+		Node(int v): Node()
+		{
+			rev = 0;
+			val = v;
+			sum = v;
+			set = 0;
+			bl = b = br = val;
+		}
+		void up()
+		{
+			sum = val;
+			bl = b = br = val;
+			if(c[0] != -1)
+			{
+				Node &n = N[c[0]];
+				ckmax(b, std::max(n.b, n.br + bl));
+				bl = std::max(n.sum + bl, n.bl);
+				ckmax(br, sum + n.br);
+				sum += n.sum;
+			}
+			if(c[1] != -1)
+			{
+				Node &n = N[c[1]];
+				ckmax(b, std::max(n.b, br + n.bl));
+				ckmax(bl, sum + n.bl);
+				br = std::max(br + n.sum, n.br);
+				sum += n.sum;
+			}
+		}
+		void down()
+		{
+			if(rev)
+			{
+				if(c[0] != -1) N[c[0]].do_rev();
+				if(c[1] != -1) N[c[1]].do_rev();
+				rev = 0;
+			}
+			if(set)
+			{
+				if(c[0] != -1) N[c[0]].do_set(set_val);
+				if(c[1] != -1) N[c[1]].do_set(set_val);
+				set = 0;
+			}
+		}
+
+		Node nl() const {return N[c[0]];}
+		Node nr() const {return N[c[1]];}
+		friend std::ostream& operator << (std::ostream &os, Node const& n)
+		{
+			os << "Node(" << n.s << ", " << n.h
+				<< ", rev=" << n.rev
+				<< ", val=" << n.val
+				<< ", sum=" << n.sum
+				<< ", set=" << n.set
+				<< ", set_val=" << n.set_val
+				<< ", best={" << n.bl << ", " << n.b << ", " << n.br << "}"
+				<< ", c={";
+			if(n.c[0] != -1) os << n.nl();
+			os << ", ";
+			if(n.c[1] != -1) os << n.nr();
+			return os<< "})";
+		}
+		/* Customize */
+	};
+private:
+	static std::vector<Node> N;
+	static std::vector<int> bank;
+	static int gh(int n) {return n != -1 ? N[n].h : 0;}
+	static int gs(int n) {return n != -1 ? N[n].s : 0;}
+	static void up(int n)
+	{
+		N[n].h = std::max(gh(N[n].c[0]), gh(N[n].c[1])) + 1;
+		N[n].s = gs(N[n].c[0]) + gs(N[n].c[1]) + 1;
+		N[n].up(); // Other utilities
+	}
+	static void down(int n)
+	{
+		N[n].down(); // Other utilities
+	}
+	static int rotate(int n, int d)
+	{
+		int o = N[n].c[d];
+		down(o); N[n].c[d] = N[o].c[!d], N[o].c[!d] = n;
+		up(n), up(o);
+		return o;
+	}
+	static int balance(int n)
+	{
+		up(n);
+		int diff = gh(N[n].c[0]) - gh(N[n].c[1]);
+		bool d;
+		if(diff >= 2) d = 0;
+		else if(diff <= -2) d = 1;
+		else return n;
+		down(N[n].c[d]);
+		if(gh(N[N[n].c[d]].c[d]) + 1 < gh(N[n].c[d])) N[n].c[d] = rotate(N[n].c[d], !d);
+		return rotate(n, d);
+	}
+	static int merge_root(int l, int n, int r)
+	{
+		if(gh(l) + 1 < gh(r))
+			return down(r), N[r].c[0] = merge_root(l, n, N[r].c[0]), balance(r);
+		else if(gh(r) + 1 < gh(l))
+			return down(l), N[l].c[1] = merge_root(N[l].c[1], n, r), balance(l);
+		else
+			return N[n].c = {l, r}, balance(n);
+	}
+	static std::tuple<int, int> split(int n, int k)
+	{
+		if(n != -1) down(n);
+		if(k == 0) return {-1, n};
+		if(k == N[n].s) return {n, -1};
+		if(k <= gs(N[n].c[0]))
+		{
+			auto [l, r] = split(N[n].c[0], k);
+			return {l, merge_root(r, n, N[n].c[1])};
+		}
+		else
+		{
+			auto [l, r] = split(N[n].c[1], k - gs(N[n].c[0]) - 1);
+			return {merge_root(N[n].c[0], n, l), r};
+		}
+	}
+	static int merge(int l, int r)
+	{
+		if(r == -1) return l;
+		auto [x, nr] = split(r, 1);
+		return merge_root(l, x, nr);
+	}
+	static void clear(int n)
+	{
+		if(n == -1)
+			return;
+		clear(N[n].c[0]);
+		clear(N[n].c[1]);
+		bank.push_back(n);
+	}
+	AVL(int v): root(v) {}
+public:
+	int root;
+	AVL(): root(-1) {}
+	AVL& operator += (AVL const& o) {root = merge(root, o.root); return *this;}
+	friend AVL operator + (AVL a, AVL const& b) {return a += b;}
+	std::tuple<AVL, AVL> split(int k)
+	{
+		auto [l, r] = split(root, k);
+		return {AVL(l), AVL(r)};
+	}
+	void clear()
+	{
+		clear(root);
+		root = -1;
+	}
+	Node& get_root() {return N[root];}
+
+	/* Optional creators */
+	static AVL make_avl(Node n)
+	{
+		int root;
+		if(bank.empty()) root = N.size(), N.push_back(n);
+		else root = bank.back(), bank.pop_back(), N[root] = n;
+		return AVL(root);
+	}
+	static AVL make_avl(std::vector<Node> const& n)
+	{
+		auto dfs=[&](auto const& dfs, int l, int r)->int
+		{
+			if(r-l==0) return -1;
+			if(r-l==1) return make_avl(n[l]).root;
+			int m=l+(r-l)/2;
+			return merge_root(dfs(dfs, l, m), make_avl(n[m]).root, dfs(dfs, m+1, r));
+		};
+		return AVL(dfs(dfs, 0, n.size()));
+	}
+	/* End optional creators */
+};
+typedef AVL::Node Node;
+std::vector<Node> AVL::N;
+std::vector<int> AVL::bank;
+
+AVL make_avl(int v)
+{
+	Node n = Node(v);
+	return AVL::make_avl(n);
+}
+AVL make_avl(std::vector<int> const& v)
+{
+	std::vector<Node> n(v.size());
+	for(int i=0;i<v.size();++i)
+		n[i] = Node(v[i]);
+	return AVL::make_avl(n);
+}
+
+int main()
+{
+	int N, M;
+	scanf("%d%d", &N, &M);
+	std::vector<int> v(N);
+	for(int &x: v) scanf("%d", &x);
+	AVL cur = make_avl(v);
+	//std::cout << cur.get_root() << '\n';
+	for(int i=0;i<M;++i)
+	{
+		char s[100];
+		scanf(" %s", s);
+		if(s[0] == 'I')
+		{
+			int p, t;
+			scanf("%d%d", &p, &t);
+			auto [l, r] = cur.split(p);
+			std::vector<int> v(t);
+			for(int &x: v) scanf("%d", &x);
+			cur = l + make_avl(v) + r;
+		}
+		else if(s[0] == 'D')
+		{
+			int p, t;
+			scanf("%d%d", &p, &t);
+			--p;
+			auto [l, r] = cur.split(p);
+			auto [r1, r2] = r.split(t);
+			r1.clear();
+			cur = l + r2;
+		}
+		else if(s[0] == 'M' && s[2] == 'K')
+		{
+			int p, t, c;
+			scanf("%d%d%d", &p, &t, &c);
+			--p;
+			auto [l, r] = cur.split(p);
+			auto [r1, r2] = r.split(t);
+			r1.get_root().do_set(c);
+			cur = l + (r1 + r2);
+		}
+		else if(s[0] == 'R')
+		{
+			int p, t;
+			scanf("%d%d", &p, &t);
+			--p;
+			auto [l, r] = cur.split(p);
+			auto [r1, r2] = r.split(t);
+			r1.get_root().do_rev();
+			cur = l + (r1 + r2);
+		}
+		else if(s[0] == 'G')
+		{
+			int p, t;
+			scanf("%d%d", &p, &t);
+			if(t == 0)
+			{
+				printf("0\n");
+				continue;
+			}
+			--p;
+			auto [l, r] = cur.split(p);
+			auto [r1, r2] = r.split(t);
+			printf("%d\n", r1.get_root().sum);
+			cur = l + (r1 + r2);
+		}
+		else
+			printf("%d\n", cur.get_root().b);
+		//std::cout << cur.get_root() << '\n';
+	}
+	return 0;
+}
+#endif
