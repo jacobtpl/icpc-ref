@@ -1,0 +1,37 @@
+set ts=2 sw=2
+set number relativenumber cursorline ruler nowrap
+set autoindent nosmartindent cindent cino=g0
+set wildmenu showcmd
+
+syntax on
+
+set undofile " Maintain undo history between sessions
+set undodir=~/.vim/undodir
+
+map <Tab> <Esc>
+imap <Tab> <Esc>
+
+autocmd FileType cpp nmap <F8> :w <Bar> !g++-12 -std=c++20 -DLOCAL %<CR>
+autocmd FileType cpp nmap <F9> :w <Bar> !g++-12 -std=c++20 -DLOCAL % && ./a.out<CR>
+
+" Optional
+set foldmethod=syntax
+autocmd FileType python set foldmethod=indent
+set foldnestmax=10
+set nofoldenable
+set foldlevel=2
+set nohlsearch
+ 
+let &t_ZH="\e[3m" " Fix bug where terminal fonts don't show correctly
+let &t_ZR="\e[23m"
+set backspace=indent,eol,start " fix bug where u cant backspace at EOL
+set notermguicolors
+
+" IDK why you will ever use these
+autocmd FileType c nmap <F8> :w <Bar> !gcc-12 -DLOCAL -w %<CR>
+autocmd FileType c nmap <F9> :w <Bar> !gcc-12 -DLOCAL -w % && ./a.out<CR>
+
+autocmd Syntax python set autoindent smartindent nocindent
+autocmd FileType python set sw=4 ts=4 sts=4 expandtab
+autocmd FileType python nmap <F8> :w <Bar> !python3 "%"<CR>
+autocmd FileType python nmap <F9> :w <Bar> !python3 -i "%"<CR>
