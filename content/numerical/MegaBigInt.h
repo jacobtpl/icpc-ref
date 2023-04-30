@@ -1,18 +1,38 @@
-#include <bits/stdc++.h>
+// NOTE:
+// - Base 10^k. If need base 2^k, see submissions in:
+//   https://www.spoj.com/problems/PBBN2/     (>= 0 only, operations: *, power, xor)
+//   https://www.spoj.com/problems/PELLFOUR/  (see CPP, older submissions)
+//   https://codeforces.com/contest/504/submission/42348976  (with negative, several operations)
+//
+// Tested:
+// - https://www.e-olymp.com/en/problems/266: Comparison
+// - https://www.e-olymp.com/en/problems/267: Subtraction
+// - https://www.e-olymp.com/en/problems/271: Multiplication
+// - https://www.e-olymp.com/en/problems/272: Multiplication
+// - https://www.e-olymp.com/en/problems/313: Addition
+// - https://www.e-olymp.com/en/problems/314: Addition/Subtraction
+// - https://www.e-olymp.com/en/problems/317: Multiplication (simple / karatsuba / fft)
+// - https://www.e-olymp.com/en/problems/1327: Multiplication
+// - https://www.e-olymp.com/en/problems/1328
+// - VOJ BIGNUM: Addition, Subtraction, Multiplication.
+// - SGU 111: sqrt
+// - SGU 193
+// - SPOJ MUL, VFMUL: Multiplication.
+// - SPOJ FDIV, VFDIV: Division.
+// - SPOJ SQRROOT: sqrt
 
-using namespace std;
+// BigInt {{{
+const int BASE_DIGITS = 9;
+const int BASE = 1000000000;
 
-const int BASE_DIGITS = 30;
-const int BASE = 1 << 30;
- 
 struct BigInt {
     int sign;
     vector<int> a;
- 
+
     // -------------------- Constructors -------------------- 
     // Default constructor.
     BigInt() : sign(1) {}
- 
+
     // Constructor from long long.
     BigInt(long long v) {
         *this = v;
@@ -28,12 +48,12 @@ struct BigInt {
             a.push_back(v % BASE);
         return *this;
     }
- 
+
     // Initialize from string.
     BigInt(const string& s) {
         read(s);
     }
- 
+
     // -------------------- Input / Output --------------------
     void read(const string& s) {
         sign = 1;
@@ -58,7 +78,7 @@ struct BigInt {
         v.read(s);
         return stream;
     }
- 
+
     friend ostream& operator<<(ostream &stream, const BigInt &v) {
         if (v.sign == -1 && !v.isZero())
             stream << '-';
@@ -67,7 +87,7 @@ struct BigInt {
             stream << setw(BASE_DIGITS) << setfill('0') << v.a[i];
         return stream;
     }
- 
+
     // -------------------- Comparison --------------------
     bool operator<(const BigInt &v) const {
         if (sign != v.sign)
@@ -79,7 +99,7 @@ struct BigInt {
                 return a[i] * sign < v.a[i] * sign;
         return false;
     }
- 
+
     bool operator>(const BigInt &v) const {
         return v < *this;
     }
@@ -95,7 +115,7 @@ struct BigInt {
     bool operator!=(const BigInt &v) const {
         return *this < v || v < *this;
     }
- 
+
     // Returns:
     // 0 if |x| == |y|
     // -1 if |x| < |y|
@@ -104,7 +124,7 @@ struct BigInt {
         if (x.a.size() != y.a.size()) {
             return x.a.size() < y.a.size() ? -1 : 1;
         }
- 
+
         for (int i = ((int) x.a.size()) - 1; i >= 0; --i) {
             if (x.a[i] != y.a[i]) {
                 return x.a[i] < y.a[i] ? -1 : 1;
@@ -112,34 +132,32 @@ struct BigInt {
         }
         return 0;
     }
- 
+
     // -------------------- Unary operator - and operators +- --------------------
     BigInt operator-() const {
         BigInt res = *this;
         if (isZero()) return res;
- 
+
         res.sign = -sign;
         return res;
     }
- 
-    // Assumption: *this and v have same sign.
+
+    // Note: sign ignored.
     void __internal_add(const BigInt& v) {
-        assert(sign == v.sign);
         if (a.size() < v.a.size()) {
             a.resize(v.a.size(), 0);
         }
         for (int i = 0, carry = 0; i < (int) max(a.size(), v.a.size()) || carry; ++i) {
             if (i == (int) a.size()) a.push_back(0);
- 
+
             a[i] += carry + (i < (int) v.a.size() ? v.a[i] : 0);
             carry = a[i] >= BASE;
             if (carry) a[i] -= BASE;
         }
     }
- 
-    // Assumption: *this and v have same sign, and |*this| >= |v|
+
+    // Note: sign ignored.
     void __internal_sub(const BigInt& v) {
-        assert(sign == v.sign);
         for (int i = 0, carry = 0; i < (int) v.a.size() || carry; ++i) {
             a[i] -= carry + (i < (int) v.a.size() ? v.a[i] : 0);
             carry = a[i] < 0;
@@ -147,7 +165,7 @@ struct BigInt {
         }
         this->trim();
     }
- 
+
     BigInt operator += (const BigInt& v) {
         if (sign == v.sign) {
             __internal_add(v);
@@ -162,7 +180,7 @@ struct BigInt {
         }
         return *this;
     }
- 
+
     BigInt operator -= (const BigInt& v) {
         if (sign == v.sign) {
             if (__compare_abs(*this, v) >= 0) {
@@ -178,7 +196,7 @@ struct BigInt {
         }
         return *this;
     }
- 
+
     // Optimize operators + and - according to
     // https://stackoverflow.com/questions/13166079/move-semantics-and-pass-by-rvalue-reference-in-overloaded-arithmetic
     template< typename L, typename R >
@@ -201,7 +219,7 @@ struct BigInt {
         result += l;
         return result;
     }
- 
+
     template< typename L, typename R >
         typename std::enable_if<
             std::is_convertible<L, BigInt>::value &&
@@ -211,17 +229,17 @@ struct BigInt {
         result -= r;
         return result;
     }
- 
+
     // -------------------- Operators * / % --------------------
     friend pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1) {
         assert(b1 > 0);  // divmod not well-defined for b < 0.
- 
+
         long long norm = BASE / (b1.a.back() + 1);
         BigInt a = a1.abs() * norm;
         BigInt b = b1.abs() * norm;
         BigInt q = 0, r = 0;
         q.a.resize(a.a.size());
- 
+
         for (int i = a.a.size() - 1; i >= 0; i--) {
             r *= BASE;
             r += a.a[i];
@@ -234,7 +252,7 @@ struct BigInt {
             }
             q.a[i] = d;
         }
- 
+
         q.sign = a1.sign * b1.sign;
         r.sign = a1.sign;
         q.trim();
@@ -244,13 +262,14 @@ struct BigInt {
         return res;
     }
     BigInt operator/(const BigInt &v) const {
+        if (v < 0) return divmod(-*this, -v).first;
         return divmod(*this, v).first;
     }
- 
+
     BigInt operator%(const BigInt &v) const {
         return divmod(*this, v).second;
     }
- 
+
     void operator/=(int v) {
         assert(v > 0);  // operator / not well-defined for v <= 0.
         if (llabs(v) >= BASE) {
@@ -266,10 +285,10 @@ struct BigInt {
         }
         trim();
     }
- 
+
     BigInt operator/(int v) const {
         assert(v > 0);  // operator / not well-defined for v <= 0.
- 
+
         if (llabs(v) >= BASE) {
             return *this / BigInt(v);
         }
@@ -280,7 +299,7 @@ struct BigInt {
     void operator/=(const BigInt &v) {
         *this = *this / v;
     }
- 
+
     long long operator%(long long v) const {
         assert(v > 0);  // operator / not well-defined for v <= 0.
         assert(v < BASE);
@@ -289,7 +308,7 @@ struct BigInt {
             m = (a[i] + m * (long long) BASE) % v;
         return m * sign;
     }
- 
+
     void operator*=(int v) {
         if (llabs(v) >= BASE) {
             *this *= BigInt(v);
@@ -320,7 +339,7 @@ struct BigInt {
         }
         trim();
     }
- 
+
     BigInt operator*(int v) const {
         if (llabs(v) >= BASE) {
             return *this * BigInt(v);
@@ -329,7 +348,7 @@ struct BigInt {
         res *= v;
         return res;
     }
- 
+
     // Convert BASE 10^old --> 10^new.
     static vector<int> convert_base(const vector<int> &a, int old_digits, int new_digits) {
         vector<long long> p(max(old_digits, new_digits) + 1);
@@ -353,54 +372,54 @@ struct BigInt {
             res.pop_back();
         return res;
     }
- 
-    void fft(vector<complex<double> > & a, bool invert) const {
-        int n = (int) a.size();
- 
+
+    void fft(vector<complex<double> > &x, bool invert) const {
+        int n = (int) x.size();
+
         for (int i = 1, j = 0; i < n; ++i) {
             int bit = n >> 1;
             for (; j >= bit; bit >>= 1)
                 j -= bit;
             j += bit;
             if (i < j)
-                swap(a[i], a[j]);
+                swap(x[i], x[j]);
         }
- 
+
         for (int len = 2; len <= n; len <<= 1) {
             double ang = 2 * 3.14159265358979323846 / len * (invert ? -1 : 1);
             complex<double> wlen(cos(ang), sin(ang));
             for (int i = 0; i < n; i += len) {
                 complex<double> w(1);
                 for (int j = 0; j < len / 2; ++j) {
-                    complex<double> u = a[i + j];
-                    complex<double> v = a[i + j + len / 2] * w;
-                    a[i + j] = u + v;
-                    a[i + j + len / 2] = u - v;
+                    complex<double> u = x[i + j];
+                    complex<double> v = x[i + j + len / 2] * w;
+                    x[i + j] = u + v;
+                    x[i + j + len / 2] = u - v;
                     w *= wlen;
                 }
             }
         }
         if (invert)
             for (int i = 0; i < n; ++i)
-                a[i] /= n;
+                x[i] /= n;
     }
- 
-    void multiply_fft(const vector<int> &a, const vector<int> &b, vector<int> &res) const {
-        vector<complex<double> > fa(a.begin(), a.end());
-        vector<complex<double> > fb(b.begin(), b.end());
+
+    void multiply_fft(const vector<int> &x, const vector<int> &y, vector<int> &res) const {
+        vector<complex<double> > fa(x.begin(), x.end());
+        vector<complex<double> > fb(y.begin(), y.end());
         int n = 1;
-        while (n < (int) max(a.size(), b.size()))
+        while (n < (int) max(x.size(), y.size()))
             n <<= 1;
         n <<= 1;
         fa.resize(n);
         fb.resize(n);
- 
+
         fft(fa, false);
         fft(fb, false);
         for (int i = 0; i < n; ++i)
             fa[i] *= fb[i];
         fft(fa, true);
- 
+
         res.resize(n);
         long long carry = 0;
         for (int i = 0; i < n; ++i) {
@@ -409,7 +428,7 @@ struct BigInt {
             res[i] = t % 1000;
         }
     }
- 
+
     BigInt mul_simple(const BigInt &v) const {
         BigInt res;
         res.sign = sign * v.sign;
@@ -424,9 +443,9 @@ struct BigInt {
         res.trim();
         return res;
     }
- 
+
     typedef vector<long long> vll;
- 
+
     static vll karatsubaMultiply(const vll &a, const vll &b) {
         int n = a.size();
         vll res(n + n);
@@ -436,27 +455,27 @@ struct BigInt {
                     res[i + j] += a[i] * b[j];
             return res;
         }
- 
+
         int k = n >> 1;
         vll a1(a.begin(), a.begin() + k);
         vll a2(a.begin() + k, a.end());
         vll b1(b.begin(), b.begin() + k);
         vll b2(b.begin() + k, b.end());
- 
+
         vll a1b1 = karatsubaMultiply(a1, b1);
         vll a2b2 = karatsubaMultiply(a2, b2);
- 
+
         for (int i = 0; i < k; i++)
             a2[i] += a1[i];
         for (int i = 0; i < k; i++)
             b2[i] += b1[i];
- 
+
         vll r = karatsubaMultiply(a2, b2);
         for (int i = 0; i < (int) a1b1.size(); i++)
             r[i] -= a1b1[i];
         for (int i = 0; i < (int) a2b2.size(); i++)
             r[i] -= a2b2[i];
- 
+
         for (int i = 0; i < (int) r.size(); i++)
             res[i + k] += r[i];
         for (int i = 0; i < (int) a1b1.size(); i++)
@@ -465,19 +484,19 @@ struct BigInt {
             res[i + n] += a2b2[i];
         return res;
     }
- 
+
     BigInt mul_karatsuba(const BigInt &v) const {
-        vector<int> a6 = convert_base(this->a, BASE_DIGITS, 6);
-        vector<int> b6 = convert_base(v.a, BASE_DIGITS, 6);
-        vll a(a6.begin(), a6.end());
-        vll b(b6.begin(), b6.end());
-        while (a.size() < b.size())
-            a.push_back(0);
-        while (b.size() < a.size())
-            b.push_back(0);
-        while (a.size() & (a.size() - 1))
-            a.push_back(0), b.push_back(0);
-        vll c = karatsubaMultiply(a, b);
+        vector<int> x6 = convert_base(this->a, BASE_DIGITS, 6);
+        vector<int> y6 = convert_base(v.a, BASE_DIGITS, 6);
+        vll x(x6.begin(), x6.end());
+        vll y(y6.begin(), y6.end());
+        while (x.size() < y.size())
+            x.push_back(0);
+        while (y.size() < x.size())
+            y.push_back(0);
+        while (x.size() & (x.size() - 1))
+            x.push_back(0), y.push_back(0);
+        vll c = karatsubaMultiply(x, y);
         BigInt res;
         res.sign = sign * v.sign;
         long long carry = 0;
@@ -490,7 +509,7 @@ struct BigInt {
         res.trim();
         return res;
     }
- 
+
     void operator*=(const BigInt &v) {
         *this = *this * v;
     }
@@ -499,7 +518,7 @@ struct BigInt {
         if (a.size() > 500111 || v.a.size() > 500111) return mul_fft(v);
         return mul_karatsuba(v);
     }
- 
+
     BigInt mul_fft(const BigInt& v) const {
         BigInt res;
         res.sign = sign * v.sign;
@@ -508,7 +527,7 @@ struct BigInt {
         res.trim();
         return res;
     }
- 
+
     // -------------------- Misc --------------------
     BigInt abs() const {
         BigInt res = *this;
@@ -521,37 +540,37 @@ struct BigInt {
         if (a.empty())
             sign = 1;
     }
- 
+
     bool isZero() const {
         return a.empty() || (a.size() == 1 && !a[0]);
     }
- 
+
     friend BigInt gcd(const BigInt &a, const BigInt &b) {
         return b.isZero() ? a : gcd(b, a % b);
     }
     friend BigInt lcm(const BigInt &a, const BigInt &b) {
         return a / gcd(a, b) * b;
     }
- 
+
     friend BigInt sqrt(const BigInt &a1) {
         BigInt a = a1;
         while (a.a.empty() || a.a.size() % 2 == 1)
             a.a.push_back(0);
- 
+
         int n = a.a.size();
- 
+
         int firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
         int norm = BASE / (firstDigit + 1);
         a *= norm;
         a *= norm;
         while (a.a.empty() || a.a.size() % 2 == 1)
             a.a.push_back(0);
- 
+
         BigInt r = (long long) a.a[n - 1] * BASE + a.a[n - 2];
         firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
         int q = firstDigit;
         BigInt res;
- 
+
         for(int j = n / 2 - 1; j >= 0; j--) {
             for(; ; --q) {
                 BigInt r1 = (r - (res * 2 * BigInt(BASE) + q) * q) * BigInt(BASE) * BigInt(BASE) + (j > 0 ? (long long) a.a[2 * j - 1] * BASE + a.a[2 * j - 2] : 0);
@@ -562,7 +581,7 @@ struct BigInt {
             }
             res *= BASE;
             res += q;
- 
+
             if (j > 0) {
                 int d1 = res.a.size() + 2 < r.a.size() ? r.a[res.a.size() + 2] : 0;
                 int d2 = res.a.size() + 1 < r.a.size() ? r.a[res.a.size() + 1] : 0;
@@ -570,10 +589,9 @@ struct BigInt {
                 q = ((long long) d1 * BASE * BASE + (long long) d2 * BASE + d3) / (firstDigit * 2);
             }
         }
- 
+
         res.trim();
         return res / norm;
     }
 };
-
-int main() {}
+// }}}
