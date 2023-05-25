@@ -1,5 +1,12 @@
-/* IDK if this works */
-
+/**
+ * Author: Siyong Huang
+ * Date: 2023-05-01
+ * License: CC0
+ * Source: My head
+ * Description: what it says
+ * Usage: just do it
+ * Status: prob works
+ */
 #include <vector>
 
 template<int B = 20>

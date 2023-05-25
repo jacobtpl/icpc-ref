@@ -3,7 +3,7 @@
  * Date: 2023-05-01
  * License: CC0
  * Source: My head
- * Description: Basic operations on square matrices.
+ * Description: what it says
  * Usage: just do it
  * Status: prob works
  */

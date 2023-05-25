@@ -1,3 +1,12 @@
+/**
+ * Author: Siyong Huang
+ * Date: 2023-05-01
+ * License: CC0
+ * Source: My head
+ * Description: what it says
+ * Usage: just do it
+ * Status: prob works
+ */
 // NOTE:
 // - Base 10^k. If need base 2^k, see submissions in:
 //   https://www.spoj.com/problems/PBBN2/     (>= 0 only, operations: *, power, xor)
