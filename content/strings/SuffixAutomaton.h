@@ -1,10 +1,14 @@
+/**
+ * Author: Siyong Huang
+ * Date: 2023-05-01
+ * License: CC0
+ * Source: My head
+ * Description: what it says
+ * Usage: just do it
+ * Status: not super optimized
+ */
 #include <vector>
 #include <map>
-
-/**
- * Not super optimized code
- */
-
 struct SA
 {
 public:
