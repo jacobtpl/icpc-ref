@@ -1,17 +1,16 @@
+/**
+ * Author: Siyong Huang
+ * Date: 2023-05-01
+ * License: CC0
+ * Source: My head
+ * Description: Basic operations on square matrices.
+ * Usage: just do it
+ * Status: prob works
+ */
 #define USE_POINTER
+#include <bits/stdc++.h>
 
 #ifdef USE_POINTER
-
-#include <cstdio>
-#include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <cassert>
-#include <ostream>
-#include <vector>
-#include <tuple>
-#include <array>
-
 // Sequence BBST (Implementation)
 struct AVL
 {
@@ -325,17 +324,6 @@ int main()
 /*
  * Pointer implementation
  */
-
-#include <cstdio>
-#include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <cassert>
-#include <ostream>
-#include <vector>
-#include <tuple>
-#include <array>
-
 template<typename T> bool ckmax(T& a, T const& b) {return b>a?a=b:1;}
 template<typename T> bool ckmin(T& a, T const& b) {return b<a?a=b:1;}
 
