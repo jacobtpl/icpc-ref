@@ -23,11 +23,11 @@ struct treap {
 		sub[0]=0;
 	}
 	bool suck(int a, int b) {
-        return rand() * (sub[a]+sub[b]) < sub[a] * RAND_MAX;
-    }
-    ll bigrand() {
-    	return rand()*RAND_MAX + rand();
-    }
+		return rand() * (sub[a]+sub[b]) < sub[a] * RAND_MAX;
+	}
+	ll bigrand() {
+		return rand()*RAND_MAX + rand();
+	}
 	void alloc(int &x,ll _v) {
 		c[cur][0]=c[cur][1]=0;
 		sub[cur]=1;
@@ -115,7 +115,7 @@ struct treap {
 	void output(int x) {
 		if (c[x][0]) output(c[x][0]);
 		printf("(%lld, %lld to %lld %lld) ", 
-v[x],mv[x],v[c[x][0]],v[c[x][1]]);
+				v[x],mv[x],v[c[x][0]],v[c[x][1]]);
 		if (c[x][1]) output(c[x][1]);
 	}
 };

@@ -1,13 +1,3 @@
-#include <cstdio>
-#include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <cassert>
-#include <ostream>
-#include <vector>
-#include <tuple>
-#include <array>
-
 struct AVL
 {
 public:
