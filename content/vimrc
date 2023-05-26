@@ -11,8 +11,8 @@ set undodir=~/.vim/undodir
 map <Tab> <Esc>
 imap <Tab> <Esc>
 
-autocmd FileType cpp nmap <F8> :w <Bar> !g++-12 -std=c++20 -DLOCAL %<CR>
-autocmd FileType cpp nmap <F9> :w <Bar> !g++-12 -std=c++20 -DLOCAL % && ./a.out<CR>
+autocmd FileType cpp nmap <F8> :w <Bar> !g++-13 -std=c++20 -DLOCAL %<CR>
+autocmd FileType cpp nmap <F9> :w <Bar> !g++-13 -std=c++20 -DLOCAL % && ./a.out<CR>
 
 " Optional
 set foldmethod=syntax
@@ -28,8 +28,8 @@ set backspace=indent,eol,start " fix bug where u cant backspace at EOL
 set notermguicolors
 
 " IDK why you will ever use these
-autocmd FileType c nmap <F8> :w <Bar> !gcc-12 -DLOCAL -w %<CR>
-autocmd FileType c nmap <F9> :w <Bar> !gcc-12 -DLOCAL -w % && ./a.out<CR>
+autocmd FileType c nmap <F8> :w <Bar> !gcc-13 -DLOCAL -w %<CR>
+autocmd FileType c nmap <F9> :w <Bar> !gcc-13 -DLOCAL -w % && ./a.out<CR>
 
 autocmd Syntax python set autoindent smartindent nocindent
 autocmd FileType python set sw=4 ts=4 sts=4 expandtab
