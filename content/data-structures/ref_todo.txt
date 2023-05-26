@@ -1,5 +1,4 @@
 todo:
-make rope ref
 
 test fenwicks
 decide on treap

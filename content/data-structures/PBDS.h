@@ -1,3 +1,12 @@
+/**
+ * Author: Jacob
+ * Date: back in the day
+ * License: CC0
+ * Source: me
+ * Description: examples for PBDS BBST, mergeable heaps and rope.
+ * Time: O(\log N)
+ * Status: tested
+ */
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
