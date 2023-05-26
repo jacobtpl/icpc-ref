@@ -10,21 +10,21 @@
 
 #pragma once
 
-#define POOL 3000000
 #define DEFAULT 0ll
-#define ll long long
-ll func(ll a, ll b) { return max(a,b); } // associative func
+ll func(ll a, ll b) {return max(a, b);} // associative func
 struct SegTree2D {
-	int l[POOL],r[POOL],b[POOL],e[POOL],st[POOL],R,C,cur=1,root;
-	ll v[POOL];
-	inline int mid(int x,int y) {
-		return ((x+y)>>1);
+	int R,C,root;
+	vector<int> l,r,b,e,st;
+	vector<ll> v;
+	inline int mid(int x,int y) {return ((x+y)>>1);}
+	SegTree2D(int _R,int _C):R(_R),C(_C) {
+		l.pb(0),r.pb(0),b.pb(0),e.pb(0),st.pb(0),v.pb(DEFAULT);
+		R=_R;
+		root=alloc2(0,R-1);
 	}
 	int alloc(int _b,int _e,ll _v) {
-		b[cur]=_b;
-		e[cur]=_e;
-		v[cur]=_v;
-		return cur++;
+		l.pb(0),r.pb(0),b.pb(_b),e.pb(_e),st.pb(0),v.pb(_v);
+		return sz(b)-1;
 	}
 	void lca(int b,int e,int ob,int oe,int i,int &nb,int &ne) {
 		int m=mid(b,e);
@@ -75,11 +75,9 @@ struct SegTree2D {
 		return func(query1(l[x],qb,qe),query1(r[x],qb,qe));
 	}
 	int alloc2(int _b,int _e) {
-		int ret=cur++;
-		b[ret]=_b;
-		e[ret]=_e;
-		st[ret]=alloc(0,C-1,DEFAULT);
-		return ret;
+		int newnode = alloc(0,C-1,DEFAULT);
+		l.pb(0),r.pb(0),b.pb(_b),e.pb(_e),v.pb(DEFAULT),st.pb(newnode);
+		return sz(b)-1;
 	}
 	void update2(int x,int i,int j,ll nv) {
 		if (b[x]>i||e[x]<i) return;
@@ -100,11 +98,6 @@ struct SegTree2D {
 		if (b[x]>re||e[x]<rb) return DEFAULT;
 		if (b[x]>=rb&&e[x]<=re) return query1(st[x],cb,ce);
 		return func(query2(l[x],rb,re,cb,ce),query2(r[x],rb,re,cb,ce));
-	}
-	SegTree2D(int _R,int _C) {
-		R=_R;
-		C=_C;
-		root=alloc2(0,R-1);
 	}
 	void update(int p,int q,ll k) {update2(root,p,q,k);}
 	ll query(int p,int q,int u,int v) {return query2(root,p,u,q,v);}
