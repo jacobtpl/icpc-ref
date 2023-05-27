@@ -17,6 +17,7 @@
 #define beg(x) x.begin()
 #define en(x) x.end()
 #define all(x) beg(x), en(x)
+#define resz resize
 
 template<class T> void ckmin(T &a, T b) { a = min(a, b); }
 template<class T> void ckmax(T &a, T b) { a = max(a, b); }
