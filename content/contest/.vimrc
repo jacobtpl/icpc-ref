@@ -1,6 +1,6 @@
-set ts=2 sw=2 ai cin cino=g0 nu rnu cul ru nowrap wmnu sc
-set udf udir=~/.vim/udir is bs=indent,eol,start
+set ts=2 sw=2 ai cin nu rnu udf udir=~/.vim/udir 
 sy on | map <tab> <esc> | imap <tab> <esc>
+set cul ru nowrap wmnu sc is bs=indent,eol,start cino=g0
 " Select region and then type :Hash to hash your selection.
 " Useful for verifying that there aren't mistypes.
 ca Hash w !cpp-11 -dD -P -fpreprocessed \| tr -d '[:space:]' \
