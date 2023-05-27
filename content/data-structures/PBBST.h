@@ -1,7 +1,13 @@
+/**
+ * Author: Siyong
+ * Date: 2023-05-25
+ * License: CC0
+ * Source: me
+ * Description: Persistent AVL tree with split
+ * Time: O(\log N)
+ */
 struct PAVL {
-public:
 	struct Node {
-	public:
 		int t;
 		int s, h; /* Customize */
 		std::array<int, 2> c;
@@ -11,7 +17,6 @@ public:
 		void up() {}; /* Customize */
 		void down() {};
 	};
-private:
 	static std::vector<Node> N;
 	static int T;
 	static int clone(int n) {
@@ -69,7 +74,6 @@ private:
 		return merge_root(l, clone(x), nr);
 	}
 	PAVL(int v) : root(v) {}
-public:
 	int root;
 	PAVL() : root(-1) {}
 	PAVL(Node&& n) : root(N.size()) { N.push_back(n); }

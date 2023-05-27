@@ -1,3 +1,11 @@
+/**
+ * Author: Siyong
+ * Date: 2023-05-25
+ * License: CC0
+ * Source: me
+ * Description: AVL tree with split (maintaining a sequence)
+ * Time: O(\log N)
+ */
 struct AVL {
 public:
 	struct Node {
