@@ -72,6 +72,7 @@ Node* remove(Node* t, int pos) {
 	return merge(pa.first, pb.second);
 }
 // Example application: move the range [l, r) to index k
+/*
 void move(Node*& t, int l, int r, int k) {
 	Node *a, *b, *c;
 	tie(a,b) = split(t, l); tie(b,c) = split(b, r - l);
@@ -79,3 +80,4 @@ void move(Node*& t, int l, int r, int k) {
 	if (k <= l) t = merge(ins(a, b, k), c);
 	else t = merge(a, ins(c, b, k - r));
 }
+*/
