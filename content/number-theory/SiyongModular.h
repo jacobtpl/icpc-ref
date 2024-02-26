@@ -12,14 +12,14 @@ struct mint {
 	int v;
 	explicit operator int() {return v;}
 	mint(): v(0) {}
-	mint(auto z): {
+	mint(auto z) {
 		z %= MOD;
 		if (z < 0) z += MOD;
 		v = z;
 	}
-	mint invert(mint a) {
+	friend mint invert(mint a) {
 		ll x, y, g = euclid(a.v, MOD, x, y);
-		assert(g == 1); return mint((x + MOD) % MOD);
+		assert(g == 1); return mint(x);
 	}
 	mint& operator+= (mint const& o) {if((v+=o.v)>=MOD) v-=MOD; return *this;}
 	mint& operator-= (mint const& o) {if((v-=o.v)<0) v+=MOD; return *this;}
