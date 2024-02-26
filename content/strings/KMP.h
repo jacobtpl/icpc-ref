@@ -24,3 +24,14 @@ vi match(const string& s, const string& pat) {
 		if (p[i] == sz(pat)) res.push_back(i - 2 * sz(pat));
 	return res;
 }
+vi match2(const string& s, const string& pat) { // only compute pi for pat
+	vi p = pi(pat), res;
+	int cp = 0;
+	rep(i,1,sz(s)) {
+		int g = cp;
+		while (g && s[i] != pat[g]) g = p[g-1];
+		cp = g + (s[i] == pat[g]);
+		if (cp >= sz(pat)) res.push_back(i - sz(pat) + 1);
+	}
+	return res;
+}

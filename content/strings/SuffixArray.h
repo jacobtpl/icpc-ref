@@ -18,7 +18,7 @@
 #pragma once
 
 struct SuffixArray {
-	vi sa, lcp;
+	vi sa, lcp; // sa[0] is empty str, size is n+1, lcp[i] is of sa[i] and sa[i-1]
 	SuffixArray(string& s, int lim=256) { // or basic_string<int>
 		int n = sz(s) + 1, k = 0, a, b;
 		vi x(all(s)+1), y(n), ws(max(n, lim)), rank(n);
@@ -39,4 +39,6 @@ struct SuffixArray {
 			for (k && k--, j = sa[rank[i] - 1];
 					s[i + k] == s[j + k]; k++);
 	}
+	// total unique substrings = (n+1 C 2)- sum(lcp)
+	// TODO: bsearch for match
 };
