@@ -25,5 +25,4 @@ vector<pair<P, P>> tangents(P c1, double r1, P c2, double r2) {
 		out.push_back({c1 + v * r1, c2 + v * r2});
 	}
 	if (h2 == 0) out.pop_back();
-	return out;
-}
+	return out; }

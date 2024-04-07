@@ -29,5 +29,4 @@ double circlePoly(P c, double r, vector<P> ps) {
 	auto sum = 0.0;
 	rep(i,0,sz(ps))
 		sum += tri(ps[i] - c, ps[(i + 1) % sz(ps)] - c);
-	return sum;
-}
+	return sum; }

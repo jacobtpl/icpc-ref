@@ -18,5 +18,4 @@ bool circleInter(P a,P b,double r1,double r2,pair<P, P>* out) {
 	if (sum*sum < d2 || dif*dif > d2) return false;
 	P mid = a + vec*p, per = vec.perp() * sqrt(fmax(0, h2) / d2);
 	*out = {mid + per, mid - per};
-	return true;
-}
+	return true; }
