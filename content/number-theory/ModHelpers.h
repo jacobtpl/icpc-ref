@@ -1,3 +1,10 @@
+/**
+ * Author: Siyong
+ * Date: April 6, 2024
+ * Description: Computes inv, fact, ifact
+ * Status: Tested many many times
+ * Time: O(N)
+ */
 #include "SiyongModular.h"
 
 int const MV = 2e6 + 10;

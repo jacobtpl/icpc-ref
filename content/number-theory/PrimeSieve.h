@@ -7,15 +7,15 @@
  * Status: kinda tested
  */
 int const LIM = 1e7+5;
-std::vector<bool> cp;
-std::vector<int> pr, nx, lp, cnt;
+vector<bool> cp;
+vi pr, nx, lp, cnt;
 void sieve()
 {
 	cp.assign(LIM, 0), nx.assign(LIM, -1), lp.assign(LIM, -1), cnt.assign(LIM, -1);
 	for(int i=2;i<LIM;++i) {
 		if(!cp[i])
 			lp[i] = pr.size(), nx[i] = cnt[i] = 1, pr.push_back(i);
-		for(int j=0,k;j<pr.size() && (k=i*pr[j])<LIM;++j) { // overflow warning?
+		for(int j=0,k;j<pr.size() && (k=i*pr[j])<LIM;++j) { // pr[j]<(LIM+i-1)/i, if there's overflow
 			cp[k] = 1, lp[k] = j;
 			if(j == lp[i]) {
 				nx[k] = nx[i], cnt[k] = cnt[i]+1; break;

@@ -1,5 +1,10 @@
-using ll = long long;
-
+/**
+ * Author: Siyong
+ * Date: April 6, 2024
+ * Description: Modular class
+ * Status: Tested many many times
+ * Time: Faster than kactl mod. Slower than using ll directly
+ */
 int const MOD = 998244353;
 
 ll euclid(ll a, ll b, ll &x, ll &y) {
