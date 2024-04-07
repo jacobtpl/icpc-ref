@@ -19,7 +19,7 @@ struct node {
 		return -1;
 	}
 	bool isroot() { return state()==-1; }
-	node* prop() {
+	node* prop() { // propagate rev, pushdown
 		if (rev) {
 			rev=0;
 			swap(c[0],c[1]);
@@ -28,7 +28,7 @@ struct node {
 		}
 		return this;
 	}
-	void set() {
+	void set() { // update any subtrees, pullup
 		subv=v;
 		if (c[0]) subv+=c[0]->subv;
 		if (c[1]) subv+=c[1]->subv;
@@ -74,9 +74,7 @@ void access(node *x) {
 	}
 	x->splay();
 }
-void evert(node *x) {
-	access(x); x->rev^=1;
-}
+void evert(node *x) {access(x); x->rev^=1;}
 void link(node *x,node *y) {
 	evert(x); access(x); access(y);
 	y->c[1]=x; x->p=y; y->set();
@@ -85,12 +83,6 @@ void cut(node *x,node *y) {
 	evert(y); access(x); access(y);
 	x->p=NULL;
 }
-node* find_root(node *x) {
-	access(x); return x->find_min();
-}
-void update(node *x, ll v) {
-	access(x); x->v += v; x->splay();
-}
-ll query(node *x, node *y) {
-	evert(x); access(y); return y->subv;
-}
+node* find_root(node *x) {access(x); return x->find_min();}
+void update(node *x, ll v) {access(x); x->v += v; x->splay();}
+ll query(node *x, node *y) {evert(x); access(y); return y->subv;}
