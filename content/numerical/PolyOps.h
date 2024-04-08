@@ -1,9 +1,7 @@
 /**
- * Description: Basic poly ops including division. Can replace \texttt{T} with double, complex.
- * Source: Own. Also see
-	* https://github.com/kth-competitive-programming/kactl/blob/master/content/numerical/PolyInterpolate.h
-	* https://github.com/ecnerwala/icpc-book/blob/master/content/numerical/fft.cpp
- * Verification: see FFT
+ * Author: jacobtpl, Benq
+ * Date: 2024
+ * Description: Operations on formal power series
  */
 int const RT = 5;
 using T = mint;
@@ -55,24 +53,6 @@ poly operator*(const poly& l, const poly& r) {
 	return x;
 }
 poly& operator*=(poly& l, const poly& r) { return l = l*r; }
-
-/**
- * Description: computes $A^{-1}$ such that $AA^{-1}\equiv 1\pmod{x^n}$.
- 	* Newton's method: If you want $F(x)=0$ and $F(Q_k)\equiv 0\pmod{x^a}$
- 	* then $Q_{k+1}=Q_k-\frac{F(Q_k)}{F'(Q_k)}\pmod{x^{2a}}$ satisfies
- 	* $F(Q_{k+1})\equiv 0 \pmod{x^{2a}}$. Application: if $f(n),g(n)$ are the
- 	* \#s of forests and trees on $n$ nodes then 
- 	* $\sum_{n=0}^{\infty}f(n)x^n=\exp\left(\sum_{n=1}^{\infty}\frac{g(n)}{n!}\right)$.
- * Time: $O(N\log N)$. For $N=5\cdot 10^5$, inv\tilde 270ms, log \tilde 350ms, exp\tilde 550ms
- * Source: CF, http://people.csail.mit.edu/madhu/ST12/scribe/lect06.pdf
- 	* https://cp-algorithms.com/algebra/polynomial.html
- * Usage: vmi v{1,5,2,3,4}; ps(exp(2*log(v,9),9)); // squares v
- * Verification: https://codeforces.com/contest/438/problem/E
- 	* https://codeforces.com/gym/102028/submission/77687049
- 	* https://loj.ac/problem/6703 (MultipointEval)
- 	* https://judge.yosupo.jp/submission/112694
- 	* https://judge.yosupo.jp/submission/112695
- */
 
 void fft(vector<T>& A, bool inverse = 0) { // NTT
 	int n = sz(A); assert((MOD-1)%n == 0); vector<T> B(n);
@@ -140,4 +120,24 @@ poly pow(poly A, ll b, int n) {
     r.insert(r.begin(), t*b, mint(0));
     r.resize(n);
     return r;
+}
+poly mod(const poly& f, const poly& g) { return quoRem(f,g).second; }
+poly xkmodf(ll k, poly f) {
+    poly r{1}, a{0,1};
+    for(;k;k>>=1) {
+        if(k&1) r = mod(conv(r,a), f);
+        a = mod(conv(a,a), f);
+    }
+    return r;
+}
+// solve recurrence with initial vals s[0], s[1]... s[n-1]
+// a[k] = c[1]*a[k-1] + c[2]*a[k-2] + ... c[n]*a[k-n]
+mint solve_linrec(vector<mint> s, vector<mint> c, int n, ll k) {
+    poly f(n+1, 0);
+    f[n] = 1;
+    for (int i=0;i<n;i++) f[i] = mint(-c[n-i]);
+    poly r = xkmodf(k, f); r.resize(n);
+    mint ans(0);
+    for (int i = 0; i < n; i++) ans += r[i] * mint(s[i]);
+    return ans;
 }
