@@ -2,7 +2,7 @@
  * Author: Benq
  * Date: Unknown
  * Description: Computes the Delaunay triangulation of a set of points.
- *  Each circumcircle contains none of the input points.
+ * Each circumcircle contains none of the input points.
  * Time: O(hull3d)
  * Status: https://dmoj.ca/problem/cco08p6
  */
