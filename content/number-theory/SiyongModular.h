@@ -34,6 +34,8 @@ struct mint {
 	friend mint operator* (mint a, mint const& b) {return a*=b;}
 	friend mint operator/ (mint const& a, mint const& b) {return a*invert(b);}
 
+	mint operator- () {return mint(-v);}
+
 	friend mint pow(mint a, auto b) {
 		mint r(1);
 		for(;b;b>>=1, a*=a)
