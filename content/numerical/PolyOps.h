@@ -6,7 +6,7 @@
 int const RT = 5;
 using T = mint;
 using poly = vector<mint>;
-void remz(poly& p) { while (sz(p)&&p.back()==T(0)) p.pop_back(); }
+void remz(poly& p) { while (sz(p)&&p.back().v==0) p.pop_back(); }
 poly REMZ(poly p) { remz(p); return p; }
 poly rev(poly p) { reverse(all(p)); return p; }
 poly shift(poly p, int x) { 
