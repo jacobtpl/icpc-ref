@@ -2,7 +2,7 @@
  * Author: Siyong
  * Date: April 6, 2024
  * Description: Boilerplate centroid decomp code
- * Status: Not tested
+ * Status: Tested by Jacob on Xenia and Tree
  * Time: O(N\log N)
  */
 
@@ -29,8 +29,7 @@ struct Centroid {
 		int c = find(start, dfs(start));
 		// Do stuff with c. Just remember to check both (x != p && !rem[x])
 		rem[c]=1;
-		for(int x:adj[c]) if(!rem[x])
-		{
+		for(int x:adj[c]) if(!rem[x]) {
 			int v = cent(x);
 			par[v] = {c, sz(links[c])};
 			links[c].push_back(v);
