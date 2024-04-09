@@ -40,5 +40,23 @@ struct SuffixArray {
 					s[i + k] == s[j + k]; k++);
 	}
 	// total unique substrings = (n+1 C 2)- sum(lcp)
-	// TODO: bsearch for match
+	pair<int,int> search(string &t) {
+		int b=1,e=sz(sa)-1;
+		while (b<e) {
+			int m=(b+e)/2;
+			if (s.compare(sa[m], sz(t), t) >= 0) e = m;
+			else b = m+1;
+		}
+		if (s.compare(sa[b], sz(t), t) != 0) return mp(-1,-1);
+		pair<int,int> ans{b,-1};
+		b=1,e=sz(sa)-1;
+		while (b<e) {
+			int m=(b+e)/2;
+			if (s.compare(sa[m], sz(t), t) > 0) e = m;
+			else b = m+1;
+		}
+		if (s.compare(sa[b], sz(t), t) != 0) e--;
+		ans.second = e;
+		return ans;
+	}
 };
