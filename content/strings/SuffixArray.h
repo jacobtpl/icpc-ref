@@ -39,12 +39,13 @@ struct SuffixArray {
 			for (k && k--, j = sa[rank[i] - 1];
 					s[i + k] == s[j + k]; k++);
 	}
-	// total unique substrings = (n+1 C 2)- sum(lcp)
+	// total unique substrings = (n+1 C 2) - sum(lcp)
+	// string search in O(m log n). returns [l,r] of matches in sa.
 	pair<int,int> search(string &t) {
 		int b=1,e=sz(sa)-1;
 		while (b<e) {
 			int m=(b+e)/2;
-			if (s.compare(sa[m], sz(t), t) >= 0) e = m;
+			if (s.compare(sa[m], sz(t), t) >= 0) e = m; // not strict
 			else b = m+1;
 		}
 		if (s.compare(sa[b], sz(t), t) != 0) return mp(-1,-1);
@@ -52,7 +53,7 @@ struct SuffixArray {
 		b=1,e=sz(sa)-1;
 		while (b<e) {
 			int m=(b+e)/2;
-			if (s.compare(sa[m], sz(t), t) > 0) e = m;
+			if (s.compare(sa[m], sz(t), t) > 0) e = m; // strict
 			else b = m+1;
 		}
 		if (s.compare(sa[b], sz(t), t) != 0) e--;
