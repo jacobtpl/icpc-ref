@@ -8,8 +8,8 @@
  * Status: not super optimized
  */
 struct SA {
-	std::vector<std::map<char, int> > adj;
-	std::vector<int> link, dis;
+	vector<map<char, int> > adj;
+	vi link, dis;
 	int N;
 	SA(): adj(1), link(1, -1), dis(1, 0), N(1) {}
 	int new_node(int v=-1) {
@@ -45,7 +45,7 @@ struct SA {
 			link[n] = go(p, c);
 		return n;
 	}
-	int add(std::string const &s) {
+	int add(string const &s) {
 		int n = 0;
 		for(char c: s)
 			n = append(n, c);
