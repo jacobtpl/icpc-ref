@@ -14,7 +14,7 @@
  	* https://en.wikipedia.org/wiki/Nimber
  	* https://judge.yosupo.jp/submission/6485
  * Time: $64^2$ xors per multiplication, memorize to speed up.
- * Verification: https://codeforces.com/gym/102341/problem/L
+ * Status: tested on https://codeforces.com/gym/102341/problem/L
  	* https://projecteuler.net/problem=459
  	* https://judge.yosupo.jp/problem/nim_product_64
  */
