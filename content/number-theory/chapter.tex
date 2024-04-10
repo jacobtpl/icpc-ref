@@ -64,3 +64,12 @@
   $ g(n) = \sum_{n|d} f(d) \Leftrightarrow f(n) = \sum_{n|d} \mu(d/n)g(d)$
 
  $ g(n) = \sum_{1 \leq m \leq n} f(\left\lfloor\frac{n}{m}\right \rfloor ) \Leftrightarrow f(n) = \sum_{1\leq m\leq n} \mu(m)g(\left\lfloor\frac{n}{m}\right\rfloor)$
+ 
+ \section{Lifting the Exponent}
+ For $n>0$, $p$ prime, and ints $x,y$ s.t. $p\nmid x,y$ and $p|x-y$:
+ % https://brilliant.org/wiki/lifting-the-exponent/
+ 
+ \begin{itemize}
+ \item $p\neq 2$ or $p=2, 4|x-y$ $\implies v_p(x^n - y^n) = v_p(x - y) + v_p(n)$.
+ \item $p=2, 2|n \implies v_2(x^n-y^n)=v_2((x^2)^{n/2}-(y^2)^{n/2})$.
+ \end{itemize}
