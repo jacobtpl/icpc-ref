@@ -3,7 +3,7 @@
  * Description: Variant on Gabow's Impl of Edmond's Blossom Algorithm. 
     * General unweighted max matching with 1-based indexing. If 
     * \texttt{white[v] = 0} after \texttt{solve()} returns, \texttt{v} is part
-    * of every max matching.
+    * of every max matching. 1-INDEXED NODES
  * Time: O(NM), faster in practice
  * Source: 
 	* https://github.com/koosaga/DeobureoMinkyuParty
@@ -17,6 +17,9 @@
  	* https://judge.yosupo.jp/problem/general_matching
  */
 
+using vb = vector<bool>;
+using pi = pair<int,int>;
+using vpi = vector<pi>;
 struct MaxMatching {
 	int N; vector<vi> adj;
 	vector<int> mate, first; vb white; vpi label;
@@ -34,7 +37,7 @@ struct MaxMatching {
 		white[st] = 1; first[st] = 0; label[st] = {0,0};
 		queue<int> q; q.push(st);
 		while (!q.empty()) {
-			int a = q.ft; q.pop(); // outer vertex
+			int a = q.front(); q.pop(); // outer vertex
 			for(auto &b:adj[a]) { assert(b);
 				if (white[b]) { // two outer vertices, form blossom
 					int x = group(a), y = group(b), lca = 0;
@@ -61,7 +64,7 @@ struct MaxMatching {
 		return false;
 	}
 	int solve() {
-		int ans = 0;
+		int ans = 0; // mate pairs node with its match, bidirectional
 		rep(st,1,N+1) if (!mate[st]) ans += augment(st);
 		rep(st,1,N+1) if (!mate[st] && !white[st]) assert(!augment(st));
 		return ans;
