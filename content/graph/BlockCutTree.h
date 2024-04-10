@@ -4,9 +4,9 @@
  * License: CC0
  * Source: folklore
  * Description: Builds the block cut tree.
- * 	BCTree node $n$ is an AP if $n >= cut$. Corresponds to who[n][0] in original graph
- * 	Node $v$ is an AP if $vmap[v] >= cut$.
- * 	$emap[i] = -1$ if edge $i$ is a bridge. Otherwise, $emap[i] = $ the BCC containing it
+ * 	BCTree node $n$ is an AP if $n >= cut$, and it corresponds to node who[n][0] in original graph.
+ * 	Node $v$ of the original graph is an AP if $vmap[v] >= cut$.
+ * 	$emap[i] = -1$ if edge $i$ is a bridge. Otherwise, $emap[i]$ is the BCC containing it.
  * Usage:
  *  see BiconnectedComponents.h
  *  edges[i] = the edge i (pair of two nodes)

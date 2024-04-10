@@ -10,14 +10,14 @@ struct PAVL {
 	struct Node {
 		int t;
 		int s, h; /* Customize */
-		std::array<int, 2> c;
+		array<int, 2> c;
 		int val;
 		Node() : t(), s(1), h(1), c{ -1, -1 } { t = T; }
 		Node(int _val) : Node() { val = _val; }
 		void up() {}; /* Customize */
 		void down() {};
 	};
-	static std::vector<Node> N;
+	static vector<Node> N;
 	static int T;
 	static int clone(int n) {
 		if (n == -1) return -1; //assert(N[n].t >= t);
@@ -27,7 +27,7 @@ struct PAVL {
 	static int gh(int n) { return n != -1 ? N[n].h : 0; }
 	static int gs(int n) { return n != -1 ? N[n].s : 0; }
 	static void up(int n) {
-		N[n].h = std::max(gh(N[n].c[0]), gh(N[n].c[1])) + 1;
+		N[n].h = max(gh(N[n].c[0]), gh(N[n].c[1])) + 1;
 		N[n].s = gs(N[n].c[0]) + gs(N[n].c[1]) + 1;
 		N[n].up();
 	}
@@ -56,7 +56,7 @@ struct PAVL {
 			return l = down(l), N[l].c[1] = merge_root(N[l].c[1], n, r), balance(l);
 		else return N[n].c = { l, r }, balance(n);
 	}
-	static std::tuple<int, int> split(int n, int k) {
+	static tuple<int, int> split(int n, int k) {
 		if (n != -1) n = down(n);
 		if (k == 0) return { -1, n };
 		if (k == N[n].s) return { n, -1 };
@@ -78,7 +78,7 @@ struct PAVL {
 	PAVL() : root(-1) {}
 	PAVL(Node&& n) : root(N.size()) { N.push_back(n); }
 	friend PAVL operator+(PAVL a, PAVL b) { return merge(a.root, b.root); }
-	std::tuple<PAVL, PAVL> split(int k) {
+	tuple<PAVL, PAVL> split(int k) {
 		auto [l, r] = split(root, k);
 		return { PAVL(l), PAVL(r) };
 	}
@@ -86,5 +86,5 @@ struct PAVL {
 	Node& get_root() { return N[root]; }
 };
 typedef PAVL::Node Node;
-std::vector<Node> PAVL::N;
+vector<Node> PAVL::N;
 int PAVL::T;
