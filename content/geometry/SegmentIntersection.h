@@ -4,7 +4,7 @@
  * License: CC0
  * Source: https://vlecomte.github.io/cp-geo.pdf
  * Description:\\
-\begin{minipage}{75mm}
+\begin{minipage}{65mm}
 If a unique intersection point between the line segments going from s1 to e1 and from s2 to e2 exists then it is returned.
 If no intersection point exists an empty vector is returned. If infinitely many exist a vector with 2 elements is returned, containing the endpoints of the common line segment.
 The wrong position will be returned if P is Point<ll> and the intersection point does not have integer coordinates.

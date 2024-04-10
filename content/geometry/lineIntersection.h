@@ -4,7 +4,7 @@
  * License: CC0
  * Source: https://vlecomte.github.io/cp-geo.pdf
  * Description:\\
-\begin{minipage}{75mm}
+\begin{minipage}{65mm}
 If a unique intersection point of the lines going through s1,e1 and s2,e2 exists \{1, point\} is returned.
 If no intersection point exists \{0, (0,0)\} is returned and if infinitely many exists \{-1, (0,0)\} is returned.
 The wrong position will be returned if P is Point<ll> and the intersection point does not have integer coordinates.

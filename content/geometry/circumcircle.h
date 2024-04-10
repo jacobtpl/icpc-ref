@@ -4,7 +4,7 @@
  * License: CC0
  * Source: http://en.wikipedia.org/wiki/Circumcircle
  * Description:\\
-\begin{minipage}{75mm}
+\begin{minipage}{65mm}
 ccRadius = radius and ccCenter = center of circle through points A, B, C.
 \end{minipage}
 \begin{minipage}{15mm}
