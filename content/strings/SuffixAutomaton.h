@@ -45,10 +45,4 @@ struct SA {
 			link[n] = go(p, c);
 		return n;
 	}
-	int add(string const &s) {
-		int n = 0;
-		for(char c: s)
-			n = append(n, c);
-		return n;
-	}
 };
