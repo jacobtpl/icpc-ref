@@ -8,7 +8,7 @@
    * Probably works with floating point too (but EPS might need to be adjusted?).
  * Time: O(N\log N)
  * Source: Own
- * Verification: 
+ * Status: tested on
 	* https://open.kattis.com/problems/bigbrother 
 	* https://icpc.kattis.com/problems/domes
 	* https://codeforces.com/gym/100962 B
