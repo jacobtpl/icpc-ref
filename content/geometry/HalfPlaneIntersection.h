@@ -17,14 +17,18 @@
 #include "Point.h"
 
 using P = Point<double>;
+using vP = vector<P>;
+const double EPS = 1e-9; // adjust as needed
+
+// -1 if lower half, 0 if origin, 1 if upper half, needs to be int type
 int half(P x) { return x.y != 0 ? sgn(x.y) : -sgn(x.x); }
 bool angleCmp(P a, P b) { int A = half(a), B = half(b);
-	return A == B ? cross(a,b) > 0 : A < B; }
+    return A == B ? a.cross(b) > 0 : A < B; }
 
 struct Ray {
 	P p, dp; // origin, direction
 	P isect(const Ray& L) const {
-		return p+dp*(cross(L.dp,L.p-p)/cross(L.dp,dp)); }
+		return p+dp*(L.dp.cross(L.p-p)/L.dp.cross(dp)); }
 	bool operator<(const Ray& L) const {
 		return angleCmp(dp,L.dp); }
 };
@@ -37,39 +41,39 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 		rays.pb({P{DX,DY},P{-1,0}});
 		rays.pb({P{0,DY},P{0,-1}});
 	}
-	sor(rays); // sort rays by angle
+	sort(all(rays)); // sort rays by angle
 	{ // remove parallel rays
 		vector<Ray> nrays;
-		each(t,rays) {
-			if (!sz(nrays) || cross(nrays.bk.dp,t.dp) > EPS) { nrays.pb(t); continue; }
+		for(auto& t: rays) {
+			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS) { nrays.pb(t); continue; }
 			// last two rays are parallel, keep only one
-			if (cross(t.dp,t.p-nrays.bk.p) > 0) nrays.bk = t;
+			if (t.dp.cross(t.p-nrays.back().p) > 0) nrays.back() = t;
 		}
 		swap(rays, nrays);
 	}
 	auto bad = [&](const Ray& a, const Ray& b, const Ray& c) {
 		P p1 = a.isect(b), p2 = b.isect(c);
-		if (dot(p2-p1,b.dp) <= EPS) { /// this EPS is required ...
-			if (cross(a.dp,c.dp) <= 0) return 2; // isect(a,b,c) = empty
+		if ((p2-p1).dot(b.dp) <= EPS) { /// this EPS is required ...
+			if (a.dp.cross(c.dp) <= 0) return 2; // isect(a,b,c) = empty
 			return 1; // isect(a,c) == isect(a,b,c)
 		}
 		return 0; // all three rays matter
 	};
 	#define reduce(t) \
 		while (sz(poly) > 1) { \
-			int b = bad(poly.at(sz(poly)-2),poly.bk,t); \
+			int b = bad(poly.at(sz(poly)-2),poly.back(),t); \
 			if (b == 2) return {}; \
 			if (b == 1) poly.pop_back(); \
 			else break; \
 		}
 	deque<Ray> poly;
-	each(t,rays) { reduce(t); poly.pb(t); }
+    for(auto& t: rays) { reduce(t); poly.pb(t); }
 	for(;;poly.pop_front()) {
 		reduce(poly[0]);
-		if (!bad(poly.bk,poly[0],poly[1])) break;
+		if (!bad(poly.back(),poly[0],poly[1])) break;
 	}
 	assert(sz(poly) >= 3); // expect nonzero area
-	vP poly_points; F0R(i,sz(poly)) 
+	vP poly_points; rep(i,0,sz(poly))
 		poly_points.pb(poly[i].isect(poly[(i+1)%sz(poly)]));
 	return poly_points;
 }
