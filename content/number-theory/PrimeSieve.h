@@ -23,17 +23,3 @@ void sieve()
 		}
 	}
 }
-/*
-int main() {
-	sieve();
-	int N; scanf("%d", &N);
-	for(int i=0;i<N;++i) {
-		int x;
-		scanf("%d", &x);
-		for(;x>1;x=nx[x])
-			for(int i=0;i<cnt[x];++i)
-				printf("%d ", pr[lp[x]]);
-		printf("\n");
-	}
-	return 0;
-}*/
