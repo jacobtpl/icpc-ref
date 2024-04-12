@@ -24,18 +24,25 @@ struct mint {
 		ll x, y, g = euclid(a.v, MOD, x, y);
 		assert(g == 1); return mint(x);
 	}
-	mint& operator+= (mint const& o) {if((v+=o.v)>=MOD) v-=MOD; return *this;}
-	mint& operator-= (mint const& o) {if((v-=o.v)<0) v+=MOD; return *this;}
-	mint& operator*= (mint const& o) {v=(ll)v*o.v%MOD; return *this;}
-	mint& operator/= (mint const& o) {return *this *= invert(o);}
+	mint& operator+= (mint const& o) {
+		if((v+=o.v)>=MOD) v-=MOD; return *this;}
+	mint& operator-= (mint const& o) {
+		if((v-=o.v)<0) v+=MOD; return *this;}
+	mint& operator*= (mint const& o) {
+		v=(ll)v*o.v%MOD; return *this;}
+	mint& operator/= (mint const& o) {
+		return *this *= invert(o);}
 
-	friend mint operator+ (mint a, mint const& b) {return a+=b;}
-	friend mint operator- (mint a, mint const& b) {return a-=b;}
-	friend mint operator* (mint a, mint const& b) {return a*=b;}
-	friend mint operator/ (mint const& a, mint const& b) {return a*invert(b);}
+	friend mint operator+ (mint a, mint const& b) {
+		return a+=b;}
+	friend mint operator- (mint a, mint const& b) {
+		return a-=b;}
+	friend mint operator* (mint a, mint const& b) {
+		return a*=b;}
+	friend mint operator/ (mint const& a, mint const& b) {
+		return a*invert(b);}
 
 	mint operator- () {return mint(-v);}
-
 	friend mint pow(mint a, auto b) {
 		mint r(1);
 		for(;b;b>>=1, a*=a)
