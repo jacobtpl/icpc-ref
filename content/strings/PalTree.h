@@ -2,9 +2,9 @@
  * Author: Benq
  * Description: trie of right-half of all palindromic substrings
  * link points to longest suffix-palindrome of node
- * oc stores # occurences after resolveOc()
- * ans[i][b]=min factorization of prefix i (1-indexed) with parity b
- * Time: O(n) construct, O(n\log n) for factorization
+ * oc stores num occurences after resolveOc()
+ * ans[i][b] is min factorization of prefix i (1-indexed) with parity b
+ * Time: O(n\log n)
  * Status: tested
  */
 struct PalTree {

@@ -15,7 +15,6 @@ void evalAll(vector<poly>& stor, poly& res, poly v, int ind = 1) {
 	if (sz(stor[ind]) == 2) { res.pb(sz(v)?v[0]:0); return; }
 	evalAll(stor,res,v,2*ind); evalAll(stor,res,v,2*ind+1);
 }
-
 // evaluate polynomial v at points in p
 poly multiEval(poly v, poly p) {
 	vector<poly> stor(4*sz(p)); segProd(stor,p,1,0,sz(p)-1);
