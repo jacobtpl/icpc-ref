@@ -3,6 +3,10 @@
  * Date: 2024
  * Description: Operations on formal power series
  */
+#pragma once
+
+#include "PolyOps.h"
+
 void fft(vector<T>& A, bool inverse = 0) { // NTT
 	int n = sz(A); assert((MOD-1)%n == 0); vector<T> B(n);
 	for(int b = n/2; b; b /= 2, swap(A,B)) { // w = n/b'th root
