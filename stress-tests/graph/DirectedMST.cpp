@@ -155,6 +155,61 @@ int main() {
 			assert(count(all(seen), 0) == 0);
 		}
 	}
+	// Multi-edges, self-loops, negative and huge weights against an
+	// exhaustive search over all parent assignments.
+	rep(it,0,100000) {
+		bumpalloc.reset();
+		int n = rand() % 6 + 1, r = rand() % n;
+		int m = rand() % 3 ? rand() % (3 * n + 1) : rand() % (n + 1);
+		int mode = rand() % 4;
+		const ll INF = LLONG_MAX;
+		vector<Edge> edges;
+		vector<vector<ll>> best(n, vector<ll>(n, INF));
+		rep(i,0,m) {
+			int a = rand() % n, b = rand() % n;
+			if (mode == 3 && rand() % 2) b = a; // extra self-loops
+			ll w = mode == 0 ? rand() % 5 : mode == 1 ? rand() % 21 - 10
+				: (ll)(rand() % 2001 - 1000) * 1000000000000LL;
+			edges.push_back({a, b, w});
+			if (a != b) best[a][b] = min(best[a][b], w);
+		}
+		ll opt = INF;
+		vi par(n, -1), cur(n);
+		function<void(int, ll)> go = [&](int v, ll sum) {
+			if (v == n) {
+				rep(i,0,n) {
+					int x = i, steps = 0;
+					while (x != r && steps++ <= n) x = par[x];
+					if (x != r) return;
+				}
+				opt = min(opt, sum);
+				return;
+			}
+			if (v == r) return go(v + 1, sum);
+			rep(p,0,n) if (best[p][v] != INF) {
+				par[v] = p;
+				go(v + 1, sum + best[p][v]);
+			}
+		};
+		go(0, 0);
+		auto pa = dmst(n, r, edges);
+		if (opt == INF) {
+			assert(pa.first == -1 && pa.second.empty());
+			continue;
+		}
+		assert(pa.first == opt && sz(pa.second) == n);
+		ll sum = 0;
+		rep(i,0,n) {
+			int p = pa.second[i];
+			if (i == r) { assert(p == -1); continue; }
+			assert(0 <= p && p < n && p != i && best[p][i] != INF);
+			sum += best[p][i];
+			int x = i, steps = 0;
+			while (x != r && steps++ <= n) x = pa.second[x];
+			assert(x == r);
+		}
+		assert(sum == opt);
+	}
 	cout<<"Tests passed!"<<endl;
 	return 0;
 }

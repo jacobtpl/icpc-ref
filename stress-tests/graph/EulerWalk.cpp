@@ -67,7 +67,57 @@ vi eulerCycle(vector<vector<pii>>& gr, int nedges, int src=0) {
 	return {ret.rbegin(), ret.rend()};
 }
 
+// Builds a graph from a random walk (so an Euler walk from `start` exists),
+// shuffles it, and checks that the returned walk uses every edge exactly once.
+void testPlanted(int n, int m, bool undir, bool closed, bool edgeIds) {
+	int start = rand() % n, cur = start;
+	vector<pii> eds;
+	rep(i,0,m) {
+		int nxt = closed && i == m - 1 ? start : rand() % n;
+		eds.emplace_back(cur, nxt);
+		cur = nxt;
+	}
+	vi order(m);
+	iota(all(order), 0);
+	random_shuffle(all(order));
+	vector<vector<pii>> ed(n);
+	vector<pii> byId(m);
+	rep(i,0,m) {
+		auto [a, b] = eds[order[i]];
+		if (undir && rand() % 2) swap(a, b);
+		byId[i] = {a, b};
+		ed[a].emplace_back(b, i);
+		if (undir) ed[b].emplace_back(a, i);
+	}
+	for (auto& v : ed) random_shuffle(all(v));
+	vi res = eulerWalk(ed, m, start);
+	assert(sz(res) == m + 1 && res[0] == start);
+	if (closed || m == 0) assert(res.back() == start);
+	if (edgeIds) {
+		map<pii, int> cnt;
+		for (auto [a, b] : byId) cnt[undir ? pii(min(a, b), max(a, b)) : pii(a, b)]++;
+		rep(i,0,m) {
+			int a = res[i], b = res[i+1];
+			if (undir && a > b) swap(a, b);
+			pii k(a, b);
+			assert(cnt[k]-- > 0);
+		}
+	}
+}
+
 int main() {
+	rep(undir,0,2) rep(closed,0,2) {
+		rep(it,0,20000) testPlanted(rand() % 8 + 1, rand() % 25, undir, closed, true);
+		rep(it,0,200) testPlanted(rand() % 300 + 1, rand() % 2000, undir, closed, true);
+		testPlanted(1, 0, undir, closed, true);
+		testPlanted(1, 1000, undir, closed, true); // only self-loops
+		testPlanted(2, 100000, undir, closed, true); // heavy multi-edges
+		testPlanted(100000, 500000, undir, closed, true);
+	}
+	{ // no edges at all: the walk is just the start vertex
+		vector<vector<pii>> ed(3);
+		assert(eulerWalk(ed, 0, 2) == vi{2});
+	}
 	rep(cycle,0,2) rep(undir,0,2) {
 		rep(it,0,10000) {
 			int n = rand() % 10 + 1;
