@@ -28,10 +28,10 @@ struct NetworkSimplex {
 	void dfs(int node) { for(auto& ei:tree[node]) if (ei != pei[node]) upd(ei); }
 	// applies cb to a -> b and (tree path b -> a)
 	template<class CB> void walk(int ei, CB cb) {
-		cb(ei);
+		cb(ei, 0);
 		for (V_id a = E[ei].src, b = E[ei].dst; a != b; ) {
-			if (depth[a] > depth[b]) cb(pei[a]^1), a = E[pei[a]].dst;
-			else cb(pei[b]), b = E[pei[b]].dst;
+			if (depth[a] > depth[b]) cb(pei[a]^1, 0), a = E[pei[a]].dst;
+			else cb(pei[b], 1), b = E[pei[b]].dst;
 		}
 	}
 	i128 solve() {
@@ -56,9 +56,11 @@ struct NetworkSimplex {
 			auto [cost, ein] = pin; 
 			if (cost == 0) continue;
 			pair<Cost,E_id> pout{E[ein].cap-E[ein].flow, ein};
-			walk(ein,[&](E_id ei) { ckmin(pout, mp(E[ei].cap-E[ei].flow,ei)); });
+			walk(ein,[&](E_id ei, bool late) { // last blocking arc, avoids stalling
+				Flow r = E[ei].cap-E[ei].flow;
+				if (r < pout.first || (late && r == pout.first)) pout = {r,ei}; });
 			auto [flow, eout] = pout;
-			walk(ein,[&](E_id ei) { E[ei].flow += flow, E[ei^1].flow -= flow; });
+			walk(ein,[&](E_id ei, bool) { E[ei].flow += flow, E[ei^1].flow -= flow; });
 			tree[E[ein].src].insert(ein), tree[E[ein].dst].insert(ein^1);
 			tree[E[eout].src].erase(eout), tree[E[eout].dst].erase(eout^1);
 			upd(pei[E[eout].src] == eout ? ein : ein^1);
