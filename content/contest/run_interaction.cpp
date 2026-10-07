@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
 	{
 		dup2(fd_grader[1], fileno(stdout));
 		dup2(fd_user[0], fileno(stdin));
-		close(fd_grader[1]);
-		close(fd_user[0]);
+		close(fd_grader[0]); close(fd_grader[1]);
+		close(fd_user[0]); close(fd_user[1]);
 
 		execl(argv[1], argv[1], (char*)0);
 
@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
 	// user
 	dup2(fd_user[1], fileno(stdout));
 	dup2(fd_grader[0], fileno(stdin));
-	close(fd_user[1]);
-	close(fd_grader[0]);
+	close(fd_grader[0]); close(fd_grader[1]);
+	close(fd_user[0]); close(fd_user[1]);
 
 	execl(argv[2], argv[2], (char*)0);
 	return 0;
