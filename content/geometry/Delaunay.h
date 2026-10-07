@@ -9,7 +9,9 @@
 
 using P = Point<ll>;
 vector<array<P,3>> triHull(vector<P> p) {
-	vector<P3> p3; vector<array<P,3>> res; for (auto &x:p) p3.pb(P3{x.x,x.y,x.dist2()});
+	vector<P3> p3; vector<array<P,3>> res;
+	if (sz(p) < 3) return res;
+	for (auto &x:p) p3.pb(P3{x.x,x.y,x.dist2()});
 	bool ok = 0; for (auto &t:p3) ok |= !coplanar(p3[0],p3[1],p3[2],t);
 	if (!ok) { // all points concyclic
 		sort(1+all(p),[&p](P a, P b) { 
