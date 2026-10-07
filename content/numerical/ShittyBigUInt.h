@@ -36,7 +36,7 @@ public:
 		{
 			if(i < o.size()) carry += o[i];
 			if(i < size()) at(i) += carry;
-			else emplace_back(carry & ALL);
+			else emplace_back(carry);
 			carry = at(i) >> B;
 			at(i) &= ALL;
 		}
