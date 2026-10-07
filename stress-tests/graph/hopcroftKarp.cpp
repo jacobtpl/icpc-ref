@@ -83,5 +83,16 @@ int main() {
 		assert(pre + res == slow(g, m));
 		assert(m - (int)count(all(btoa), -1) == pre + res);
 	}
+#ifdef HK_BENCH // opt-in timing: random graph, 1e6 + 1e6 vertices, 3e6 edges
+	{
+		int n = 1000000;
+		vector<vi> g(n);
+		rep(i,0,3 * n) g[rnd(0, n - 1)].push_back(rnd(0, n - 1));
+		vi btoa(n, -1);
+		clock_t t = clock();
+		int res = hopcroftKarp(g, btoa);
+		cerr << "matching " << res << " in " << double(clock() - t) / CLOCKS_PER_SEC << " s" << endl;
+	}
+#endif
 	cout << "Tests passed!" << endl;
 }

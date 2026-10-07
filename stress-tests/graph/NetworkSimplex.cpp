@@ -185,5 +185,29 @@ int main() {
 		ns.ae(0, 1, 0, U, -C); ns.ae(1, 2, 0, U, -C); ns.ae(2, 0, 0, U, -C);
 		assert(ns.solve() == -(i128)3 * C * U);
 	}
+#ifdef NS_EMPTY // opt-in: solve() on an empty network (n = 0) reads E[0] out of bounds
+	{
+		NetworkSimplex ns; ns.init(0);
+		assert(ns.solve() == 0);
+	}
+#endif
+#ifdef NS_BENCH // opt-in timing: random b-flow, m = 10n (NS_BENCH = n)
+	{
+		mt19937 r2(1);
+		int n = NS_BENCH;
+		NetworkSimplex ns; ns.init(n);
+		rep(i,0,10 * n) {
+			int a = (int)(r2() % n), b = (int)(r2() % n);
+			ns.ae(a, b, 0, r2() % 1000000000, (ll)(r2() % 2000000001) - 1000000000);
+		}
+		rep(i,0,n / 2) {
+			int a = (int)(r2() % n), b = (int)(r2() % n); ll x = r2() % 1000;
+			ns.B[a] += x, ns.B[b] -= x;
+		}
+		clock_t t = clock();
+		try { ns.solve(); } catch (int) {}
+		cerr << "n=" << n << " m=" << 10 * n << ": " << double(clock() - t) / CLOCKS_PER_SEC << " s" << endl;
+	}
+#endif
 	cout << "Tests passed!" << endl;
 }
