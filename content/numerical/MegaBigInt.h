@@ -47,14 +47,12 @@ struct BigInt {
         *this = v;
     }
     BigInt& operator = (long long v) {
-        sign = 1;
-        if (v < 0) {
-            sign = -1;
-            v = -v;
-        }
+        sign = v < 0 ? -1 : 1;
+        unsigned long long u = v; // -LLONG_MIN overflows
+        if (v < 0) u = -u;
         a.clear();
-        for (; v > 0; v = v / BASE)
-            a.push_back(v % BASE);
+        for (; u > 0; u = u / BASE)
+            a.push_back((int) (u % BASE));
         return *this;
     }
 
