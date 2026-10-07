@@ -2,7 +2,9 @@
  * Author: Stanford
  * Date: Unknown
  * Source: Stanford Notebook
- * Description: KD-tree (2d, can be extended to 3d)
+ * Description: KD-tree (2d, can be extended to 3d). Needs at least one point.
+ * Time: O(n \log^2 n) build. nearest is O(\log n) on average for random
+ * points, but O(n) in the worst case (e.g. points on a circle, query at its center).
  * Status: Tested on excellentengineers
  */
 #pragma once
@@ -48,11 +50,12 @@ struct KDTree {
 	Node* root;
 	KDTree(const vector<P>& vp) : root(new Node({all(vp)})) {}
 
-	pair<T, P> search(Node *node, const P& p) {
+	void search(Node *node, const P& p, pair<T, P>& best) {
 		if (!node->first) {
 			// uncomment if we should not find the point itself:
-			// if (p == node->pt) return {INF, P()};
-			return make_pair((p - node->pt).dist2(), node->pt);
+			// if (p == node->pt) return;
+			best = min(best, make_pair((p - node->pt).dist2(), node->pt));
+			return;
 		}
 
 		Node *f = node->first, *s = node->second;
@@ -60,15 +63,15 @@ struct KDTree {
 		if (bfirst > bsec) swap(bsec, bfirst), swap(f, s);
 
 		// search closest side first, other side if needed
-		auto best = search(f, p);
-		if (bsec < best.first)
-			best = min(best, search(s, p));
-		return best;
+		if (bfirst < best.first) search(f, p, best);
+		if (bsec < best.first) search(s, p, best);
 	}
 
 	// find nearest point to a point, and its squared distance
 	// (requires an arbitrary operator< for Point)
 	pair<T, P> nearest(const P& p) {
-		return search(root, p);
+		pair<T, P> best(INF, P());
+		search(root, p, best);
+		return best;
 	}
 };
