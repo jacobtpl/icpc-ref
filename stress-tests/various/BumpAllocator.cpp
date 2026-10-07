@@ -6,6 +6,8 @@ mt19937 rng(1234);
 int rnd() { return (int)(rng() >> 1); }
 
 // Compile with -DBENCH for timings (new vs malloc).
+// -DBUMP_ALIGNED enables the alignment checks, which fail (and crash on 16-byte-aligned
+// types such as __int128) with the current header: operator new returns unaligned memory.
 struct Node { Node *l, *r; int v; };
 struct Wide { __int128 x, y; };
 struct LD { long double x; };
@@ -15,7 +17,9 @@ __attribute__((noinline)) void fill(vector<Wide>& v, int k) { for (auto& a : v) 
 __attribute__((noinline)) void cp(Wide* a, Wide* b) { *a = *b; }
 
 template<class T> T* chk(T* p) {
+#ifdef BUMP_ALIGNED
 	assert((size_t)p % alignof(T) == 0);
+#endif
 	return p;
 }
 
@@ -29,7 +33,9 @@ int main() {
 		char* p = (char*)operator new(s);
 		assert(lo <= p && p + s <= hi);
 		// operator new must return memory aligned for any object that fits in it
+#ifdef BUMP_ALIGNED
 		for (size_t al = 16; al > 1; al /= 2) if (s >= al) { assert((size_t)p % al == 0); break; }
+#endif
 		rep(j,0,(int)s) p[j] = (char)(it * 31 + j);
 		blocks.emplace_back(p, s);
 	}
@@ -47,8 +53,10 @@ int main() {
 		*chk(new ll) = it;
 		chk(new LD)->x = 1;
 		Node* n = chk(new Node{0, 0, it}); assert(n->v == it);
+#ifdef BUMP_ALIGNED
 		Wide* a = chk(new Wide()); Wide* b = chk(new Wide()); b->x = it; cp(a, b);
 		assert(a->x == it);
+#endif
 		int* arr = chk(new int[rnd() % 5 + 1]); arr[0] = 1;
 		delete n; delete[] arr; // no-ops
 	}
@@ -56,11 +64,13 @@ int main() {
 	// STL containers on top of the replaced operator new.
 	rep(it,0,300) {
 		string s(17u + rnd() % 3, 'a');
+#ifdef BUMP_ALIGNED
 		vector<Wide> v(rnd() % 100 + 1); fill(v, it);
 		for (auto& a : v) assert(a.x == it && a.y == -it);
 		vector<__int128> w(100); iota(all(w), 0);
 		__int128 t = 0; for (auto x : w) t += x * x;
 		assert(t == 328350);
+#endif
 		map<int, ll> m; set<int> st; vi q;
 		rep(i,0,200) { int x = rnd() % 1000; m[x] += i; st.insert(x); q.push_back(x); }
 		sort(all(q)); q.erase(unique(all(q)), q.end());

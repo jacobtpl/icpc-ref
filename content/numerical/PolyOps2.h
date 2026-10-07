@@ -78,7 +78,7 @@ poly pow(poly A, ll b, int n) {
     r.insert(r.begin(), t*b, mint(0));
     r.resize(n);
     return r;
-} // 8dc32d
+} // 7b303d
 poly mod(const poly& f, const poly& g) { return quoRem(f,g).second; }
 poly xkmodf(ll k, poly f) {
     poly r{1}, a{0,1};
