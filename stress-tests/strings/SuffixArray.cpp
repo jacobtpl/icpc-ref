@@ -1,4 +1,5 @@
 #include "../utilities/template.h"
+#define mp make_pair // from content/contest/template.cpp
 
 #include "../../content/strings/SuffixArray.h"
 
@@ -239,9 +240,67 @@ void perf2() {
 	cout << res << endl;
 }
 
+// search() against a scan of the suffix array
+void testSearch(string s, const string& t) {
+	SuffixArray sa(s);
+	int n = sz(s), lo = -1, hi = -1;
+	rep(i,1,n+1) if (s.compare(sa.sa[i], sz(t), t) == 0) {
+		if (lo == -1) lo = i;
+		hi = i;
+	}
+	string tc = t;
+	pair<int,int> got = sa.search(tc);
+	if (got != make_pair(lo, hi)) {
+		cout << "search fails for s=" << s << " t=" << t << ": got "
+			<< got.first << ' ' << got.second << ", expected "
+			<< lo << ' ' << hi << endl;
+		assert(0);
+	}
+}
+
+void stressSearch() {
+	mt19937 rng(12345);
+	auto rnd = [&](int a, int b) {
+		return (int)(rng() % (unsigned)(b - a + 1)) + a; };
+	rep(it,0,150000) {
+		int alpha = rnd(1, 4), n = rnd(1, 12), m = rnd(0, 5);
+		string s, t;
+		rep(i,0,n) s += (char)('a' + rnd(0, alpha-1));
+		if (m <= n && rnd(0, 2)) { // substring of s, maybe mutated
+			t = s.substr(rnd(0, n-m), m);
+			if (m && rnd(0, 3) == 0)
+				t[rnd(0, m-1)] = (char)('a' + rnd(0, alpha));
+		} else rep(i,0,m) t += (char)('a' + rnd(0, alpha));
+		testSearch(s, t);
+		if (it % 16 == 0) { // pattern longer than the text
+			testSearch(s, s + "a"); testSearch(s, s + s); testSearch(s, s);
+		}
+	}
+#ifdef SA_EMPTY_TEXT // opt-in: search() on an empty text reads sa[1]
+	testSearch("", "");
+	testSearch("", "a");
+#endif
+}
+
+// larger random strings (full alphabet, runs, periodic), naive oracle
+void stressRandom() {
+	mt19937 rng(777);
+	rep(it,0,3000) {
+		int n = (int)(rng() % 300), kind = (int)(rng() % 4);
+		int alpha = kind == 0 ? 127 : kind == 1 ? 2 : 1 + (int)(rng() % 5);
+		int per = 1 + (int)(rng() % 7);
+		string s(n, 'x');
+		rep(i,0,n) s[i] = (char)(1 + rng() % (unsigned)alpha);
+		if (kind == 3) rep(i,per,n) if (rng() % 50) s[i] = s[i - per];
+		test(s, 255);
+	}
+}
+
 int main() {
 	// compare();
 	stress(0);
+	stressRandom();
+	stressSearch();
 	cout<<"Tests passed!"<<endl;
 	// perf();
 	// perf2();
