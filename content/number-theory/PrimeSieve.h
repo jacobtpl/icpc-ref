@@ -11,7 +11,7 @@ vector<bool> cp;
 vi pr, nx, lp, cnt;
 void sieve()
 {
-	cp.assign(LIM, 0), nx.assign(LIM, -1), lp.assign(LIM, -1), cnt.assign(LIM, -1);
+	pr.clear(), cp.assign(LIM, 0), nx.assign(LIM, -1), lp.assign(LIM, -1), cnt.assign(LIM, -1);
 	for(int i=2;i<LIM;++i) {
 		if(!cp[i])
 			lp[i] = pr.size(), nx[i] = cnt[i] = 1, pr.push_back(i);
