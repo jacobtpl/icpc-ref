@@ -2,6 +2,9 @@
  * Author: Benq
  * Description: 3d hull helpers
  */
+#pragma once
+
+#include "Point3D.h"
 
 using T = double;
 using P3 = Point3D<double>;

@@ -6,6 +6,9 @@
  * Time: O(n^2, n \log n)
  * Status: tested on SPOJ CH3D
  */
+#pragma once
+
+#include "Point3D.h"
 
 using T = double;
 using P3 = Point3D<double>;

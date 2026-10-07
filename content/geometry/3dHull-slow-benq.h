@@ -6,6 +6,9 @@
  * Time: O(n^2)
  * Status: tested on SPOJ CH3D
  */
+#pragma once
+
+#include "3dHull-template-benq.h"
 
 using F = array<int,3>; // face
 vector<F> hull3d(vector<P3>& p) {
