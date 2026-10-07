@@ -20,7 +20,7 @@ template <class F>
 d rec(F& f, d a, d b, d eps, d S) {
 	d c = (a + b) / 2;
 	d S1 = S(a, c), S2 = S(c, b), T = S1 + S2;
-	if (abs(T - S) <= 15 * eps || b - a < 1e-10)
+	if (abs(T - S) <= 15 * eps || abs(b - a) < 1e-10)
 		return T + (T - S) / 15;
 	return rec(f, a, c, eps / 2, S1) + rec(f, c, b, eps / 2, S2);
 }
