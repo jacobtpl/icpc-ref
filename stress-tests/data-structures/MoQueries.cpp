@@ -163,8 +163,114 @@ void testTr(int n, int q) {
 	}
 }
 
-int main() {
+// Extra coverage: arbitrary tree shapes (0 = random, 1 = path, 2 = star,
+// 3 = caterpillar, 4 = random labels on a path), arbitrary root, queries with
+// equal endpoints. Returns the number of add/del calls.
+int testTrShape(int n, int q, int shape, int root, int useBlk = 0) {
+	ops = 0;
+	blk = useBlk ? useBlk : max((int)(n / sqrt(max(q, 1))), 1);
+	vi par(n, -1), val(n), dep(n), perm(n);
+	iota(all(perm), 0);
+	if (shape == 4) random_shuffle(perm.begin() + 1, perm.end());
+	rep(i,1,n) {
+		int p = shape == 0 ? rand() % i : shape == 1 || shape == 4 ? i - 1 :
+			shape == 2 ? 0 : (i % 2 ? max(i - 2, 0) : i - 1);
+		par[perm[i]] = perm[p], dep[perm[i]] = dep[perm[p]] + 1;
+	}
+	rep(i,0,n) val[i] = rand() % 1000;
+	vector<vi> ed(n);
+	rep(i,1,n) ed[par[i]].push_back(i), ed[i].push_back(par[i]);
+	vector<array<int, 2>> queries(q);
+	for (auto& pa : queries) {
+		pa[0] = rand() % n, pa[1] = rand() % n;
+		if (rand() % 8 == 0) pa[1] = pa[0];
+	}
+	MoTree::vals = val;
+	MoTree::sum = 0;
+	MoTree::path.clear();
+	vi res = MoTree::moTree(queries, ed, root);
+	vector<ll> pre(n + 1); // for paths: prefix sums along the path
+	vi at(n);
+	rep(i,0,n) at[perm[i]] = i;
+	rep(i,0,n) pre[i + 1] = pre[i] + val[perm[i]];
+	rep(i,0,q) {
+		int l = queries[i][0], r = queries[i][1];
+		ll sum = 0;
+		if (shape == 1 || shape == 4) {
+			int x = min(at[l], at[r]), y = max(at[l], at[r]);
+			sum = pre[y + 1] - pre[x];
+		} else {
+			while (l != r) {
+				if (dep[l] < dep[r]) swap(l, r);
+				sum += val[l], l = par[l];
+			}
+			sum += val[l];
+		}
+		assert(res[i] == sum);
+	}
+	return ops;
+}
+
+// mo() with queries that are not sorted pairs / empty ranges / full ranges
+void testEdge() {
+	blk = 350;
+	curL = curR = ops = 0;
+	assert(mo({}).empty());
+	assert(ops == 0);
+	vector<pii> qs = {{0, 0}, {5, 5}, {0, 1000}, {999, 1000}, {3, 3}, {0, 1}};
+	vi res = mo(qs);
+	rep(i,0,sz(qs)) {
+		int l = qs[i].first, r = qs[i].second;
+		assert(res[i] == (l == r ? -1 : l + (r - l) * 10));
+	}
+	vector<vi> ed(1);
+	MoTree::vals = {7}; MoTree::sum = 0; MoTree::path.clear();
+	assert(MoTree::moTree({}, ed).empty());
+	MoTree::sum = 0; MoTree::path.clear();
+	assert((MoTree::moTree({{{0, 0}}, {{0, 0}}}, ed) == vi{7, 7}));
+}
+
+int main(int argc, char** argv) {
+	if (argc > 2) { // ./a.out deep N: recursion depth check on a path of N nodes
+		testTrShape(atoi(argv[2]), 1000, 1, 0, 350);
+		cerr << "moTree path n=" << argv[2] << " ok\n";
+		return 0;
+	}
+	if (argc > 1) { // benchmark mode: ./a.out bench  (header's blk = 350)
+		const char* names[] = {"random", "path", "star", "caterpillar", "shuffled path"};
+		for (int n : {100000, 200000}) {
+			rep(shape,0,5) {
+				if (shape == 0) continue; // brute force oracle is too slow there
+				auto t0 = chrono::steady_clock::now();
+				int o = testTrShape(n, n, shape, rand() % n, 350);
+				cerr << "moTree n=q=" << n << " " << names[shape] << ": ops=" << o
+					<< " = " << o / (n * sqrt(n)) << " * N sqrt Q, " << chrono::duration<double>(
+					chrono::steady_clock::now() - t0).count() << " s (incl. oracle)\n";
+			}
+			auto t0 = chrono::steady_clock::now();
+			blk = 350; curL = curR = ops = 0;
+			vector<pii> qs(n);
+			for (auto& pa : qs) {
+				pa.first = rand() % n, pa.second = rand() % n;
+				if (pa.first > pa.second) swap(pa.first, pa.second);
+			}
+			mo(qs);
+			cerr << "mo n=q=" << n << " random: ops=" << ops << " = " << ops / (n * sqrt(n))
+				<< " * N sqrt Q, " << chrono::duration<double>(
+				chrono::steady_clock::now() - t0).count() << " s\n";
+		}
+		return 0;
+	}
 	srand(2);
+	testEdge();
+	rep(it,0,6) rep(n,1,12) rep(shape,0,5) rep(q,0,n*n/2+2) {
+		testTrShape(n, q, shape, rand() % n);
+	}
+	rep(shape,1,5) {
+		int n = 50000, o = testTrShape(n, n, shape, rand() % n);
+		assert(o < 4 * n * sqrt(n));
+		testTrShape(100000, 1000, shape, rand() % 100000); // deep dfs recursion
+	}
 	rep(it,0,10) rep(n,1,15) rep(q,0,n*n) {
 		testTr(n, q);
 	}
