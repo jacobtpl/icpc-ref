@@ -44,6 +44,7 @@ struct SuffixArray {
 	// string search in O(m log n). returns [l,r] of matches in sa.
 	pair<int,int> search(string &t) {
 		int b=1,e=sz(sa)-1;
+		if (!e) return mp(-1,-1);
 		while (b<e) {
 			int m=(b+e)/2;
 			if (s.compare(sa[m], sz(t), t) >= 0) e = m; // not strict
