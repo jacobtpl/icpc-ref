@@ -87,7 +87,7 @@ public:
 		o.assign(full + 1, 0);
 		for(int i=0;i<size();++i)
 		{
-			o[i + full] |= at(i) << partial & ALL;
+			o[i + full] |= (at(i) & ALL >> partial) << partial;
 			o.push_back(at(i) >> B - partial);
 		}
 		for(;!o.empty() && o.back() == 0;o.pop_back());
@@ -102,7 +102,7 @@ public:
 		for(int i=full;i<size();++i)
 		{
 			if(i > full)
-				o[i - full - 1] |= at(i) << (B - partial) & ALL;
+				o[i - full - 1] |= (at(i) & ((1 << partial) - 1)) << (B - partial);
 			o.push_back(at(i) >> partial);
 		}
 		for(;!o.empty() && o.back() == 0;) o.pop_back();
