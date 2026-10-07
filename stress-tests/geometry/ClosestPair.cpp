@@ -63,6 +63,8 @@ double closestpair(It begin, It end, It &i1, It &i2 ) {
 }
 }
 
+ll bigRand(ll lim) { return (ll)((((unsigned long long)rand() << 31) ^ rand()) % (unsigned long long)(2 * lim + 1)) - lim; }
+
 int main() {
 	// Compare against the old code
 	ll sum = 0;
@@ -120,6 +122,36 @@ int main() {
 		ll foundDist = (pa.first - pa.second).dist2();
 		if (minDist != foundDist) {
 			cerr << "failed at " << it << endl;
+			return 1;
+		}
+	}
+	// Edge cases against brute force: n = 2, repeated points, one row or
+	// column, and coordinates up to 1e9 in absolute value (dist2 up to 8e18).
+	rep(it,0,300000) {
+		int n = rand() % 12 + 2, mode = rand() % 6;
+		vector<P> ps;
+		rep(i,0,n) {
+			ll x = bigRand(1000000000), y = bigRand(1000000000);
+			if (mode == 1) x = bigRand(3), y = bigRand(3);
+			if (mode == 2) x = 1000000000 - rand() % 3, y = bigRand(1000000000);
+			if (mode == 3) y = -1000000000 + rand() % 3;
+			if (mode == 4) x = (rand() % 2 ? 1 : -1) * (1000000000 - rand() % 4), y = (rand() % 2 ? 1 : -1) * (1000000000 - rand() % 4);
+			if (mode == 5) x = bigRand(2) * 400000000, y = bigRand(2) * 400000000 + rand() % 2;
+			ps.emplace_back(x, y);
+		}
+		ll minDist = LLONG_MAX;
+		rep(i,0,n) rep(j,i+1,n) minDist = min(minDist, (ps[i] - ps[j]).dist2());
+		auto pa = closest(ps);
+		if ((pa.first - pa.second).dist2() != minDist) {
+			cerr << "failed edge case at " << it << endl;
+			return 1;
+		}
+		// the answer consists of two different input points
+		int ia = -1, ib = -1;
+		rep(i,0,n) if (ps[i] == pa.first) { ia = i; break; }
+		rep(i,0,n) if (ps[i] == pa.second && i != ia) { ib = i; break; }
+		if (ia < 0 || ib < 0) {
+			cerr << "answer is not a pair of input points at " << it << endl;
 			return 1;
 		}
 	}
