@@ -35,10 +35,11 @@ void Node::pushdown() {
 		rev=0;}
 }
 template<class F> void each(Node* n, F f) {
-	if (n) { each(n->l, f); f(n->val); each(n->r, f); }
+	if (n) { n->pushdown(); each(n->l, f); f(n->val); each(n->r, f); }
 }
 pair<Node*, Node*> split(Node* n, int k) { // splits so left side has k nodes
 	if (!n) return {};
+	n->pushdown();
 	if (cnt(n->l) >= k) { // "n->val >= k" for lower_bound(k)
 		auto pa = split(n->l, k);
 		n->l = pa.second;
