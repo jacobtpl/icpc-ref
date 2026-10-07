@@ -19,7 +19,11 @@ struct Node {
 };
 int cnt(Node* n) { return n ? n->c : 0; }
 void ladd(Node *n, int add) {n->val+=add;n->minval+=add;n->lazyadd+=add;}
-void Node::recalc() { c = cnt(l) + cnt(r) + 1;} // update range vals if needed
+void Node::recalc() { // update range vals if needed
+	c = cnt(l) + cnt(r) + 1; minval = val;
+	if (l) minval = min(minval, l->minval);
+	if (r) minval = min(minval, r->minval);
+}
 void Node::pushdown() {
 	if (lazyadd) {
 		if (l) ladd(l, lazyadd);
