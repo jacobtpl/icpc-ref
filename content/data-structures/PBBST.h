@@ -3,8 +3,16 @@
  * Date: 2023-05-25
  * License: CC0
  * Source: me
- * Description: Persistent AVL tree with split
- * Time: O(\log N)
+ * Description: Persistent AVL tree with split. Nodes made since the last
+ * \texttt{step()} are modified in place, so \texttt{split} and \texttt{+} destroy
+ * their operands unless those are older. \texttt{step()} freezes all existing
+ * trees (they stay valid forever) and returns a fresh modifiable copy.
+ * Needs C++17 (evaluation order of \texttt{N[x].c[d] = f()}).
+ * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
+ *  PAVL b = a.step(); // a is now immutable
+ *  auto [l, r] = b.split(1); // consumes b, not a
+ *  PAVL c = a + l + r + a;
+ * Time: O(\log N) time and new nodes per operation
  */
 struct PAVL {
 	struct Node {

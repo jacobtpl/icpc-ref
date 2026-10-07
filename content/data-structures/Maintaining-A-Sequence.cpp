@@ -589,7 +589,7 @@ int main()
 			--p;
 			auto [l, r] = cur.split(p);
 			auto [r1, r2] = r.split(t);
-			r1.get_root().do_set(c);
+			if(r1.root != -1) r1.get_root().do_set(c);
 			cur = l + (r1 + r2);
 		}
 		else if(s[0] == 'R')
@@ -599,7 +599,7 @@ int main()
 			--p;
 			auto [l, r] = cur.split(p);
 			auto [r1, r2] = r.split(t);
-			r1.get_root().do_rev();
+			if(r1.root != -1) r1.get_root().do_rev();
 			cur = l + (r1 + r2);
 		}
 		else if(s[0] == 'G')
