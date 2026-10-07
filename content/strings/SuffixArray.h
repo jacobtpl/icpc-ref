@@ -18,8 +18,9 @@
 #pragma once
 
 struct SuffixArray {
+	string s; // or basic_string<int>
 	vi sa, lcp; // sa[0] is empty str, size is n+1, lcp[i] is of sa[i] and sa[i-1]
-	SuffixArray(string& s, int lim=256) { // or basic_string<int>
+	SuffixArray(string& _s, int lim=256) : s(_s) {
 		int n = sz(s) + 1, k = 0, a, b;
 		vi x(all(s)+1), y(n), ws(max(n, lim)), rank(n);
 		sa = lcp = y, iota(all(sa), 0);
