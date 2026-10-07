@@ -20,11 +20,11 @@ struct MCMF {
 	vector<size_t> par;
 
 	MCMF(int N) :
-		N(N), ed(N), dist(N), pi(N), par(N), amt(N) {}
+		N(N), ed(N), dist(N), pi(N), amt(N), par(N) {}
 
 	void addEdge(int u, int v, F f, C c) {
-		ed[u].emplace_back(v, -f, c, ed[v].size());
-		ed[v].emplace_back(u, 0, -c, ed[u].size()-1);
+		ed[u].push_back({v, -f, c, ed[v].size()});
+		ed[v].push_back({u, 0, -c, ed[u].size()-1});
 	}
 
 	void path(int s) { // 417ab0
