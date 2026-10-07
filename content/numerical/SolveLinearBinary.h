@@ -5,6 +5,7 @@
  * Source: own work
  * Description: Solves $Ax = b$ over $\mathbb F_2$. If there are multiple solutions, one is returned arbitrarily.
  *  Returns rank, or -1 if no solutions. Destroys $A$ and $b$.
+ *  Bits of $A$ at positions $\ge m$ must be zero.
  * Time: O(n^2 m)
  * Status: bruteforce-tested for n, m <= 4
  */
