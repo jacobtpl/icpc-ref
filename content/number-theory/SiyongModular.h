@@ -1,7 +1,7 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Modular class
+ * Description: Modular class. \texttt{pow(a, b)} requires $b \ge 0$ (loops forever otherwise).
  * Status: Tested many many times
  * Time: Faster than kactl mod. Slower than using ll directly
  */
@@ -13,12 +13,11 @@ ll euclid(ll a, ll b, ll &x, ll &y) {
 }
 struct mint {
 	int v;
-	explicit operator int() {return v;}
+	explicit operator int() const {return v;}
 	mint(): v(0) {}
 	mint(auto z) {
-		z %= MOD;
-		if (z < 0) z += MOD;
-		v = z;
+		v = int(z % MOD);
+		if (v < 0) v += MOD;
 	}
 	friend mint invert(mint a) {
 		ll x, y, g = euclid(a.v, MOD, x, y);
@@ -42,7 +41,7 @@ struct mint {
 	friend mint operator/ (mint const& a, mint const& b) {
 		return a*invert(b);}
 
-	mint operator- () {return mint(-v);}
+	mint operator- () const {return mint(-v);}
 	friend mint pow(mint a, auto b) {
 		mint r(1);
 		for(;b;b>>=1, a*=a)
