@@ -3,7 +3,9 @@
  * Description: Multipoint evaluation and interpolation
  * Time: O(N\log^2 N)
  */
-#include "PolyOps.h"
+#pragma once
+
+#include "PolyOps2.h"
 
 void segProd(vector<poly>& stor, poly& v, int ind, int l, int r) { // v -> places to evaluate at
 	if (l == r) { stor[ind] = {-v[l],1}; return; }
@@ -17,6 +19,7 @@ void evalAll(vector<poly>& stor, poly& res, poly v, int ind = 1) {
 }
 // evaluate polynomial v at points in p
 poly multiEval(poly v, poly p) {
+	if (p.empty()) return {};
 	vector<poly> stor(4*sz(p)); segProd(stor,p,1,0,sz(p)-1);
 	poly res; evalAll(stor,res,v); return res; }
 
@@ -28,6 +31,7 @@ poly combAll(vector<poly>& stor, poly& dems, int ind, int l, int r) {
 }
 poly interpolate(vector<pair<T,T>> v) {
 	int n = sz(v); poly x; for (auto t:v) x.pb(t.first);
+	if (!n) return {};
 	vector<poly> stor(4*n); segProd(stor,x,1,0,n-1);
 	poly dems; evalAll(stor,dems,dif(stor[1]));
 	rep(i,0,n) dems[i] = v[i].second/dems[i];

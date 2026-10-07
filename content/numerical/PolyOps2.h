@@ -1,8 +1,15 @@
 /**
  * Author: jacobtpl, Benq
  * Date: 2024
- * Description: Operations on formal power series
+ * Description: Operations on formal power series.
+ * inv needs $A[0] \neq 0$, sqrt/log $A[0] = 1$, exp $A[0] = 0$ (A non-empty).
+ * quoRem/mod/xkmodf need a non-zero leading coefficient (g.back()).
+ * solve\_linrec takes c 1-indexed (size n+1, c[0] unused).
  */
+#pragma once
+
+#include "PolyOps.h"
+
 void fft(vector<T>& A, bool inverse = 0) { // NTT
 	int n = sz(A); assert((MOD-1)%n == 0); vector<T> B(n);
 	for(int b = n/2; b; b /= 2, swap(A,B)) { // w = n/b'th root
@@ -55,6 +62,7 @@ poly exp(poly A, int n) { assert(A[0].v == 0);
 	return RSZ(B,n);
 } // 203953
 poly pow(poly A, ll b, int n) {
+    A.resize(n);
     if (b==0) { poly r(n,0); r[0]=1; return r; }
     int t = -1;
     for (int i = 0; i < n; i++) if (A[i].v != 0) { t = i; break; }
