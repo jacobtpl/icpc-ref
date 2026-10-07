@@ -114,7 +114,7 @@ struct treap {
 	}
 	void output(int x) {
 		if (c[x][0]) output(c[x][0]);
-		printf("(%lld, %lld to %lld %lld) ", 
+		printf("(%d, %d to %d %d) ", 
 				v[x],mv[x],v[c[x][0]],v[c[x][1]]);
 		if (c[x][1]) output(c[x][1]);
 	}
