@@ -18,7 +18,7 @@
 
 vector<ll> berlekampMassey(vector<ll> s) {
 	int n = sz(s), L = 0, m = 0;
-	vector<ll> C(n), B(n), T;
+	vector<ll> C(n+1), B(n+1), T;
 	C[0] = B[0] = 1;
 
 	ll b = 1;
