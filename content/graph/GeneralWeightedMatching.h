@@ -130,6 +130,7 @@ template<int SZ> struct WeightedMatch {
 				if (S[x] == -1) ckmin(d,eDelta(g[slack[x]][x]));
 				else if (S[x] == 0) ckmin(d,eDelta(g[slack[x]][x])/2);
 			} // edge weights shouldn't go below 0
+			if (d == INT_MAX) return 0; // no slack left, avoid overflow
 			rep(u,1,N+1) {
 				if (S[st[u]] == 0) {
 					if (lab[u] <= d) return 0; // why?
