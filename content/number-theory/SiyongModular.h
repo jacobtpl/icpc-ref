@@ -13,7 +13,7 @@ ll euclid(ll a, ll b, ll &x, ll &y) {
 }
 struct mint {
 	int v;
-	explicit operator int() {return v;}
+	explicit operator int() const {return v;}
 	mint(): v(0) {}
 	mint(auto z) {
 		z %= MOD;
@@ -42,7 +42,7 @@ struct mint {
 	friend mint operator/ (mint const& a, mint const& b) {
 		return a*invert(b);}
 
-	mint operator- () {return mint(-v);}
+	mint operator- () const {return mint(-v);}
 	friend mint pow(mint a, auto b) {
 		mint r(1);
 		for(;b;b>>=1, a*=a)
