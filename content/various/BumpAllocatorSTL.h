@@ -23,3 +23,7 @@ template<class T> struct small {
 	}
 	void deallocate(T*, size_t) {}
 };
+template<class T, class U>
+bool operator==(small<T>, small<U>) { return 1; }
+template<class T, class U>
+bool operator!=(small<T>, small<U>) { return 0; }
