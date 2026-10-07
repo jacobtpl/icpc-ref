@@ -16,7 +16,7 @@ struct NetworkSimplex {
 		depth.resize(n+1); P.resize(n+1); tree.resize(n+1); }
 	int ae(V_id a, V_id b, Flow l, Flow u, Cost c) {
 		E.pb({a,b,0,u-l,c}); E.pb({b,a,0,0,-c});
-		delta += l*c; B[b] += l, B[a] -= l;
+		delta += i128(l)*c; B[b] += l, B[a] -= l;
 		return sz(E)-2;
 	}
 	void upd(E_id ei) {
