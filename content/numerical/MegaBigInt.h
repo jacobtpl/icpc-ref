@@ -523,7 +523,7 @@ struct BigInt {
         *this = *this * v;
     }
     BigInt operator*(const BigInt &v) const {
-        if (a.size() * v.a.size() <= 1000111) return mul_simple(v);
+        if (a.size() * v.a.size() <= 1000111 || min(a.size(), v.a.size()) <= 1000) return mul_simple(v);
         if (a.size() > 500111 || v.a.size() > 500111) return mul_fft(v);
         return mul_karatsuba(v);
     }
