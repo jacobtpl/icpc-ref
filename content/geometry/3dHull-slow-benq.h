@@ -3,9 +3,13 @@
  * Description: Computes all faces of the 3-dimension hull of a point set.
  *  *No four points must be coplanar*, or else random results will be returned.
  *  All faces will point outwards.
+ *  Shuffles p; the returned faces index the shuffled p.
  * Time: O(n^2)
  * Status: tested on SPOJ CH3D
  */
+#pragma once
+
+#include "3dHull-template-benq.h"
 
 using F = array<int,3>; // face
 vector<F> hull3d(vector<P3>& p) {
