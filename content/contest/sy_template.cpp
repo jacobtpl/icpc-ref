@@ -9,8 +9,7 @@ typedef long long ll;
 #ifdef LOCAL
 template<typename T>
 struct vector: std::vector<T> {
-	template<typename... V>
-		vector(V&&... args): std::vector<T>(std::forward<V>(args)...) { }
+	using std::vector<T>::vector;
 	T& operator[] (size_t idx) {return this->at(idx);}
 	T const& operator[] (size_t idx) const {return this->at(idx);}
 };
