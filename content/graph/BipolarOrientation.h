@@ -7,7 +7,7 @@
  * Status: https://codeforces.com/contest/1916/submission/245524057
  */
 
-// Warning: Mutates the vector `a`
+// `a` is taken by value: the caller's graph is not modified
 vector<int> bipolarOrient(vector<vector<int> > a, int s, int t) {
 	size_t N = a.size(); // must have s != t, N >= 2
 	vector<int> o(N), p(N, -1), d(N, -1), l(N), lk[2];

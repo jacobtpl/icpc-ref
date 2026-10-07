@@ -1,7 +1,8 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Boilerplate centroid decomp code
+ * Description: Boilerplate centroid decomp code.
+ * adj must be a connected tree with $N \ge 1$ (only the component of node 0 is decomposed).
  * Status: Tested by Jacob on Xenia and Tree
  * Time: O(N\log N)
  */
