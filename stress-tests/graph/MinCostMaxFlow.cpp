@@ -5,6 +5,9 @@
 // #include "mcmfold.h"
 // #include "mcmfnew.h"
 #include <bits/extc++.h>
+// from content/contest/template.cpp
+template<class T, class U>
+bool ckmin(T &a, U const& b) {return b<a?a=b,1:0;}
 #define setpi dummy(){} bool setpi
 #undef assert
 #define assert(x) return x
@@ -39,6 +42,80 @@ void* operator new(size_t s) {
 }
 void operator delete(void*) noexcept {}
 #endif
+
+
+// Independent oracle: successive shortest paths with Bellman-Ford.
+struct RefMCMF {
+	struct E { int u, v; ll cap, cost; };
+	int n; vector<E> es;
+	RefMCMF(int n) : n(n) {}
+	void addEdge(int u, int v, ll cap, ll cost) {
+		if (u == v) return;
+		es.push_back({u, v, cap, cost});
+		es.push_back({v, u, 0, -cost});
+	}
+	pair<ll, ll> maxflow(int s, int t) {
+		ll fl = 0, co = 0;
+		const ll inf = LLONG_MAX / 4;
+		for (;;) {
+			vector<ll> d(n, inf); vi pe(n, -1);
+			d[s] = 0;
+			rep(it,0,n) rep(i,0,sz(es)) {
+				E& e = es[i];
+				if (e.cap > 0 && d[e.u] < inf && d[e.u] + e.cost < d[e.v])
+					d[e.v] = d[e.u] + e.cost, pe[e.v] = i;
+			}
+			if (d[t] == inf) break;
+			ll f = inf;
+			for (int x = t; x != s; x = es[pe[x]].u) f = min(f, es[pe[x]].cap);
+			for (int x = t; x != s; x = es[pe[x]].u)
+				es[pe[x]].cap -= f, es[pe[x] ^ 1].cap += f;
+			fl += f, co += f * d[t];
+		}
+		return {fl, co};
+	}
+};
+
+// Random graphs with multi-edges, self-loops, antiparallel edges, zero
+// capacities and (optionally) negative costs without negative cycles.
+// Also checks that the reported flow is a feasible flow of that cost.
+void testRef(int its, int maxN, int maxM, int maxCap, int maxCost, bool neg) {
+	rep(it,0,its) {
+		int N = rand() % maxN + 1, M = rand() % (maxM + 1);
+		int S = rand() % N, T = rand() % N;
+		if (S == T) { if (N == 1) continue; T = (S + 1) % N; }
+		MCMF mcmf(N); RefMCMF ref(N);
+		vi pot(N);
+		if (neg) rep(i,0,N) pot[i] = rand() % (maxCost + 1);
+		struct Ad { int u, v, cap, cost; size_t id; };
+		vector<Ad> ads;
+		rep(i,0,M) {
+			int u = rand() % N, v = rand() % N;
+			if (neg && u == v) continue;
+			int cap = rand() % 4 == 0 ? 0 : rand() % maxCap + 1;
+			int cost = rand() % (maxCost + 1) + pot[u] - pot[v];
+			if (rand() % 8 == 0) cap = maxCap;
+			ads.push_back({u, v, cap, cost, mcmf.ed[u].size()});
+			mcmf.addEdge(u, v, cap, cost);
+			ref.addEdge(u, v, cap, cost);
+		}
+		if (neg || rand() % 4 == 0) assert(mcmf.setpi(S));
+		auto pa = mcmf.maxflow(S, T);
+		auto pb = ref.maxflow(S, T);
+		assert(pa.first == pb.first);
+		assert(pa.second == pb.second);
+		vector<ll> bal(N); ll co = 0;
+		for (auto& a : ads) if (a.u != a.v) {
+			auto& e = mcmf.ed[a.u][a.id];
+			ll f = a.cap + e.flow; // flows start at -cap
+			assert(e.n == a.v && 0 <= f && f <= a.cap);
+			assert(mcmf.ed[a.v][e.rev].flow == -f);
+			bal[a.u] -= f, bal[a.v] += f, co += f * a.cost;
+		}
+		rep(i,0,N) assert(bal[i] == (i == S ? -pa.first : i == T ? pa.first : 0));
+		assert(co == pa.second);
+	}
+}
 
 typedef vector<ll> vd;
 bool zero(ll x) { return x == 0; }
@@ -185,7 +262,7 @@ void testNeg() {
 		}
 		if (!mcmf.setpi(S))  // has negative loops
 			continue;
-		auto pa = mcmf.maxflow(S, T);
+		pair<ll, ll> pa = mcmf.maxflow(S, T);
 		auto pa2 = mcmf2.maxflow(S, T);
 		assert(pa == pa2);
 		::i = lasti;
@@ -194,6 +271,11 @@ void testNeg() {
 }
 
 int main() {
+	srand(3);
+	testRef(200000, 6, 12, 5, 6, false);
+	testRef(200000, 6, 12, 5, 6, true);
+	testRef(20000, 12, 60, 1000000, 100000, false);
+	testRef(20000, 12, 60, 1000000, 100000, true);
 	testMatching();
 	testNeg();
 }
