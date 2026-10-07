@@ -16,9 +16,8 @@ struct mint {
 	explicit operator int() const {return v;}
 	mint(): v(0) {}
 	mint(auto z) {
-		z %= MOD;
-		if (z < 0) z += MOD;
-		v = z;
+		v = int(z % MOD);
+		if (v < 0) v += MOD;
 	}
 	friend mint invert(mint a) {
 		ll x, y, g = euclid(a.v, MOD, x, y);
