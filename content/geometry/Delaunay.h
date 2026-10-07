@@ -17,7 +17,8 @@ vector<array<P,3>> triHull(vector<P> p) {
 	if (!ok) { // all points concyclic
 		sort(1+all(p),[&p](P a, P b) { 
 			return (a-p.front()).cross(b-p.front())>0; });
-		rep(i,1,sz(p)-1) res.pb({p.front(),p[i],p[i+1]});
+		rep(i,1,sz(p)-1) if (p[0].cross(p[i],p[i+1]))
+			res.pb({p[0],p[i],p[i+1]});
 	} else {
 		#define nor(z) P(p3[z].x,p3[z].y)
 		for(auto &t:hull3dFast(p3)) 
