@@ -48,7 +48,7 @@ int main() {
 		[&]() { return (ll)(rng() % 20) - 10; },
 		[&]() { return (ll)(rng() % 3000); },
 		[&]() { return (ll)rng(); },
-		[&]() { return edge[rng() % 13] + (ll)(rng() % 3 == 0); },
+		[&]() { return (ll)((uint64_t)edge[rng() % 13] + (rng() % 3 == 0)); },
 		[&]() { return (ll)(rng() % 300) << (16 * (rng() % 4)); }, // equal low bits
 		[&]() { return (ll)((rng() % 300) * inv); }, // all hash to the same bucket
 	};
