@@ -5,6 +5,7 @@
    * by a point \texttt{p} and a direction \texttt{dp}. 
    * Area of intersection should be sufficiently precise when all inputs
    * are integers with magnitude $\le 10^5$. Intersection must be bounded.
+   * Returns an empty vector if the intersection is empty or has zero area.
    * Probably works with floating point too (but EPS might need to be adjusted?).
  * Time: O(N\log N)
  * Source: Own
@@ -45,8 +46,9 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 	{ // remove parallel rays
 		vector<Ray> nrays;
 		for(auto& t: rays) {
-			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS) { nrays.pb(t); continue; }
-			// last two rays are parallel, keep only one
+			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS
+				|| nrays.back().dp.dot(t.dp) < 0) { nrays.pb(t); continue; }
+			// last two rays have the same direction, keep only one
 			if (t.dp.cross(t.p-nrays.back().p) > 0) nrays.back() = t;
 		}
 		swap(rays, nrays);
@@ -72,8 +74,10 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 		reduce(poly[0]);
 		if (!bad(poly.back(),poly[0],poly[1])) break;
 	}
-	assert(sz(poly) >= 3); // expect nonzero area
-	vP poly_points; rep(i,0,sz(poly))
-		poly_points.pb(poly[i].isect(poly[(i+1)%sz(poly)]));
+	vP poly_points; rep(i,0,sz(poly)) {
+		Ray& r = poly[(i+1)%sz(poly)]; // parallel: zero area
+		if (poly[i].dp.cross(r.dp) <= EPS) return {};
+		poly_points.pb(poly[i].isect(r));
+	}
 	return poly_points;
 }
