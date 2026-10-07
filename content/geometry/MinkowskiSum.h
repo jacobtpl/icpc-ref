@@ -8,11 +8,16 @@
    * MITPC
    * https://open.kattis.com/problems/roberthood
  */
+#pragma once
+
+#include "Point.h"
+
+typedef Point<ll> P;
 using vP = vector<P>;
 vP minkowski_sum(vP a, vP b) {
 	if (sz(a) > sz(b)) swap(a, b);
 	if (!sz(a)) return {};
-	if (sz(a) == 1) {for (auto &t: b) t += a.front(); return b;}
+	if (sz(a) == 1) {for (auto &t: b) t = t + a.front(); return b;}
 	rotate(begin(a), min_element(all(a)), end(a));
 	rotate(begin(b), min_element(all(b)), end(b));
 	a.pb(a[0]), a.pb(a[1]);
@@ -21,7 +26,7 @@ vP minkowski_sum(vP a, vP b) {
 	int i = 0, j = 0;
 	while (i < sz(a)-2 || j < sz(b)-2) {
 		result.pb(a[i]+b[j]);
-		T crs = (a[i+1]-a[i]).cross(b[j+1]-b[j]);
+		auto crs = (a[i+1]-a[i]).cross(b[j+1]-b[j]);
 		i += (crs >= 0);
 		j += (crs <= 0);
 	}
