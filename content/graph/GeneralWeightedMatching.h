@@ -3,7 +3,7 @@
  * Description: General max weight matching with 1-based indexing
  	* (weight is maximized, NOT cardinality: path 1,3,1 gives \{3,1\}).
  	* Edge weights must be positive, combo of UnweightedMatch and
- 	* Hungarian. 1-INDEXED NODES
+ 	* Hungarian. 1-INDEXED NODES. Requires $N < SZ$ (declare globally).
  * Time: O(N^3)?
  * Source: 
 	* https://github.com/koosaga/DeobureoMinkyuParty
