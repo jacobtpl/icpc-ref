@@ -1,7 +1,7 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Modular class
+ * Description: Modular class. \texttt{pow(a, b)} requires $b \ge 0$ (loops forever otherwise).
  * Status: Tested many many times
  * Time: Faster than kactl mod. Slower than using ll directly
  */
