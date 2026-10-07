@@ -3,7 +3,7 @@
  * Date: 2019-04-24
  * License: CC0
  * Source: folklore
- * Description:
+ * Description: $b^e \bmod \text{mod}$ for $0 \le b < 3 \cdot 10^9$ (reduce $b$ first), $e \ge 0$.
  * Status: tested
  */
 #pragma once
