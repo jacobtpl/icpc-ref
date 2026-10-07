@@ -101,8 +101,8 @@ public:
 		BigUInt o;
 		for(int i=full;i<size();++i)
 		{
-			if(i-full >= 0)
-				o.v[i - full - 1] |= at(i) << (B - partial) & ALL;
+			if(i > full)
+				o[i - full - 1] |= at(i) << (B - partial) & ALL;
 			o.push_back(at(i) >> partial);
 		}
 		for(;!o.empty() && o.back() == 0;) o.pop_back();
