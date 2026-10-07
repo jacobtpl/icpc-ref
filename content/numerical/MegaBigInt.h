@@ -279,7 +279,7 @@ struct BigInt {
         return divmod(*this, v).second;
     }
 
-    void operator/=(int v) {
+    void operator/=(long long v) {
         assert(v > 0);  // operator / not well-defined for v <= 0.
         if (llabs(v) >= BASE) {
             *this /= BigInt(v);
@@ -295,7 +295,7 @@ struct BigInt {
         trim();
     }
 
-    BigInt operator/(int v) const {
+    BigInt operator/(long long v) const {
         assert(v > 0);  // operator / not well-defined for v <= 0.
 
         if (llabs(v) >= BASE) {
@@ -318,7 +318,7 @@ struct BigInt {
         return m * sign;
     }
 
-    void operator*=(int v) {
+    void operator*=(long long v) {
         if (llabs(v) >= BASE) {
             *this *= BigInt(v);
             return ;
@@ -349,7 +349,7 @@ struct BigInt {
         trim();
     }
 
-    BigInt operator*(int v) const {
+    BigInt operator*(long long v) const {
         if (llabs(v) >= BASE) {
             return *this * BigInt(v);
         }
