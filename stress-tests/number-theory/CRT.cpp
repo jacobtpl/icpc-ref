@@ -11,7 +11,36 @@ ll randExp() {
 	return uniform_int_distribution<ll>(0, (ll)((1ULL << e) - 1))(rng);
 }
 
-int main(int argc, char** argv) {
+int main() {
+	// exhaustive on tiny inputs against brute force
+	rep(m,1,25) rep(n,1,25) rep(a,-m+1,m) rep(b,-n+1,n) {
+		ll l = m / __gcd(m, n) * n, exp = -1;
+		rep(x,0,l) if (rmod(x - a, m) == 0 && rmod(x - b, n) == 0) {
+			assert(exp == -1); // unique
+			exp = x;
+		}
+		assert((exp != -1) == ((a - b) % __gcd(m, n) == 0));
+		if (exp != -1) assert(crt(a, m, b, n) == exp);
+	}
+	// a, b far outside (-m, m): still a valid solution
+	rep(m,1,13) rep(n,1,13) rep(a,-40,40) rep(b,-40,40)
+		if ((a - b) % __gcd(m, n) == 0) {
+			ll r = crt(a, m, b, n);
+			assert(rmod(r - a, m) == 0 && rmod(r - b, n) == 0);
+		}
+	// large coprime moduli with m*n just below 2^62, known answer
+	rep(it,0,1000000) {
+		ll m = (1LL << 31) - (ll)(rng() % 1000), n = (1LL << 31) - (ll)(rng() % 1000);
+		if (it % 3 == 0) m = (1LL << 61) - (ll)(rng() % 1000), n = 1 + (ll)(rng() % 2);
+		if (it % 3 == 1) m = (1LL << 42) - (ll)(rng() % 1000), n = (1LL << 20) - (ll)(rng() % 1000);
+		if (rng() % 2) swap(m, n);
+		ll l = m / __gcd(m, n) * n;
+		ll x = (ll)(rng() % (unsigned long long)l);
+		ll a = x % m, b = x % n;
+		if (rng() % 2 && a) a -= m;
+		if (rng() % 2 && b) b -= n;
+		assert(crt(a, m, b, n) == x);
+	}
 	rep(it,0,10000000) {
 		ll a = randExp() * (rand() % 2 ? 1 : -1);
 		ll b = randExp() * (rand() % 2 ? 1 : -1);
