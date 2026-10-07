@@ -4,7 +4,7 @@
  * License: CC0
  * Source: Wikipedia
  * Description: Given $N$ and a real number $x \ge 0$, finds the closest rational approximation $p/q$ with $p, q \le N$.
- * It will obey $|p/q - x| \le 1/qN$.
+ * For $x \le 1$ it will obey $|p/q - x| \le 1/N$.
  *
  * For consecutive convergents, $p_{k+1}q_k - q_{k+1}p_k = (-1)^k$.
  * ($p_k/q_k$ alternates between $>x$ and $<x$.)
