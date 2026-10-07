@@ -6,7 +6,7 @@ template<typename T, typename U> bool ckmin(T &a, U const& b) {return b<a?a=b,1:
 
 #define all(x) std::begin(x), std::end(x)
 typedef long long ll;
-ifdef LOCAL
+#ifdef LOCAL
 template<typename T>
 struct vector: std::vector<T> {
 	template<typename... V>
