@@ -394,17 +394,19 @@ struct BigInt {
                 swap(x[i], x[j]);
         }
 
+        // Exact roots: accumulating w *= wlen loses too much precision for large n.
+        vector<complex<double> > rt(n / 2);
+        for (int i = 0; i < n / 2; ++i) {
+            double ang = 2 * 3.14159265358979323846 * i / n * (invert ? -1 : 1);
+            rt[i] = complex<double>(cos(ang), sin(ang));
+        }
         for (int len = 2; len <= n; len <<= 1) {
-            double ang = 2 * 3.14159265358979323846 / len * (invert ? -1 : 1);
-            complex<double> wlen(cos(ang), sin(ang));
             for (int i = 0; i < n; i += len) {
-                complex<double> w(1);
                 for (int j = 0; j < len / 2; ++j) {
                     complex<double> u = x[i + j];
-                    complex<double> v = x[i + j + len / 2] * w;
+                    complex<double> v = x[i + j + len / 2] * rt[n / len * j];
                     x[i + j] = u + v;
                     x[i + j + len / 2] = u - v;
-                    w *= wlen;
                 }
             }
         }
