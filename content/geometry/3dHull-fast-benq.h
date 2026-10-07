@@ -10,17 +10,17 @@ vector<F> hull3dFast(vector<P3>& p) {
 	prep(p); int N = sz(p); vector<F> hull; 
 	vb active; // whether face is active
 	vector<vi> rvis; // points visible from each face
-	vector<array<pi,3>> other; // other face adjacent to each edge of face
+	vector<array<pii,3>> other; // other face adjacent to each edge of face
 	vector<vi> vis(N); // faces visible from each point
 	auto ad = [&](int a, int b, int c) { 
 		hull.pb({a,b,c}); active.pb(1); rvis.emplace_back(); other.emplace_back(); };
 	auto ae = [&](int a, int b) { vis[b].pb(a), rvis[a].pb(b); };
 	auto abv = [&](int a, int b) {
 		F f=hull[a]; return above(p[f[0]],p[f[1]],p[f[2]],p[b]);};
-	auto edge = [&](pi e) -> pi { 
+	auto edge = [&](pii e) -> pii { 
 		return {hull[e.first][e.second],hull[e.first][(e.second+1)%3]}; };
-	auto glue = [&](pi a, pi b) { // link two faces by an edge
-		pi x = edge(a); assert(edge(b) == mp(x.second,x.first));
+	auto glue = [&](pii a, pii b) { // link two faces by an edge
+		pii x = edge(a); assert(edge(b) == mp(x.second,x.first));
 		other[a.first][a.second] = b, other[b.first][b.second] = a;
 	}; // ensure face 0 is removed when i=3
 	ad(0,1,2), ad(0,2,1); if (abv(1,3)) swap(p[1],p[2]); 
