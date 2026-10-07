@@ -1,7 +1,10 @@
 /**
  * Author: jacobtpl, Benq
  * Date: 2024
- * Description: Operations on formal power series
+ * Description: Operations on formal power series.
+ * inv needs $A[0] \neq 0$, sqrt/log $A[0] = 1$, exp $A[0] = 0$ (A non-empty).
+ * quoRem/mod/xkmodf need a non-zero leading coefficient (g.back()).
+ * solve\_linrec takes c 1-indexed (size n+1, c[0] unused).
  */
 #pragma once
 

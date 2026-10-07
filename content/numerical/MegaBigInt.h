@@ -3,7 +3,9 @@
  * Date: 2023-05-01
  * License: CC0
  * Source: My head
- * Description: what it says
+ * Description: what it says.
+ * a / b truncates toward zero, but BigInt \% BigInt (b > 0) is in [0, b), so
+ * (a/b)*b + a\%b != a for a < 0. BigInt \% long long keeps the sign of a.
  * Usage: just do it
  * Status: prob works
  */
