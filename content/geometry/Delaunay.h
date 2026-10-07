@@ -10,6 +10,7 @@
 using P = Point<ll>;
 vector<array<P,3>> triHull(vector<P> p) {
 	vector<P3> p3; vector<array<P,3>> res;
+	sort(all(p)); p.erase(unique(all(p)),end(p));
 	if (sz(p) < 3) return res;
 	for (auto &x:p) p3.pb(P3{x.x,x.y,x.dist2()});
 	bool ok = 0; for (auto &t:p3) ok |= !coplanar(p3[0],p3[1],p3[2],t);
