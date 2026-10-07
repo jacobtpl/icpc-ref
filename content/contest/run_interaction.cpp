@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 		close(fd_grader[1]);
 		close(fd_user[0]);
 
-		execl(argv[1], argv[1]);
+		execl(argv[1], argv[1], (char*)0);
 
 		return 0;
 	}
@@ -34,6 +34,6 @@ int main(int argc, char* argv[]) {
 	close(fd_user[1]);
 	close(fd_grader[0]);
 
-	execl(argv[2], argv[2]);
+	execl(argv[2], argv[2], (char*)0);
 	return 0;
 }
