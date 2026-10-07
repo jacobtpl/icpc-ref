@@ -32,8 +32,7 @@ template<class T, int N> struct Matrix {
 		rep(i,0,N) a.d[i][i] = 1;
 		while (p) {
 			if (p&1) a = a*b;
-			b = b*b;
-			p >>= 1;
+			if (p >>= 1) b = b*b;
 		}
 		return a;
 	}
