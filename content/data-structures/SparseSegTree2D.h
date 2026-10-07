@@ -45,26 +45,26 @@ struct SegTree2D {
 				else {
 					int nb,ne;
 					lca(0,C-1,b[l[x]],e[l[x]],i,nb,ne);
-					int y=l[x];
-					l[x]=alloc(nb,ne,DEFAULT);
-					if (i>mid(nb,ne)) l[l[x]]=y,r[l[x]]=alloc(i,i,nv);
-					else r[l[x]]=y,l[l[x]]=alloc(i,i,nv);
-					up(l[x]);
+					int y=l[x],z=alloc(nb,ne,DEFAULT),w=alloc(i,i,nv);
+					l[x]=z;
+					if (i>mid(nb,ne)) l[z]=y,r[z]=w;
+					else r[z]=y,l[z]=w;
+					up(z);
 				}
-			} else l[x]=alloc(i,i,nv);
+			} else {int z=alloc(i,i,nv);l[x]=z;}
 		} else {
 			if (r[x]) {
 				if (b[r[x]]<=i && i<=e[r[x]]) update1(r[x],i,nv);
 				else {
 					int nb,ne;
 					lca(0,C-1,b[r[x]],e[r[x]],i,nb,ne);
-					int y=r[x];
-					r[x]=alloc(nb,ne,DEFAULT);
-					if (i>mid(nb,ne)) l[r[x]]=y,r[r[x]]=alloc(i,i,nv);
-					else r[r[x]]=y,l[r[x]]=alloc(i,i,nv);
-					up(r[x]);
+					int y=r[x],z=alloc(nb,ne,DEFAULT),w=alloc(i,i,nv);
+					r[x]=z;
+					if (i>mid(nb,ne)) l[z]=y,r[z]=w;
+					else r[z]=y,l[z]=w;
+					up(z);
 				}
-			} else r[x]=alloc(i,i,nv);
+			} else {int z=alloc(i,i,nv);r[x]=z;}
 		}
 		up(x);
 	}
@@ -85,8 +85,8 @@ struct SegTree2D {
 		else {
 			int m=mid(b[x],e[x]);
 			if (!l[x]) {
-				l[x]=alloc2(b[x],m);
-				r[x]=alloc2(m+1,e[x]);
+				int y=alloc2(b[x],m),z=alloc2(m+1,e[x]);
+				l[x]=y,r[x]=z;
 			}
 			if (i<=m) update2(l[x],i,j,nv);
 			else update2(r[x],i,j,nv);

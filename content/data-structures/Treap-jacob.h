@@ -26,7 +26,7 @@ struct treap {
 		return rand() * (sub[a]+sub[b]) < sub[a] * RAND_MAX;
 	}
 	ll bigrand() {
-		return rand()*RAND_MAX + rand();
+		return (ll)rand()*RAND_MAX + rand();
 	}
 	void alloc(int &x,ll _v) {
 		c[cur][0]=c[cur][1]=0;
@@ -114,7 +114,7 @@ struct treap {
 	}
 	void output(int x) {
 		if (c[x][0]) output(c[x][0]);
-		printf("(%lld, %lld to %lld %lld) ", 
+		printf("(%d, %d to %d %d) ", 
 				v[x],mv[x],v[c[x][0]],v[c[x][1]]);
 		if (c[x][1]) output(c[x][1]);
 	}
