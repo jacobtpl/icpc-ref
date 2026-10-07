@@ -4,6 +4,7 @@
  * License: CC0
  * Description: Permutation -> integer conversion. (Not order preserving.)
  * Integer -> permutation can use a lookup table.
+ * Values must be in $[0,n)$ and $n \le 12$ (the result is $< n!$).
  * Time: O(n)
  */
 #pragma once

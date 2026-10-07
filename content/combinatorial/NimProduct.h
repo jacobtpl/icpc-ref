@@ -45,7 +45,7 @@ struct Precalc {
 	ul multFast(ul a, ul b) const { // faster nim product
 		ul res = 0; auto f=[](ul c,int d) {return c>>(8*d)&255;};
 		rep(i,0,8) {
-			F0R(j,i) res ^= y[i][j][x[f(a,i)][f(b,j)]
+			rep(j,0,i) res ^= y[i][j][x[f(a,i)][f(b,j)]
 							^x[f(a,j)][f(b,i)]];
 			res ^= y[i][i][x[f(a,i)][f(b,i)]];
 		}
