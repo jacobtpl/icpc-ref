@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "ModPow.h"
+#include "ModMulLL.h"
 
 ll sqrt(ll a, ll p) {
 	a %= p; if (a < 0) a += p;
@@ -22,7 +22,7 @@ ll sqrt(ll a, ll p) {
 	while (s % 2 == 0)
 		++r, s /= 2;
 	/// find a non-square mod p
-	while (modpow(n, (p - 1) / 2, p) != p - 1) ++n;
+	while (modpow(n, (p - 1) / 2, p) != ull(p - 1)) ++n;
 	ll x = modpow(a, (s + 1) / 2, p);
 	ll b = modpow(a, s, p), g = modpow(n, s, p);
 	for (;; r = m) {
