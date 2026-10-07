@@ -32,5 +32,23 @@ int main() {
 		assert(minRotation(v) == 0);
 		assert(min_rotation2(v) == 0);
 	}
+	assert(minRotation("") == 0);
+	// longer strings: periodic, all-equal, near-periodic, high bytes
+	mt19937 rng(31337);
+	rep(it,0,100000) {
+		int n = 1 + (int)(rng() % 60), kind = (int)(rng() % 4);
+		int alpha = kind == 0 ? 256 : 1 + (int)(rng() % 3);
+		int p = 1 + (int)(rng() % 6);
+		string v(n, 0);
+		rep(i,0,n) v[i] = (char)('a' + rng() % (unsigned)alpha);
+		if (kind >= 2) rep(i,p,n) v[i] = v[i-p];
+		if (kind == 3) v[rng() % (unsigned)n]++;
+		int r = minRotation(v), best = 0;
+		string w = v + v;
+		// first index of the smallest rotation, chars compared as char
+		rep(i,1,n) if (lexicographical_compare(w.begin()+i, w.begin()+i+n,
+			w.begin()+best, w.begin()+best+n)) best = i;
+		assert(r == best);
+	}
 	cout<<"Tests passed!"<<endl;
 }
