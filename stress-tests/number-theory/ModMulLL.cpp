@@ -82,7 +82,32 @@ void testEdges() {
 	}
 }
 
+#ifdef BENCH
+// Opt-in (-DBENCH): the header claims modmul is ~2x faster than __int128 %.
+void bench() {
+	mt19937_64 rng(1);
+	volatile ull vm = 7199999999999999999ULL; ull m = vm, s = 0;
+	const int N = 1 << 16, IT = 50'000'000;
+	vector<ull> A(N), B(N);
+	rep(i,0,N) A[i] = rng() % m, B[i] = rng() % m;
+	auto now = [] { return chrono::duration<double, milli>(chrono::steady_clock::now().time_since_epoch()).count(); };
+	rep(mode,0,4) {
+		double t = now(); ull a = A[0];
+		rep(i,0,IT) {
+			ull x = mode < 2 ? a : A[i & (N-1)], y = B[i & (N-1)];
+			a = mode % 2 ? int128_modmul(x, y, m) : modmul(x, y, m), s += a;
+		}
+		cout << (mode < 2 ? "chained " : "independent ") << (mode % 2 ? "__int128 % : " : "modmul     : ")
+			<< (now() - t) / IT * 1e6 << " ns/op" << endl;
+	}
+	if (s == 42) cout << endl;
+}
+#endif
+
 int main() {
+#ifdef BENCH
+	bench();
+#endif
 	testEdges();
 	const ull limDoubles = 1ULL << 52;
 	test(limDoubles, true, true);
