@@ -270,7 +270,28 @@ void testNeg() {
 	cout<<"Tests passed!"<<endl;
 }
 
+// Opt-in (-DMCMF_INT_LIMITS): with the default typedefs (C = F = int)
+// answers are silently wrong once a shortest path costs >= INFC = 2^29-ish
+// or the total flow exceeds INT_MAX. Passes if the typedefs are widened.
+void testLimits() {
+	{
+		MCMF m(3);
+		m.addEdge(0, 1, 1, 300000000); m.addEdge(1, 2, 1, 300000000);
+		auto r = m.maxflow(0, 2);
+		assert(r.first == 1 && r.second == 600000000);
+	}
+	{
+		MCMF m(2);
+		m.addEdge(0, 1, 2000000000, 1); m.addEdge(0, 1, 2000000000, 1);
+		auto r = m.maxflow(0, 1);
+		assert(r.first == 4000000000LL && r.second == 4000000000LL);
+	}
+}
+
 int main() {
+#ifdef MCMF_INT_LIMITS
+	testLimits();
+#endif
 	srand(3);
 	testRef(200000, 6, 12, 5, 6, false);
 	testRef(200000, 6, 12, 5, 6, true);
