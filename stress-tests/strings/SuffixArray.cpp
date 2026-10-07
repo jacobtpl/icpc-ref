@@ -276,9 +276,12 @@ void stressSearch() {
 			testSearch(s, s + "a"); testSearch(s, s + s); testSearch(s, s);
 		}
 	}
-#ifdef SA_EMPTY_TEXT // opt-in: search() on an empty text reads sa[1]
-	testSearch("", "");
+	testSearch("", ""); // empty text
 	testSearch("", "a");
+#ifdef SA_HIGH_BYTES // opt-in: chars must be in [1, lim), so with a
+	// signed char, bytes >= 128 index ws[] with a negative value
+	string hi = "ab\xe9" "cd";
+	test(hi, 255);
 #endif
 }
 
