@@ -3,6 +3,7 @@
  * Description: Computes all faces of the 3-dimension hull of a point set.
  *  *No four points must be coplanar*, or else random results will be returned.
  *  All faces will point outwards.
+ *  Shuffles p; the returned faces index the shuffled p.
  * Time: O(n^2, n \log n)
  * Status: tested on SPOJ CH3D
  */

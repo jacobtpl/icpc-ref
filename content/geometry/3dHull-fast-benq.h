@@ -1,7 +1,10 @@
 /**
  * Author: Benq
  * Description: Computes all faces of the 3-dimension hull of a point set.
- * Time: O(n \log n)
+ *  All faces will point outwards. Coplanar points are fine if not all
+ *  points are coplanar (asserts) and coord$^3$ is exact in T ($|x| \le 5 \cdot 10^4$).
+ *  Shuffles p; the returned faces index the shuffled p.
+ * Time: O(n \log n) expected
  * Status: tested on SPOJ CH3D
  */
 #pragma once
