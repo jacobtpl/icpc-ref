@@ -2,7 +2,7 @@
  * Author: brunomont, CF
  * Description: Static RMQ
  * min(V[a], V[a + 1], ... V[b]) in constant time.
- * Usage: RMQ rmq(values); rmq.query(inclusive, exclusive);
+ * Usage: RMQ rmq(values); rmq.query(inclusive, inclusive);
  * Time: $O(N + Q)$
  * Status: tested
  */
