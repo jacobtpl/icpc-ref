@@ -15,8 +15,44 @@ int main2() {
 	return 0;
 }
 
+// Checks the returned iterator, negative / extreme coordinates and
+// that touching intervals are merged.
+void test2() {
+	mt19937 rng(11);
+	auto rnd = [&](int lo, int hi) { return uniform_int_distribution<int>(lo, hi)(rng); };
+	for (int off : {0, -7, INT_MIN, INT_MAX - 14}) rep(it,0,300000) {
+		static set<pii> iv; static vi line;
+		const int N = 14;
+		if (it % 40 == 0) iv.clear(), line.assign(N, 0);
+		int l = rnd(0, N), r = rnd(0, N);
+		if (l > r) swap(l, r);
+		if (rnd(0, 1)) {
+			auto res = addInterval(iv, off + l, off + r);
+			rep(i,l,r) line[i] = 1;
+			if (l == r) assert(res == iv.end());
+			else {
+				assert(res != iv.end());
+				assert(res->first <= off + l && off + r <= res->second);
+			}
+		} else {
+			removeInterval(iv, off + l, off + r);
+			rep(i,l,r) line[i] = 0;
+		}
+		// the set must be exactly the maximal runs of `line`
+		vector<pii> exp;
+		rep(i,0,N) if (line[i]) {
+			int j = i;
+			while (j < N && line[j]) j++;
+			exp.emplace_back(off + i, off + j);
+			i = j;
+		}
+		assert(vector<pii>(all(iv)) == exp);
+	}
+}
+
 int main() {
 	// return main2();
+	test2();
 	const int N = 10;
 	const int iters = 10000000;
 	set<pii> iv;

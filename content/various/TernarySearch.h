@@ -18,7 +18,7 @@ template<class F>
 int ternSearch(int a, int b, F f) {
 	assert(a <= b);
 	while (b - a >= 5) {
-		int mid = (a + b) / 2;
+		int mid = a + (b - a) / 2;
 		if (f(mid) < f(mid+1)) a = mid; // (A)
 		else b = mid+1;
 	}
