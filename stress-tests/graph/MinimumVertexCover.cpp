@@ -56,5 +56,27 @@ int main() {
 		verify(cover2);
 		// cout << '.' << endl;
 	}
+	// exact minimum by brute force over all vertex subsets (multi-edges, empty sides)
+	{ vector<vi> g; assert(cover(g, 0, 0).empty()); assert(cover(g, 0, 3).empty()); }
+	{ vector<vi> g(3); assert(cover(g, 3, 0).empty()); }
+	mt19937 rng(99);
+	rep(it,0,30000) {
+		int N = (int)(rng() % 7), M = (int)(rng() % 7), p = (int)(rng() % 101);
+		vector<vi> gr(N);
+		rep(i,0,N) rep(j,0,M) rep(k,0,2) if ((int)(rng() % 100) < (k ? p / 3 : p)) gr[i].push_back(j);
+		rep(i,0,N) shuffle(all(gr[i]), rng);
+		int best = N + M;
+		rep(mask,0,1 << (N + M)) {
+			bool ok = 1;
+			rep(i,0,N) if (!(mask >> i & 1)) for (int j : gr[i]) if (!(mask >> (N + j) & 1)) ok = 0;
+			if (ok) best = min(best, __builtin_popcount(mask));
+		}
+		for (vi c : {cover(gr, N, M), coverHK(gr, N, M)}) {
+			assert(sz(c) == best);
+			int mask = 0;
+			for (int x : c) { assert(0 <= x && x < N + M && !(mask >> x & 1)); mask |= 1 << x; }
+			rep(i,0,N) if (!(mask >> i & 1)) for (int j : gr[i]) assert(mask >> (N + j) & 1);
+		}
+	}
 	cout<<"Tests passed!"<<endl;
 }
