@@ -4,6 +4,7 @@
 int main(int argc, char* argv[]) {
 	if(argc != 3) {
 		printf("\x1b[31mUsage: ./run_interaction [grader] [user]\x1b[0m\n");
+		return 1;
 	}
 
 	int fd_grader[2]; // grader -> user channel
