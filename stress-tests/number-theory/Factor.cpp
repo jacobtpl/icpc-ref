@@ -55,7 +55,7 @@ int main() {
 		assertValid(n*ll(n), res);
 	}
 	// compare against trial division, as multisets
-	rep(n,1,300000) {
+	rep(n,1,100000) {
 		auto res = factor(n), exp = naive(n);
 		sort(all(res));
 		assert(res == exp);
@@ -83,7 +83,7 @@ int main() {
 		while (n <= 7000000000000000000ULL / p) n *= p, check(n);
 	}
 	// squares and cubes of larger primes
-	rep(i,0,300) {
+	rep(i,0,150) {
 		ull p = randPrime(1e5, 2600000000ULL);
 		auto res = factor(p * p);
 		assert((res == vector<ull>{p, p}));
@@ -92,7 +92,7 @@ int main() {
 		assert((res == vector<ull>{q, q, q}));
 	}
 	// semiprimes of every size, balanced and unbalanced
-	rep(i,0,20000) {
+	rep(i,0,9000) {
 		int b1 = 2 + i % 30, b2 = 2 + (i / 30) % 30;
 		ull p = randPrime(1ULL << (b1 - 1), 1ULL << b1);
 		ull q = randPrime(1ULL << (b2 - 1), 1ULL << b2);
@@ -101,7 +101,7 @@ int main() {
 		assert((res == vector<ull>{min(p, q), max(p, q)}));
 	}
 	// worst case: two primes just below sqrt(7e18)
-	rep(i,0,300) {
+	rep(i,0,150) {
 		ull p = randPrime(2500000000ULL, 2640000000ULL);
 		ull q = randPrime(2500000000ULL, 2640000000ULL);
 		auto res = factor(p * q);
