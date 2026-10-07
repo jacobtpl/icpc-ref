@@ -45,8 +45,9 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 	{ // remove parallel rays
 		vector<Ray> nrays;
 		for(auto& t: rays) {
-			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS) { nrays.pb(t); continue; }
-			// last two rays are parallel, keep only one
+			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS
+				|| nrays.back().dp.dot(t.dp) < 0) { nrays.pb(t); continue; }
+			// last two rays have the same direction, keep only one
 			if (t.dp.cross(t.p-nrays.back().p) > 0) nrays.back() = t;
 		}
 		swap(rays, nrays);
@@ -72,7 +73,7 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 		reduce(poly[0]);
 		if (!bad(poly.back(),poly[0],poly[1])) break;
 	}
-	assert(sz(poly) >= 3); // expect nonzero area
+	if (sz(poly) < 3) return {}; // empty or zero area
 	vP poly_points; rep(i,0,sz(poly))
 		poly_points.pb(poly[i].isect(poly[(i+1)%sz(poly)]));
 	return poly_points;
