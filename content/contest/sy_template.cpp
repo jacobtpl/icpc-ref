@@ -10,8 +10,8 @@ typedef long long ll;
 template<typename T>
 struct vector: std::vector<T> {
 	using std::vector<T>::vector;
-	T& operator[] (size_t idx) {return this->at(idx);}
-	T const& operator[] (size_t idx) const {return this->at(idx);}
+	decltype(auto) operator[] (size_t idx) {return this->at(idx);}
+	decltype(auto) operator[] (size_t idx) const {return this->at(idx);}
 };
 #else
 using std::vector;
