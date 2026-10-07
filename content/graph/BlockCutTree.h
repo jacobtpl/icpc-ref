@@ -46,7 +46,7 @@ tuple<int, vector<vi>, vector<vi>, vi, vi> BCTree() {
 	int TN = bclist.size();
 	vector<vi> who(TN);
 	for(int i = 0;i < N;++i)
-		if(vmap[i] == -2) vmap[i] = TN++, who.emplace_back(1, i);
+		if(vmap[i] < 0) vmap[i] = TN++, who.emplace_back(1, i);
 		else who[vmap[i]].emplace_back(i);
 	vector<vi> tadj(TN);
 
