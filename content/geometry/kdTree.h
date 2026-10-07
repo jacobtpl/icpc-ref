@@ -2,7 +2,9 @@
  * Author: Stanford
  * Date: Unknown
  * Source: Stanford Notebook
- * Description: KD-tree (2d, can be extended to 3d)
+ * Description: KD-tree (2d, can be extended to 3d). Needs at least one point.
+ * Time: O(n \log^2 n) build. nearest is O(\log n) on average for random
+ * points, but O(n) in the worst case (e.g. points on a circle, query at its center).
  * Status: Tested on excellentengineers
  */
 #pragma once
