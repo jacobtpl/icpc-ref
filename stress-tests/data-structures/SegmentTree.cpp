@@ -60,7 +60,11 @@ struct Tree {
 int nonabelianF(int a, int b) {
 	return a == INT_MIN ? b : b == INT_MIN ? a : nonabelian::lut[a][b];
 }
-int segF(int a, int b) { return segMode ? nonabelianF(a, b) : max(a, b); }
+// segMode = 2: sum, again with INT_MIN as the identity.
+int sumF(int a, int b) { return a == INT_MIN ? b : b == INT_MIN ? a : a + b; }
+int segF(int a, int b) {
+	return segMode == 1 ? nonabelianF(a, b) : segMode == 2 ? sumF(a, b) : max(a, b);
+}
 
 void testMore() {
 	mt19937 rng(7);
@@ -73,10 +77,8 @@ void testMore() {
 				(ri(0, 1) ? INT_MIN : INT_MAX);
 		};
 		int def = ri(0, 1) ? maximum::Tree::unit : val();
-		maximum::Tree tr(n, maximum::Tree::unit);
-		vi v(n, maximum::Tree::unit);
-		if (def != maximum::Tree::unit) // a non-unit default needs explicit updates
-			rep(i,0,n) tr.update(i, def), v[i] = def;
+		maximum::Tree tr(n, def);
+		vi v(n, def);
 		rep(it,0,300) {
 			if (n && ri(0, 2)) {
 				int i = ri(0, n - 1);
@@ -102,6 +104,23 @@ void testMore() {
 			int r = INT_MIN;
 			rep(k,i,j) r = nonabelianF(r, v[k]);
 			assert(tr.query(i, j) == r);
+		}
+	}
+	// f = sum with a non-unit default: Tree(n, def) must describe n copies of def
+	segMode = 2;
+	rep(n,0,40) rep(rounds,0,10) {
+		int def = ri(-5, 5);
+		maximum::Tree tr(n, def);
+		vi v(n, def);
+		rep(it,0,100) {
+			int i = ri(0, n), j = ri(0, n);
+			int r = INT_MIN;
+			rep(k,i,j) r = sumF(r, v[k]);
+			assert(tr.query(i, j) == r);
+			if (n && ri(0, 3) == 0) {
+				i = ri(0, n - 1);
+				tr.update(i, v[i] = ri(-5, 5));
+			}
 		}
 	}
 	segMode = 0;
