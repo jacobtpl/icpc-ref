@@ -49,7 +49,34 @@ void run(int R, int C, int ops, ll maxv) {
 	}
 }
 
+// Opt-in cost report (not run by default, the larger sizes need several hundred MB):
+//   g++ -std=c++17 -O2 -DBENCH SparseSegTree2D.cpp && ./a.out
+// prints time and number of allocated nodes (28 bytes each) for N random updates.
+void bench() {
+	const int B = 1000000000;
+	for (int n : {22000, 100000, 250000}) {
+		SegTree2D st(B, B);
+		auto t0 = chrono::steady_clock::now();
+		rep(i,0,n) st.update((int)rnd(0, B - 1), (int)rnd(0, B - 1), rnd(0, (ll)4e18));
+		auto t1 = chrono::steady_clock::now();
+		ll x = 0;
+		rep(i,0,n) {
+			int p = (int)rnd(0, B - 1), u = (int)rnd(0, B - 1), q = (int)rnd(0, B - 1), v = (int)rnd(0, B - 1);
+			x ^= st.query(min(p, u), min(q, v), max(p, u), max(q, v));
+		}
+		auto t2 = chrono::steady_clock::now();
+		cout << n << " updates: " << chrono::duration<double>(t1 - t0).count() << " s, "
+			<< sz(st.b) << " nodes (" << sz(st.b) / n << " per update, "
+			<< (ll)sz(st.b) * 28 / 1000000 << " MB); " << n << " queries: "
+			<< chrono::duration<double>(t2 - t1).count() << " s (" << x << ")" << endl;
+	}
+}
+
 int main() {
+#ifdef BENCH
+	bench();
+	return 0;
+#endif
 	{ // empty structure
 		SegTree2D st(1000000000, 1000000000);
 		assert(st.query(0, 0, 999999999, 999999999) == 0);
