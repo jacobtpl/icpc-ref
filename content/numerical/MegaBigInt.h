@@ -453,7 +453,7 @@ struct BigInt {
         return res;
     }
 
-    typedef vector<long long> vll;
+    typedef vector<unsigned long long> vll; // karatsuba intermediates wrap mod 2^64
 
     static vll karatsubaMultiply(const vll &a, const vll &b) {
         int n = a.size();
