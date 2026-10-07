@@ -7,10 +7,6 @@
  * Time: O(N \log N) with $N = |A|+|B|$ ($\tilde 1s$ for $N=2^{22}$)
  * Status: somewhat tested
  */
-#pragma once
-
-#include "FastFourierTransform.h"
-
 vector<C> conv_complex(const vector<C>& a, const vector<C>& b) {
 	if (a.empty() || b.empty()) return {};
 	vector<C> res(sz(a) + sz(b) - 1);

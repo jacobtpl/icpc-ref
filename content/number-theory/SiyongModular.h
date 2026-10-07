@@ -5,8 +5,6 @@
  * Status: Tested many many times
  * Time: Faster than kactl mod. Slower than using ll directly
  */
-#pragma once
-
 int const MOD = 998244353;
 ll euclid(ll a, ll b, ll &x, ll &y) {
 	if (!b) return x = 1, y = 0, a;

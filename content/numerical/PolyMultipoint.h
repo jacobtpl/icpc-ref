@@ -3,10 +3,6 @@
  * Description: Multipoint evaluation and interpolation
  * Time: O(N\log^2 N)
  */
-#pragma once
-
-#include "PolyOps2.h"
-
 void segProd(vector<poly>& stor, poly& v, int ind, int l, int r) { // v -> places to evaluate at
 	if (l == r) { stor[ind] = {-v[l],1}; return; }
 	int m = (l+r)/2; segProd(stor,v,2*ind,l,m); segProd(stor,v,2*ind+1,m+1,r);

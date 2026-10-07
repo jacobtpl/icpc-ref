@@ -11,7 +11,6 @@
  * Usage: Dinic d(n); d.AddEdge(u, v, cap); ll f = d.MaxFlow(s, t);
  * Status: stress-tested
  */
-#pragma once
 
 struct Dinic {
   struct Edge {

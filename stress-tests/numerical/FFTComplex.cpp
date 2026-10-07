@@ -2,6 +2,7 @@
 
 // FFTComplex.h uses `C` and `fft` from FastFourierTransform.h, which it
 // has to pull in itself.
+#include "../../content/numerical/FastFourierTransform.h"
 #include "../../content/numerical/FFTComplex.h"
 
 mt19937_64 rng(4242);
