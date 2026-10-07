@@ -59,6 +59,7 @@ poly exp(poly A, int n) { assert(A[0].v == 0);
 	return RSZ(B,n);
 } // 203953
 poly pow(poly A, ll b, int n) {
+    A.resize(n);
     if (b==0) { poly r(n,0); r[0]=1; return r; }
     int t = -1;
     for (int i = 0; i < n; i++) if (A[i].v != 0) { t = i; break; }
