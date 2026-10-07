@@ -6,13 +6,13 @@
  * Description: Dinic's without scaling
  */
 
-struct Edge {
-  int u, v;
-  ll cap, flow;
-  Edge() {}
-  Edge(int u, int v, ll cap): u(u), v(v), cap(cap), flow(0) {}
-};
 struct Dinic {
+  struct Edge {
+    int u, v;
+    ll cap, flow;
+    Edge() {}
+    Edge(int u, int v, ll cap): u(u), v(v), cap(cap), flow(0) {}
+  };
   int N;
   vector<Edge> E;
   vector<vector<int>> g;
