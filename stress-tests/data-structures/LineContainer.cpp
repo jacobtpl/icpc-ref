@@ -66,6 +66,46 @@ int test2() {
 	return 0;
 }
 
+// brute force with __int128, large coefficients, duplicates, sorted orders
+void test3() {
+	mt19937_64 rng(99);
+	auto rnd = [&](ll lim) { return (ll)(rng() % (2 * (unsigned long long)lim + 1)) - lim; };
+	rep(it,0,6000) {
+		int N = (int)(rng() % 12) + 1;
+		if (it % 100 == 0) N = 400;
+		ll K = 1, M = 1, X = 1;
+		switch (it % 6) {
+			case 0: K = 3, M = 3, X = 5; break;
+			case 1: K = 1000000000, M = (ll)1e18, X = 1000000000; break;
+			case 2: K = 2, M = (ll)1e18, X = 1000000000; break;
+			case 3: K = 1000000000, M = 2, X = 1000000000; break;
+			case 4: K = (ll)1e6, M = (ll)1e12, X = (ll)1e6; break;
+			case 5: K = (ll)1e18, M = (ll)1e18, X = 2; break;
+		}
+		vector<pair<ll, ll>> ls(N);
+		for (auto& l : ls) l = {rnd(K), rnd(M)};
+		int order = (int)(rng() % 4);
+		if (order == 1) sort(all(ls));
+		if (order == 2) sort(all(ls)), reverse(all(ls));
+		if (order == 3) rep(i,1,N) if (rng() % 3 == 0) ls[i] = ls[rng() % i];
+		LineContainer lc;
+		rep(i,0,N) {
+			lc.add(ls[i].first, ls[i].second);
+			rep(q,0,N > 100 ? 2 : 6) {
+				ll x = rnd(X);
+				if (rng() % 8 == 0) x = rng() % 2 ? X : -X;
+				__int128 best = (__int128)ls[0].first * x + ls[0].second;
+				rep(j,1,i+1) best = max(best, (__int128)ls[j].first * x + ls[j].second);
+				assert(best == lc.query(x));
+			}
+			// hull invariants: sorted slopes, strictly increasing breakpoints
+			assert(prev(lc.end())->p == LineContainer::inf);
+			for (auto a = lc.begin(), b = next(a); b != lc.end(); ++a, ++b)
+				assert(a->k <= b->k && a->p < b->p);
+		}
+	}
+}
+
 volatile ll glob;
 int ra() {
 	static unsigned blah;
@@ -93,5 +133,6 @@ int main() {
 		}
 	}
 	test2();
+	test3();
 	cout<<"Tests passed!"<<endl;
 }

@@ -86,14 +86,12 @@ public:
 	}
 	void clear() { clear(root); root = -1; }
 	Node& get_root() { return N[root]; }
-	/*
-	static AVL make_avl(Node n)
-	{
+	static AVL make_avl(Node n) {
 		int root;
-		if(bank.empty()) root = N.size(), N.push_back(std::move(n));
+		if (bank.empty()) root = (int)N.size(), N.push_back(n);
 		else root = bank.back(), bank.pop_back(), N[root] = n;
 		return AVL(root);
-	} */
+	}
 };
 typedef AVL::Node Node;
 std::vector<Node> AVL::N;
