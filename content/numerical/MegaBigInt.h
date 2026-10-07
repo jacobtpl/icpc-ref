@@ -568,7 +568,7 @@ struct BigInt {
 
         int n = a.a.size();
 
-        int firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
+        int firstDigit = (int) sqrtl((long double) a.a[n - 1] * BASE + a.a[n - 2]);
         int norm = BASE / (firstDigit + 1);
         a *= norm;
         a *= norm;
@@ -576,7 +576,7 @@ struct BigInt {
             a.a.push_back(0);
 
         BigInt r = (long long) a.a[n - 1] * BASE + a.a[n - 2];
-        firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
+        firstDigit = (int) sqrtl((long double) a.a[n - 1] * BASE + a.a[n - 2]);
         int q = firstDigit;
         BigInt res;
 
