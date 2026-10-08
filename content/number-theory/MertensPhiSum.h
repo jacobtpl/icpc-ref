@@ -8,23 +8,23 @@
  * $M(n) = 1 - \sum_{d=2}^{n} M(\lfloor n/d \rfloor)$, and
  * \texttt{Phi(n)} $= \sum_{i=1}^{n} \phi(i) = \sum_{d=1}^{n} \mu(d) T(\lfloor n/d \rfloor)$,
  * $T(m) = m(m+1)/2$. Both are exact for any $n \ge 0$; \texttt{Phi(n)} only
- * fits in a \texttt{ll} for $n \le 5.5 \cdot 10^9$. Call \texttt{init()} first.
+ * fits in a \texttt{ll} for $n \le 5.5 \cdot 10^9$. Call \texttt{initMu()} once first.
  * In general, if $g$ and $f * g$ have easy prefix sums $G$, $H$ then
  * $g(1) S_f(n) = H(n) - \sum_{d=2}^{n} g(d) S_f(\lfloor n/d \rfloor)$.
- * Time: \texttt{init} is $O(\texttt{LIM})$; with $\texttt{LIM} \approx n^{2/3}$,
+ * Time: \texttt{initMu} is $O(\texttt{LIM})$; with $\texttt{LIM} \approx n^{2/3}$,
  * \texttt{M(n)} is $O(n^{2/3})$ and \texttt{Phi(n)} is $O(\sqrt n)$ more.
  * $n=10^{10}$ (\texttt{LIM}=5e6) $\approx$ 0.3s, $n=10^{11}$ (\texttt{LIM}=2e7) $\approx$ 1.5s.
- * Usage: init(); ll m = M(n); lll s = Phi(n);
+ * Usage: initMu(); ll m = M(n); lll s = Phi(n);
  * Status: stress-tested
  */
 #pragma once
 
 typedef __int128 lll;
 const int LIM = 5e6; // ~ n^(2/3), 4*LIM bytes
-int mu[LIM]; // prefix sums of mu after init()
+int mu[LIM]; // prefix sums of mu after initMu()
 map<ll, ll> memo;
 
-void init() {
+void initMu() {
 	vi pr; vector<bool> comp(LIM);
 	mu[1] = 1;
 	rep(i,2,LIM) {
