@@ -4,18 +4,16 @@
  * License: CC0
  * Source: Bj\"orklund, Husfeldt, Kaski, Koivisto, "Fourier meets M\"obius: fast subset convolution" (2007)
  * Description: \texttt{zeta(a)} replaces $a[S]$ by
- * $\sum_{T \subseteq S} a[T]$; \texttt{zeta(a, 1)} is the inverse
+ * $\sum_{U \subseteq S} a[U]$; \texttt{zeta(a, 1)} is the inverse
  * (M\"obius transform). \texttt{subsetConv} returns
- * $c[S] = \sum_{T \subseteq S} a[T] \cdot b[S \setminus T]$.
+ * $c[S] = \sum_{U \subseteq S} a[U] \cdot b[S \setminus U]$.
  * Masks are bitsets over bits $0..n-1$; $a$ and $b$ must have the
- * same size $N = 2^n \ge 1$. $T$ is a modular type or
- * \texttt{unsigned ll}: intermediate values overflow \texttt{ll}
- * even when the answer fits, but the result is exact mod $2^{64}$.
- * \texttt{subsetConv} stores $2N(n+1)$ values
- * ($n=20$: 170 MB for mint, 340 MB for 64-bit).
- * Leave \texttt{w} (internal block width) as 1.
+ * same size $N = 2^n \ge 1$. The value type is a modular type or
+ * \texttt{unsigned long long} (exact mod $2^{64}$; intermediate
+ * values overflow \texttt{ll} even when the answer fits).
+ * \texttt{subsetConv} stores $2N(n+1)$ values; never pass \texttt{w}.
  * Time: O(N \log N) for zeta, O(N \log^2 N) for subsetConv
- * ($n=20$: $\approx 1$s with mint).
+ * ($n=20$: $\approx 1.2$s with mint, $\approx 1.7$s and 340 MB for 64-bit).
  * Usage: vector<mint> c = subsetConv(a, b);
  * Status: stress-tested
  */
