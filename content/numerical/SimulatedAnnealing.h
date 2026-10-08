@@ -2,31 +2,34 @@
  * Author: Devin
  * Date: 2026-10-08
  * License: CC0
- * Source: Kirkpatrick, Gelatt, Vecchi (1983); xorshift64 (7, 9) by Marsaglia
+ * Source: Kirkpatrick, Gelatt, Vecchi (1983); xorshift64 (13, 7, 17) by Marsaglia
  * Description: Simulated annealing, minimizing a score for \texttt{sec} seconds.
  * \texttt{step()} applies a random neighbour move to the user's state and returns
  * the new score, \texttt{undo()} reverts that move, \texttt{save()} is called
- * whenever the state is the best seen so far (copy it there); the initial state is
- * not saved. Returns the best score, given the initial score \texttt{cur}.
+ * whenever the state is strictly better than all earlier ones (copy it there); the
+ * initial state is not saved. Returns the best score, given the initial score \texttt{cur}.
  * A worse move is accepted with probability $e^{-\Delta/T}$, where $T$ falls
  * geometrically from \texttt{t0} to \texttt{t1} ($\texttt{t0} \ge \texttt{t1} > 0$);
  * pick them near the largest and smallest typical $\Delta$ of a worsening move.
  * Scores must be finite. To maximize, negate the score.
  * The clock is read every 256 steps, so step should be fast ($O(1)$ score updates).
  * \texttt{rnd()} is uniform on $[1, 2^{64})$, \texttt{rnd01()} on $[0, 1)$; \texttt{rs} must be nonzero.
- * Time: \texttt{sec} seconds; one step, and one undo or save, per iteration.
+ * Time: \texttt{sec} seconds; one step, and at most one undo or save, per iteration.
  * Usage:
-	double b = anneal(len(p), 0.9, 100, 0.1, [&]() {
-		i = rnd() % n, j = rnd() % n; // 2-opt, say
+	double b = anneal(len(p), 0.9, 100, 0.1, [\&]() {
+		j = rnd() \% n, i = rnd() \% (j + 1); // 2-opt, say
 		rev(i, j); return len(p); // better: update in O(1)
-	}, [&]() { rev(i, j); }, [&]() { bp = p; });
- * Status: stress-tested (optimal on small TSP against DP, Boltzmann acceptance, RNG period)
+	}, [\&]() { rev(i, j); }, [\&]() { bp = p; });
+ * Status: stress-tested (optimal on small TSP against DP, Boltzmann state occupancy, RNG serial correlation)
  */
 #pragma once
 
 typedef unsigned long long ull;
 ull rs = 88172645463325252;
-ull rnd() { rs ^= rs << 7; return rs ^= rs >> 9; }
+ull rnd() {
+	rs ^= rs << 13; rs ^= rs >> 7;
+	return rs ^= rs << 17;
+}
 double rnd01() { return double(rnd() >> 11) * 0x1p-53; }
 
 template<class S, class U, class B>
