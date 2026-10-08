@@ -13,10 +13,9 @@
  * order, so they must commute. Everything is removed at the end.
  * Usage:
  *  vi cnt(C), res(n); int d = 0; // distinct colours in subtree
- *  sack(g, 0, [&](int v) { d += !cnt[col[v]]++; },
- *   [&](int v) { d -= !--cnt[col[v]]; },
- *   [&](int v) { res[v] = d; });
- * Time: $O(N \log N)$ hook calls
+ *  sack(g, 0, [\&](int v) { d += !cnt[col[v]]++; }, [\&](int v)
+ *   { d -= !--cnt[col[v]]; }, [\&](int v) { res[v] = d; });
+ * Time: $O(N \log N)$ hook calls + $O(N)$
  * Status: stress-tested
  */
 #pragma once
