@@ -8,7 +8,10 @@
  *  (so the argmins are non-decreasing). This holds for Monge matrices:
  *  $A[i][j] + A[i'][j'] \le A[i][j'] + A[i'][j]$.
  *  Returns the 0-indexed column of the leftmost minimum of each row. Requires $m \ge 1$ if $n \ge 1$.
- *  Values are only compared with $<$ and $>$. For maxima, negate $f$.
+ *  Values are only compared with $<$ and $>$. Negating $f$ gives maxima only if $-A$
+ *  satisfies the condition (e.g. inverse Monge $A$); for row maxima of a Monge $A$ use
+ *  $g(i, j) = -f(i, m-1-j)$: row $i$'s rightmost maximum is at column $m-1-$ans$[i]$.
+ *  Mainly pays off over D\&C when $f$ is expensive or $m \gg n$.
  * Time: O(N + M) calls to $f$
  * Usage: vi opt = smawk(n, m, [\&](int i, int j) { return cost(i, j); });
  * Status: stress-tested
