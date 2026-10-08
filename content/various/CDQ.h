@@ -10,9 +10,9 @@
  *  $p_j \le p_i$ in all three coordinates (equal points count each other).
  *  Any int coordinates work (z is compressed). To drop a dimension by
  *  offline processing in general, make time the first key and change the
- *  marked lines.
+ *  three commented lines (insert left, query right, undo).
  * Time: O(N \log^2 N)
- * Usage: vi res = cdq(pts); // pts[i] = \{x, y, z\}
+ * Usage: vi res = cdq(pts); // pts[i] = {x, y, z}
  * Status: stress-tested
  */
 #pragma once
