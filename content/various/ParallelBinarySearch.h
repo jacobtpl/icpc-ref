@@ -8,13 +8,14 @@
  * such that \texttt{check(j)} holds after the first $k$ operations
  * (i.e. operations $[0,k)$), or $n+1$ if there is none.
  * \texttt{check(j)} must be monotone in $k$ (false, then true) and must
- * not modify the structure. \texttt{reset()} restores the empty structure,
- * \texttt{apply(i)} applies operation $i$.
+ * not change the structure's answers. \texttt{reset()} restores the empty
+ * structure, \texttt{apply(i)} applies operation $i$. Needs $n < 2^{30}$.
  * Usage:
-	UF uf(0); // edges (a[i], b[i]), queries (u[j], v[j])
-	vi r = parBinSearch(m, q, [\&]() { uf = UF(n); },
-		[\&](int i) { uf.join(a[i], b[i]); },
-		[\&](int j) { return uf.sameSet(u[j], v[j]); });
+	UF uf(0); // edges a[i]-b[i], queries u[j],v[j]
+	auto R = [\&]() { uf = UF(n); };
+	auto A = [\&](int i) { uf.join(a[i], b[i]); };
+	auto C = [\&](int j) { return uf.sameSet(u[j], v[j]); };
+	vi r = parBinSearch(m, q, R, A, C);
  * Time: $\lfloor\log_2(n+1)\rfloor+1$ rounds, each one reset, $n$ applies
  * and at most $q$ checks: O((n+q) \log n) operations.
  * Status: stress-tested
