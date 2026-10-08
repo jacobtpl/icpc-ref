@@ -7,10 +7,10 @@
  * of neighbors of the left partition, and $btoa$ should be a vector full of
  * -1's of the same size as the right partition. Returns the size of
  * the matching. $btoa[i]$ will be the match for vertex $i$ on the right side,
- * or $-1$ if it's not matched.
+ * or $-1$ if it's not matched. Recursion depth is up to $\min(|L|, |R|)$.
  * Usage: vi btoa(m, -1); hopcroftKarp(g, btoa);
  * Time: O(\sqrt{V}E)
- * Status: stress-tested by MinimumVertexCover, and tested on oldkattis.adkbipmatch and SPOJ:MATCHING
+ * Status: stress-tested against brute force, DFSMatching and another Hopcroft-Karp
  */
 #pragma once
 
@@ -36,24 +36,17 @@ int hopcroftKarp(vector<vi>& g, vi& btoa) {
 		for (int a : btoa) if(a != -1) A[a] = -1;
 		rep(a,0,sz(g)) if(A[a] == 0) cur.push_back(a);
 		/// Find all layers using bfs.
-		for (int lay = 1;; lay++) {
-			bool islast = 0;
+		bool found = 0;
+		for (int lay = 1; !cur.empty(); lay++) {
 			next.clear();
-			for (int a : cur) for (int b : g[a]) {
-				if (btoa[b] == -1) {
-					B[b] = lay;
-					islast = 1;
-				}
-				else if (btoa[b] != a && !B[b]) {
-					B[b] = lay;
-					next.push_back(btoa[b]);
-				}
+			for (int a : cur) for (int b : g[a]) if (!B[b]) {
+				B[b] = lay;
+				if (btoa[b] == -1) found = 1;
+				else A[btoa[b]] = lay, next.push_back(btoa[b]);
 			}
-			if (islast) break;
-			if (next.empty()) return res;
-			for (int a : next) A[a] = lay;
 			cur.swap(next);
 		}
+		if (!found) return res;
 		/// Use DFS to scan for augmenting paths.
 		rep(a,0,sz(g))
 			res += dfs(a, 0, g, btoa, A, B);
