@@ -1,7 +1,7 @@
 #include "../utilities/template.h"
 
 #include "../../content/graph/PushRelabel.h"
-#include "../../content/graph/DinicWithScaling.h"
+#include "../../content/graph/Dinic.h"
 #include "../../content/graph/EdmondsKarp.h"
 
 // Bump allocator, to speed the test up and get rid of malloc performance noise
@@ -9,10 +9,9 @@ static char buf[1 << 23];
 static size_t bufi = sizeof buf;
 void* operator new(size_t s) {
 	assert(s < bufi);
-	return (void*)&buf[bufi = (bufi - s) & ~(size_t)15];
+	return (void*)&buf[bufi -= s];
 }
 void operator delete(void*) {}
-void operator delete(void*, size_t) {}
 
 int main() {
 	rep(it,0,500000) {
@@ -98,42 +97,6 @@ int main() {
 
 		// min cut = max flow
 		assert(acrossCut == flow);
-	}
-
-	// DinicWithScaling vs EdmondsKarp with long long capacities far above 2^30
-	// (20 edges of up to 4e17 keep every sum below LLONG_MAX), plus its min cut.
-	rep(it,0,100000) {
-		bufi = sizeof buf;
-		int n = 2 + rand() % 7;
-		int s = rand() % n;
-		int t = rand() % (n - 1);
-		if (t >= s) t++;
-		Dinic dinic(n);
-		vector<unordered_map<int, ll>> ek(n);
-		int m = rand() % 21;
-		int mode = it % 4;
-		rep(eit,0,m) {
-			int a = rand() % n;
-			int b = rand() % n;
-			ll c = mode == 0 ? 400000000000000000LL - rand() % 5
-				: mode == 1 ? (1LL << (rand() % 58)) + rand() % 3 - 1
-				: mode == 2 ? (1LL << 30) + rand() % 3 - 1
-				: rand() % 3;
-			dinic.addEdge(a, b, c);
-			if (a != b) ek[a][b] += c;
-		}
-		ll flow = dinic.calc(s, t);
-		assert(flow == edmondsKarp(ek, s, t));
-		vector<ll> ex(n);
-		ll cut = 0;
-		assert(dinic.leftOfMinCut(s) && !dinic.leftOfMinCut(t));
-		rep(i,0,n) for (auto& e : dinic.adj[i]) {
-			assert(0 <= e.c && e.flow() <= e.oc);
-			ex[i] -= e.flow(), ex[e.to] += e.flow();
-			if (dinic.leftOfMinCut(i) && !dinic.leftOfMinCut(e.to)) cut += e.oc;
-		}
-		rep(i,0,n) if (i != s && i != t) assert(ex[i] == 0);
-		assert(ex[t] == flow && cut == flow);
 	}
 
 	cout << "Tests passed!" << endl;

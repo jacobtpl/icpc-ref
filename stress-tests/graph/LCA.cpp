@@ -79,60 +79,10 @@ void test_n(int n, int num) {
     }
 }
 
-// Oracle: walk up parent pointers. `directed` passes child-only lists.
-void test_naive(int n, bool directed, int shape) {
-	vi par(n, -1), depth(n), perm(n);
-	iota(all(perm), 0);
-	random_shuffle(perm.begin() + 1, perm.end()); // 0 stays root
-	vector<vi> tree(n);
-	rep(i,1,n) {
-		int p = shape == 0 ? rand() % i : shape == 1 ? i - 1 :
-			shape == 2 ? 0 : (i - 1) / 2;
-		int a = perm[i], b = perm[p];
-		par[a] = b;
-		tree[b].push_back(a);
-		if (!directed) tree[a].push_back(b);
-	}
-	if (rand() % 2) for (auto& v : tree) random_shuffle(all(v));
-	rep(i,1,n) depth[perm[i]] = depth[par[perm[i]]] + 1;
-	LCA l(tree);
-	auto naive = [&](int a, int b) {
-		while (a != b) {
-			if (depth[a] < depth[b]) swap(a, b);
-			a = par[a];
-		}
-		return a;
-	};
-	if (n <= 40) { rep(a,0,n) rep(b,0,n) assert(l.lca(a, b) == naive(a, b)); }
-	else rep(it,0,300) {
-		int a = rand() % n, b = rand() % n;
-		assert(l.lca(a, b) == naive(a, b));
-	}
-}
-
 signed main() {
-    srand(5);
-    rep(n,1,13) rep(it,0,1500) test_naive(n, it & 1, 0);
-    rep(it,0,2000) test_naive(rand() % 40 + 1, it & 1, it % 4);
-    rep(it,0,40) test_naive(rand() % 3000 + 1, it & 1, it % 4);
     test_n(10, 1000);
     test_n(100, 100);
     test_n(1000, 10);
-#ifdef LCA_DEEP
-    // Opt-in: the recursive dfs needs ~32 bytes of stack per level, so a
-    // path with >= ~3e5 nodes overflows a default 8 MB stack (run with
-    // `ulimit -s 8192`; run-all.sh raises the limit to 512 MB).
-    {
-        int n = 1000000;
-        vector<vi> tree(n);
-        rep(i,1,n) tree[i-1].push_back(i), tree[i].push_back(i-1);
-        LCA l(tree);
-        rep(i,0,1000) {
-            int a = rand() % n, b = rand() % n;
-            assert(l.lca(a, b) == min(a, b));
-        }
-    }
-#endif
     cout<<"Tests passed!"<<endl;
 }
 

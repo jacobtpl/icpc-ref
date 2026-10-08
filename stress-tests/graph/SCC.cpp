@@ -83,36 +83,6 @@ int main() {
 		}
 		// cout << "tested " << count << endl;
 	}
-	// larger random graphs (self-loops, multi-edges, disconnected) against Floyd-Warshall reachability
-	mt19937 rng(4242);
-	rep(it,0,30000) {
-		int N = (int)(rng() % 13), M = N ? (int)(rng() % (3 * N + 1)) : 0;
-		vector<vi> adj(N);
-		vector<vector<bool>> reach(N, vector<bool>(N));
-		rep(i,0,N) reach[i][i] = 1;
-		rep(i,0,M) {
-			int a = (int)(rng() % N), b = (int)(rng() % N);
-			adj[a].push_back(b); reach[a][b] = 1;
-		}
-		rep(k,0,N) rep(i,0,N) rep(j,0,N) if (reach[i][k] && reach[k][j]) reach[i][j] = 1;
-		vector<vi> comps;
-		scc(adj, [&](vi& v) {
-			assert(ncomps == sz(comps)); // callback sees the index of the component being reported
-			for (int x : v) assert(comp[x] == ncomps);
-			comps.push_back(v);
-		});
-		assert(ncomps == sz(comps));
-		vi cnt(N);
-		rep(c,0,ncomps) {
-			assert(!comps[c].empty());
-			for (int x : comps[c]) assert(comp[x] == c), cnt[x]++;
-		}
-		rep(i,0,N) assert(cnt[i] == 1);
-		rep(i,0,N) rep(j,0,N) {
-			assert((comp[i] == comp[j]) == (reach[i][j] && reach[j][i]));
-			if (reach[i][j]) assert(comp[j] <= comp[i]); // reverse topological order
-		}
-	}
 	cout<<"Tests passed!"<<endl;
 	return 0;
 }

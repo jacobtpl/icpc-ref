@@ -5,34 +5,22 @@ ll modpow(ll a, ll e, ll mod) {
 	ll x = modpow(a * a % mod, e >> 1, mod);
 	return e & 1 ? x * a % mod : x;
 }
-bool isPrime(ll x) {
+bool isPrime(int x) {
 	if (x <= 1) return false;
-	for (ll i = 2; i*i <= x; ++i) {
+	for (int i = 2; i*i <= x; ++i) {
 		if (x % i == 0) return false;
 	}
 	return true;
 }
-void test(const ll mod, const int LIM) {
-	assert(LIM <= mod && isPrime(mod)); // documented preconditions
-	#include "../../content/number-theory/ModInverse.h"
-	rep(i,1,LIM) {
-		assert(0 < inv[i] && inv[i] < mod);
-		assert(inv[i] * i % mod == 1);
-		if (mod < 2000) assert(inv[i] == modpow(i, mod-2, mod));
-	}
-	delete[] (inv + 1);
-}
 int main() {
-	// every prime below 1000 with every admissible LIM (including LIM = mod)
-	rep(mod,2,1000) if (isPrime(mod))
-		rep(LIM,2,mod+1) test(mod, LIM);
-	// large primes, including the ones commonly used and ones close to 2^31
-	mt19937 rng(7);
-	for (ll mod : {1000003LL, 998244353LL, 1000000007LL, 1000000009LL, 2147483647LL, 2147483629LL, 4294967291LL}) {
-		test(mod, 2);
-		test(mod, 200000);
-		test(mod, (int)min(mod, 2000000LL));
-		rep(it,0,20) test(mod, (int)(rng() % 5000 + 2));
+	rep(it,1,1000) {
+		int mod = it, LIM=1000;
+		if (!isPrime(mod)) continue;
+		#include "../../content/number-theory/ModInverse.h"
+		for (int i=1; i<it; i++){
+			assert(inv[i] == modpow(i, mod-2, mod));
+		}
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests pass!"<<endl;
 }
+

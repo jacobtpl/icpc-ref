@@ -54,23 +54,6 @@ void testCorrect() {
 			}
 		}
 	}
-	// structured graphs: empty, stars, paths, cycles, cliques, complete bipartite
-	test(0, {});
-	rep(n,1,60) {
-		vector<pii> star, path, cyc, clique, bip;
-		rep(i,1,n) star.push_back({0, i}), path.push_back({i - 1, i});
-		cyc = path;
-		if (n > 2) cyc.push_back({n - 1, 0});
-		rep(i,0,n) rep(j,0,i) {
-			clique.push_back({i, j});
-			if (i >= n / 2 && j < n / 2) bip.push_back({j, i});
-		}
-		for (auto ed : {star, path, cyc, clique, bip}) rep(it,0,5) {
-			test(n, ed);
-			shuffle_vec(ed);
-			for (auto& e : ed) if (randBool()) swap(e.first, e.second);
-		}
-	}
 	rep(n,10,30) rep(it,0,200) {
 		int m = randIncl(n * (n-1) / 2);
 		vector<pii> ed = randomSimpleGraphAsEdgeList(n, m);

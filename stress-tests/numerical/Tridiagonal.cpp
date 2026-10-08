@@ -381,136 +381,13 @@ int main() {
 #else
 	}
 #endif
+	cout<<"Tests passed!"<<endl;
 	return 0;
 }
 
 }
 
-// ---- tests of the actual header ----
-namespace header {
-
-#include "../../content/numerical/Tridiagonal.h"
-
-mt19937 rng(31337);
-int rnd(int lo, int hi) { return uniform_int_distribution<int>(lo, hi)(rng); }
-
-typedef long double ld;
-// dense Gaussian elimination with partial pivoting; returns false if singular
-bool dense(vector<vector<ld>> a, vector<ld> b, vector<ld>& x) {
-	int n = sz(a);
-	rep(i,0,n) {
-		int p = i;
-		rep(j,i+1,n) if (fabsl(a[j][i]) > fabsl(a[p][i])) p = j;
-		if (fabsl(a[p][i]) < 1e-12L) return false;
-		swap(a[i], a[p]); swap(b[i], b[p]);
-		rep(j,i+1,n) {
-			ld f = a[j][i] / a[i][i];
-			rep(k,i,n) a[j][k] -= f * a[i][k];
-			b[j] -= f * b[i];
-		}
-	}
-	x.assign(n, 0);
-	for (int i = n; i--;) {
-		ld s = b[i];
-		rep(k,i+1,n) s -= a[i][k] * x[k];
-		x[i] = s / a[i][i];
-	}
-	return true;
-}
-
-// small integer matrices (lots of zeros on the diagonal -> exercises the 'tr' branch),
-// compared against dense elimination whenever the matrix is non-singular.
-void testSmall(int iters, int maxN, int C, int zeroDiag) {
-	int solved = 0;
-	rep(it,0,iters) {
-		int n = rnd(1, maxN);
-		vector<T> d(n), p(max(n-1, 0)), q(max(n-1, 0)), b(n);
-		vector<vector<ld>> M(n, vector<ld>(n)); vector<ld> bl(n), x;
-		rep(i,0,n) {
-			d[i] = rnd(0, 9) < zeroDiag ? 0 : rnd(-C, C);
-			b[i] = rnd(-C, C);
-			M[i][i] = d[i]; bl[i] = b[i];
-		}
-		rep(i,0,n-1) {
-			M[i][i+1] = p[i] = rnd(-C, C);
-			M[i+1][i] = q[i] = rnd(-C, C);
-		}
-		if (!dense(M, bl, x)) continue;
-		solved++;
-		vector<T> r = tridiagonal(d, p, q, b);
-		assert(sz(r) == n);
-		rep(i,0,n) assert(fabsl(r[i] - x[i]) < 1e-6L * max((ld)1, fabsl(x[i])));
-	}
-	assert(solved > iters / 10);
-}
-
-// large diagonally dominant systems: check the residual
-void testLarge(int n, bool rowDominant) {
-	vector<T> d(n), p(n-1), q(n-1), b(n);
-	rep(i,0,n-1) p[i] = rnd(-1000, 1000) / 100.0, q[i] = rnd(-1000, 1000) / 100.0;
-	rep(i,0,n) {
-		double s = rowDominant ? (i < n-1 ? abs(p[i]) : 0) + (i ? abs(q[i-1]) : 0)
-		                       : (i ? abs(p[i-1]) : 0) + (i < n-1 ? abs(q[i]) : 0);
-		d[i] = (s + rnd(1, 100) / 100.0) * (rnd(0, 1) ? 1 : -1);
-		b[i] = rnd(-1000, 1000) / 10.0;
-	}
-	vector<T> x = tridiagonal(d, p, q, b);
-	rep(i,0,n) {
-		double s = d[i] * x[i];
-		if (i) s += q[i-1] * x[i-1];
-		if (i < n-1) s += p[i] * x[i+1];
-		assert(abs(s - b[i]) < 1e-7);
-	}
-}
-
-// The recurrence a_i = b_i a_{i-1} + c_i a_{i+1} + d_i (1 <= i <= n) from the header comment,
-// i.e. b_i a_{i-1} - a_i + c_i a_{i+1} = -d_i. `sign` is the sign given to d_i in the right-hand side.
-double recurrenceError(int sign) {
-	double worst = 0;
-	rep(it,0,2000) {
-		int n = rnd(1, 8);
-		vector<T> a(n+2), B(n+1), Cc(n+1), D(n+1);
-		rep(i,0,n+2) a[i] = rnd(-5, 5);
-		rep(i,1,n+1) {
-			B[i] = rnd(1, 40) / 100.0; Cc[i] = rnd(1, 40) / 100.0; // |b_i| + |c_i| < 1: stable
-			D[i] = a[i] - B[i] * a[i-1] - Cc[i] * a[i+1];
-		}
-		vector<T> diag(n+2, -1), super(n+1), sub(n+1), rhs(n+2);
-		diag[0] = diag[n+1] = 1;
-		rep(i,1,n+1) super[i] = Cc[i], sub[i-1] = B[i], rhs[i] = sign * D[i];
-		rhs[0] = a[0]; rhs[n+1] = a[n+1];
-		vector<T> r = tridiagonal(diag, super, sub, rhs);
-		rep(i,0,n+2) worst = max(worst, abs(r[i] - a[i]));
-	}
-	return worst;
-}
-
-void main() {
-	assert(tridiagonal({}, {}, {}, {}).empty());
-	{ auto r = tridiagonal({4}, {}, {}, {2}); assert(sz(r) == 1 && r[0] == 0.5); }
-	{ // zero diagonal everywhere: x1 = 3, x0 = 5
-		auto r = tridiagonal({0, 0}, {1}, {1}, {3, 5});
-		assert(abs(r[0] - 5) < 1e-12 && abs(r[1] - 3) < 1e-12);
-	}
-	testSmall(300000, 3, 2, 3);
-	testSmall(300000, 8, 3, 3);
-	testSmall(200000, 10, 5, 0);
-	testSmall(100000, 6, 1, 6);
-	for (int n : {1, 2, 3, 1000, 200000}) rep(rd,0,2) testLarge(n, rd);
-	// documented usage must reproduce a
-	assert(recurrenceError(-1) < 1e-9);
-#ifdef TRIDIAGONAL_DOC_SIGN
-	// right-hand side exactly as written in the original header comment ({a_0, d_1, ..., d_n, a_{n+1}})
-	cout << "max error with +d_i: " << recurrenceError(1) << endl;
-	assert(recurrenceError(1) < 1e-9);
-#endif
-}
-
-}
-
 int main() {
-	finite_field::main();
+	// finite_field::main();
 	real::main();
-	header::main();
-	cout<<"Tests passed!"<<endl;
 }

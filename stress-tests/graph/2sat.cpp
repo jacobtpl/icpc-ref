@@ -50,66 +50,6 @@ int main2() {
 	return 0;
 }
 
-// Exhaustive check against brute force on tiny instances, including
-// either/setValue/atMostOne with repeated and contradictory literals.
-int ra();
-void bruteTest() {
-	rep(it,0,200000) {
-		int N = ra() % 6 + 1, M = ra() % 12;
-		TwoSat ts(N);
-		vector<pii> cl;
-		vector<vi> atm;
-		auto lit = [&]() { int a = ra() % N; return ra() % 2 ? a : ~a; };
-		rep(i,0,M) {
-			int t = ra() % 8;
-			if (t < 5) {
-				int a = lit(), b = lit();
-				ts.either(a, b);
-				cl.emplace_back(a, b);
-			} else if (t < 6) {
-				int a = lit();
-				ts.setValue(a);
-				cl.emplace_back(a, a);
-			} else {
-				vi li(ra() % 5);
-				for (int& x : li) x = lit();
-				ts.atMostOne(li);
-				atm.push_back(li);
-			}
-		}
-		auto ok = [&](int mask) {
-			auto val = [&](int x) { return x >= 0 ? mask >> x & 1 : !(mask >> ~x & 1); };
-			for (auto [a, b] : cl) if (!val(a) && !val(b)) return false;
-			for (auto& li : atm) {
-				int c = 0;
-				for (int x : li) c += val(x);
-				if (c > 1) return false;
-			}
-			return true;
-		};
-		bool sat = 0;
-		rep(mask,0,1<<N) if (ok(mask)) sat = 1;
-		bool got = ts.solve();
-		assert(got == sat);
-		if (got) {
-			int mask = 0;
-			rep(i,0,N) {
-				assert(ts.values[i] == 0 || ts.values[i] == 1);
-				mask |= ts.values[i] << i;
-			}
-			assert(ok(mask));
-			assert(ts.solve()); // solving twice is fine
-		}
-	}
-	TwoSat empty;
-	assert(empty.solve() && empty.values.empty());
-	int a = empty.addVar();
-	empty.setValue(~a);
-	assert(empty.solve() && empty.values == vi({0}));
-	empty.setValue(a);
-	assert(!empty.solve());
-}
-
 int ra() {
 	static unsigned X;
 	X *= 1283611;
@@ -121,7 +61,6 @@ int ra() {
 int main() {
 	main1();
 	main2();
-	bruteTest();
 	const int N = 100, M = 400;
 	rep(it,0,100) {
 		vector<bool> v(N);

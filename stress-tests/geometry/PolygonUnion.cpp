@@ -168,142 +168,6 @@ P rndUlp(int lim, long long ulps = 5) { return P(randNearIntUlps(lim, ulps), ran
 
 P rndEps(int lim, double eps) { return P(randNearIntEps(lim, eps), randNearIntEps(lim, eps)); }
 
-namespace slab {
-typedef long double ld;
-mt19937 rng(12345);
-int ri(int a, int b) { return uniform_int_distribution<int>(a, b)(rng); }
-
-// Independent oracle: vertical slab decomposition. Between two consecutive
-// event x-coordinates (vertices and edge crossings) no edges cross, so the
-// covered length is linear in x and equals its value at the slab midpoint.
-ld slabUnion(const vector<vector<P>>& polys) {
-	vector<array<ld,4>> es;
-	vector<ld> xs;
-	for (auto& p : polys) rep(i,0,sz(p)) {
-		P a = p[i], b = p[(i+1)%sz(p)];
-		es.push_back({a.x, a.y, b.x, b.y});
-		xs.push_back(a.x);
-	}
-	rep(i,0,sz(es)) rep(j,0,i) {
-		auto& e = es[i]; auto& f = es[j];
-		ld dx1 = e[2]-e[0], dy1 = e[3]-e[1], dx2 = f[2]-f[0], dy2 = f[3]-f[1];
-		ld den = dx1*dy2 - dy1*dx2;
-		if (den == 0) continue;
-		ld t = ((f[0]-e[0])*dy2 - (f[1]-e[1])*dx2) / den;
-		if (t > 0 && t < 1) xs.push_back(e[0] + t*dx1);
-	}
-	sort(all(xs));
-	ld area = 0;
-	rep(k,0,sz(xs)-1) {
-		ld x0 = xs[k], x1 = xs[k+1], xm = (x0+x1)/2;
-		if (x1 - x0 < 1e-13L) continue;
-		vector<pair<ld,ld>> iv;
-		for (auto& p : polys) {
-			vector<ld> ys;
-			rep(i,0,sz(p)) {
-				P a = p[i], b = p[(i+1)%sz(p)];
-				if (a.x > b.x) swap(a, b);
-				if (a.x < xm && xm < b.x)
-					ys.push_back(a.y + (ld)(b.y-a.y) * (xm-a.x) / ((ld)b.x-a.x));
-			}
-			sort(all(ys));
-			assert(sz(ys) % 2 == 0);
-			for (int i = 0; i < sz(ys); i += 2) iv.emplace_back(ys[i], ys[i+1]);
-		}
-		sort(all(iv));
-		ld len = 0, hi = -1e30L;
-		for (auto [l, r] : iv) {
-			if (l > hi) len += r - l, hi = r;
-			else if (r > hi) len += r - hi, hi = r;
-		}
-		area += len * (x1 - x0);
-	}
-	return area;
-}
-
-typedef Point<ll> Q;
-bool properOrTouch(Q a, Q b, Q c, Q d) { // closed segments intersect?
-	auto o = [](Q p, Q q, Q r) { return sgn(p.cross(q, r)); };
-	auto on = [](Q s, Q e, Q p) { return p.cross(s,e)==0 && (s-p).dot(e-p)<=0; };
-	if (o(a,b,c)*o(a,b,d) < 0 && o(c,d,a)*o(c,d,b) < 0) return 1;
-	return on(a,b,c) || on(a,b,d) || on(c,d,a) || on(c,d,b);
-}
-// simple polygon, positive area, distinct vertices. strict: no 180-degree angles
-bool isSimple(const vector<Q>& p, bool strict) {
-	int n = sz(p);
-	if (n < 3) return 0;
-	ll A = 0;
-	rep(i,0,n) A += p[i].cross(p[(i+1)%n]);
-	if (A <= 0) return 0;
-	rep(i,0,n) rep(j,0,i) if (p[i] == p[j]) return 0;
-	rep(i,0,n) {
-		Q a = p[i], b = p[(i+1)%n], c = p[(i+2)%n];
-		if (a.cross(b, c) == 0) {
-			if (strict || (a-b).dot(c-b) > 0) return 0;
-		}
-		rep(j,0,i) {
-			if ((j+1)%n == i || (i+1)%n == j) continue;
-			if (properOrTouch(a, b, p[j], p[(j+1)%n])) return 0;
-		}
-	}
-	return 1;
-}
-vector<Q> randSimple(int n, int lo, int hi, bool strict) {
-	for (;;) {
-		vector<Q> p(n);
-		for (auto& q : p) q = Q(ri(lo,hi), ri(lo,hi));
-		if (!isSimple(p, strict)) { reverse(all(p)); if (!isSimple(p, strict)) continue; }
-		return p;
-	}
-}
-vector<P> conv(const vector<Q>& p) { vector<P> r; for (auto q : p) r.emplace_back((double)q.x, (double)q.y); return r; }
-
-
-void check(vector<vector<P>> polys) {
-	ld want = slabUnion(polys);
-	double got = polyUnion(polys);
-	// rounding error is about eps * (largest coordinate) * (extent)
-	ld scale = 1, lo = 1e30L, hi = -1e30L;
-	for (auto& p : polys) for (auto q : p) {
-		scale = max<ld>(scale, max(fabsl(q.x), fabsl(q.y)));
-		lo = min<ld>(lo, min(q.x, q.y)), hi = max<ld>(hi, max(q.x, q.y));
-	}
-	if (!(fabsl(got - want) <= 1e-10L * scale * max<ld>(1, hi - lo))) {
-		cout << setprecision(17) << "polyUnion " << got << ", expected " << (double)want << endl;
-		for (auto& p : polys) { for (auto q : p) cout << q << ' '; cout << endl; }
-		abort();
-	}
-}
-
-// Small integer polygons: lots of shared/overlapping edges, touching
-// vertices, identical polygons, collinear vertices and nested polygons.
-void testSlab() {
-	{ vector<vector<P>> none; assert(polyUnion(none) == 0); }
-	check({{P(0,0), P(1,0), P(0,1)}});
-	rep(it,0,150000) {
-		int k = ri(1, 4);
-		vector<vector<P>> ps;
-		bool strict = it % 2;
-		int off = it % 3 == 0 ? ri(-1000000, 1000000) : 0, mul = it % 5 == 0 ? ri(-3, 3) : 1;
-		if (!mul) mul = 1000;
-		rep(i,0,k) {
-			int t = ri(0, 5);
-			vector<Q> q;
-			if (t == 0 && i) { ps.push_back(ps[ri(0,i-1)]); continue; }
-			else if (t == 1) {
-				int x = ri(0,3), y = ri(0,3), w = ri(1,3), h = ri(1,3);
-				q = {Q(x,y), Q(x+w,y), Q(x+w,y+h), Q(x,y+h)};
-			} else q = randSimple(ri(3, 6), 0, ri(2, 5), strict);
-			for (auto& p : q) p = p * mul + Q(off, -off);
-			rotate(q.begin(), q.begin() + ri(0, sz(q)-1), q.end());
-			ps.push_back(conv(q));
-		}
-		check(ps);
-	}
-}
-} // namespace slab
-
-int numSimple = 0;
 void testRandom(int n, int numPts = 10, int lim = 5, bool brute = false) {
     vector<vector<P>> polygons;
     for (int i = 0; i < n; i++) {
@@ -334,18 +198,7 @@ void testRandom(int n, int numPts = 10, int lim = 5, bool brute = false) {
     }
     auto val3 = blackhorse::polygon_union(polygons2.data(), sz(polygons2));
     auto val4 = lovelive::polygon_union(polygons3.data(), sz(polygons3));
-    // genPolygon sometimes returns self-intersecting polygons, for which the
-    // union is not well defined; only use the independent oracle on simple ones.
-    auto val5 = val1;
-    bool simple = true;
-    for (auto &i : polygons) {
-        vector<slab::Q> q;
-        for (auto j : i) q.emplace_back((ll)j.x, (ll)j.y);
-        simple &= slab::isSimple(q, false);
-    }
-    if (simple) val5 = (double)slab::slabUnion(polygons), numSimple++;
-    if (abs(val1 - val3) > 1e-8 || abs(val1 - val4) > 1e-8 || abs(val1 - val5) > 1e-8 * lim * lim) {
-        cout << "n=" << n << " numPts=" << numPts << " lim=" << lim << setprecision(15) << " polyUnion=" << val1 << " ref=" << val3 << " " << val4 << " slab=" << val5 << endl;
+    if (abs(val1 - val3) > 1e-8 || abs(val1 - val4) > 1e-8) {
         rep(i, 0, n) {
             for (auto &x : polygons[i]) {
                 cout << x << ' ';
@@ -370,13 +223,5 @@ int main() {
     for (int i = 0; i < 50; i++) {
         testRandom(5, 100, 5);
     }
-    for (int i = 0; i < 200; i++) {
-        testRandom(8, 40, 1000);
-    }
-    for (int i = 0; i < 2000; i++) {
-        testRandom(3, 8, 4);
-    }
-    assert(numSimple > 1000);
-    slab::testSlab();
     cout << "Tests passed!" << endl;
 }

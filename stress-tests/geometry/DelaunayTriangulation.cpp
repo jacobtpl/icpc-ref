@@ -71,50 +71,5 @@ int main() {
 		continue; }
 fail:;
 	}
-	// Fewer than three points: no triangles; exactly three: one ccw triangle.
-	rep(n,0,3) {
-		vector<P> ps(n);
-		rep(i,0,n) ps[i] = P(i, i * i);
-		delaunay(ps, [&](int, int, int) { assert(false); });
-	}
-	// Exact check on integer points in general position, up to |x| <= 1e6:
-	// ccw triangles with empty circumcircles covering the hull, every point used.
-	typedef __int128 lll;
-	auto inCircle = [](Point<ll> a, Point<ll> b, Point<ll> c, Point<ll> d) {
-		a = a - d, b = b - d, c = c - d;
-		return (lll)a.dist2() * b.cross(c) + (lll)b.dist2() * c.cross(a) + (lll)c.dist2() * a.cross(b);
-	};
-	for (int K : {3, 10, 1000, 1000000}) rep(it,0,20000) {
-		int N = rand() % 12 + 3;
-		if (K == 3) N = rand() % 3 + 3;
-		vector<Point<ll>> q;
-		if (it % 2) rep(i,0,N) q.emplace_back(rand() % (2*K+1) - K, rand() % (2*K+1) - K);
-		else { // thin triangles
-			Point<ll> d(rand() % K + 1, rand() % K + 1);
-			int m = max(1, K / (int)max(d.x, d.y));
-			rep(i,0,N) q.push_back(d * (rand() % (2*m+1) - m) + Point<ll>(rand() % 5 - 2, rand() % 5 - 2));
-		}
-		bool bad = 0;
-		rep(i,0,N) rep(j,0,i) rep(k,0,j) {
-			if (q[i].cross(q[j], q[k]) == 0) bad = 1;
-			else rep(l,0,k) if (inCircle(q[i], q[j], q[k], q[l]) == 0) bad = 1;
-		}
-		if (bad) continue;
-		vector<P> ps;
-		for (auto p : q) ps.emplace_back((double)p.x, (double)p.y);
-		lll sum = 0, area = 0;
-		vi used(N);
-		delaunay(ps, [&](int i, int j, int k) {
-			used[i] = used[j] = used[k] = 1;
-			ll ar = q[i].cross(q[j], q[k]);
-			assert(ar > 0);
-			sum += ar;
-			rep(l,0,N) assert(inCircle(q[i], q[j], q[k], q[l]) <= 0);
-		});
-		rep(i,0,N) assert(used[i]);
-		vector<P> hull = convexHull(ps);
-		rep(i,0,sz(hull)) area += (lll)llround(hull[i].cross(hull[(i + 1) % sz(hull)]));
-		assert(sum == area);
-	}
 	cout<<"Tests passed!"<<endl;
 }

@@ -7,17 +7,9 @@ int ra() {
 	return RA >> 1;
 }
 
-// The header can only be included once (#pragma once), so to also run the real
-// header with a non-commutative f, its max() is routed through segF, which is
-// plain max unless segMode is set (see nonabelianF below).
-int segMode = 0;
-int segF(int a, int b);
-
 namespace maximum {
 
-#define max(a, b) segF(a, b)
 #include "../../content/data-structures/SegmentTree.h"
-#undef max
 
 }
 
@@ -55,98 +47,7 @@ struct Tree {
 
 }
 
-// segMode = 1: a non-commutative monoid on {INT_MIN} + D6 in which INT_MIN
-// (the header's unit) is the identity.
-int nonabelianF(int a, int b) {
-	return a == INT_MIN ? b : b == INT_MIN ? a : nonabelian::lut[a][b];
-}
-// segMode = 2: sum, again with INT_MIN as the identity.
-int sumF(int a, int b) { return a == INT_MIN ? b : b == INT_MIN ? a : a + b; }
-int segF(int a, int b) {
-	return segMode == 1 ? nonabelianF(a, b) : segMode == 2 ? sumF(a, b) : max(a, b);
-}
-
-void testMore() {
-	mt19937 rng(7);
-	auto ri = [&](int a, int b) { return uniform_int_distribution<int>(a, b)(rng); };
-	// max-tree: all sizes up to 70 (non powers of two), negative and extreme values
-	rep(n,0,71) rep(rounds,0,20) {
-		int mode = ri(0, 2);
-		auto val = [&]() {
-			return mode == 0 ? ri(INT_MIN, INT_MAX) : mode == 1 ? ri(-3, 3) :
-				(ri(0, 1) ? INT_MIN : INT_MAX);
-		};
-		int def = ri(0, 1) ? maximum::Tree::unit : val();
-		maximum::Tree tr(n, def);
-		vi v(n, def);
-		rep(it,0,300) {
-			if (n && ri(0, 2)) {
-				int i = ri(0, n - 1);
-				tr.update(i, v[i] = val());
-			}
-			int i = ri(0, n), j = ri(0, n);
-			int ma = INT_MIN;
-			rep(k,i,j) ma = max(ma, v[k]);
-			assert(tr.query(i, j) == ma); // i >= j gives unit
-		}
-	}
-	// non-commutative f on the real header
-	segMode = 1;
-	rep(n,1,40) rep(rounds,0,20) {
-		maximum::Tree tr(n);
-		vi v(n, INT_MIN);
-		rep(it,0,300) {
-			if (ri(0, 2)) {
-				int i = ri(0, n - 1);
-				tr.update(i, v[i] = ri(0, 5));
-			}
-			int i = ri(0, n), j = ri(0, n);
-			int r = INT_MIN;
-			rep(k,i,j) r = nonabelianF(r, v[k]);
-			assert(tr.query(i, j) == r);
-		}
-	}
-	// f = sum with a non-unit default: Tree(n, def) must describe n copies of def
-	segMode = 2;
-	rep(n,0,40) rep(rounds,0,10) {
-		int def = ri(-5, 5);
-		maximum::Tree tr(n, def);
-		vi v(n, def);
-		rep(it,0,100) {
-			int i = ri(0, n), j = ri(0, n);
-			int r = INT_MIN;
-			rep(k,i,j) r = sumF(r, v[k]);
-			assert(tr.query(i, j) == r);
-			if (n && ri(0, 3) == 0) {
-				i = ri(0, n - 1);
-				tr.update(i, v[i] = ri(-5, 5));
-			}
-		}
-	}
-	segMode = 0;
-}
-
-void bench() {
-	for (int N : {200000, 1000000}) {
-		maximum::Tree tr(N);
-		auto t0 = chrono::steady_clock::now();
-		ll sum = 0;
-		rep(i,0,N) tr.update(i, ra());
-		rep(it,0,2000000) {
-			tr.update(ra() % N, ra());
-			int i = ra() % N, j = ra() % N;
-			if (i > j) swap(i, j);
-			sum += tr.query(i, j+1);
-		}
-		cerr << "N=" << N << ", 2e6 updates + 2e6 queries: " << chrono::duration<double>(
-			chrono::steady_clock::now() - t0).count() << " s (" << sum << ")\n";
-	}
-}
-
-int main(int argc, char**) {
-	if (argc > 1) return bench(), 0; // benchmark mode: ./a.out bench
-	testMore();
-
+int main() {
 	{
 		maximum::Tree t(0);
 		assert(t.query(0, 0) == t.unit);

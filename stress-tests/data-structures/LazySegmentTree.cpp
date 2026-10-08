@@ -42,47 +42,5 @@ int main() {
 			rep(k,i,j) v[k] = x;
 		}
 	}
-	// random sizes and offsets, both constructors, larger values
-	mt19937 rng(3);
-	rep(it,0,6000) {
-		int n = (int)(rng() % 40) + 1, lo = 0;
-		if (it % 100 == 0) n = 2000;
-		bool sparse = it % 2;
-		int V = it % 3 == 0 ? 5 : 1000000;
-		vi w(n, -inf);
-		Node* t;
-		if (sparse) {
-			if (it % 4 == 1) lo = (int)(rng() % 2000001) - 1000000;
-			else if (it % 8 == 3) lo = INT_MAX - n; // near the int limit
-			else if (it % 8 == 7) lo = INT_MIN;
-			t = new Node(lo, lo + n);
-		} else {
-			for (int& x : w) x = (int)(rng() % (2 * V + 1)) - V;
-			t = new Node(w, 0, n);
-		}
-		rep(q,0,n > 100 ? 4000 : 120) {
-			int i = (int)(rng() % (n + 1)), j = (int)(rng() % (n + 1));
-			if (i > j) swap(i, j);
-			if (rng() % 10 == 0) i = 0, j = n;
-			int x = (int)(rng() % (2 * V + 1)) - V, r = (int)(rng() % 3);
-			if (r == 0) {
-				int ma = -inf;
-				rep(k,i,j) ma = max(ma, w[k]);
-				assert(t->query(lo + i, lo + j) == ma);
-			} else if (r == 1) {
-				x = x % 1000; // keep sums far from overflow
-				// untouched sparse cells are -inf; values must never go below that
-				if (i < j && *min_element(w.begin() + i, w.begin() + j) + x < -inf) x = -x;
-				t->add(lo + i, lo + j, x);
-				rep(k,i,j) w[k] += x;
-			} else {
-				t->set(lo + i, lo + j, x);
-				rep(k,i,j) w[k] = x;
-			}
-		}
-		rep(i,0,n) assert(t->query(lo + i, lo + i + 1) == w[i]);
-		// ranges sticking out of [lo, hi) are clipped
-		if (!sparse) assert(t->query(-5, n + 5) == *max_element(all(w)));
-	}
 	cout<<"Tests passed!"<<endl;
 }

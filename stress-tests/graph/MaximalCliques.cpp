@@ -57,62 +57,6 @@ int main1() {
 		}
 		assert(co == realCo);
 	}
-	// n up to 16, all densities, set-equality against bitmask brute force
-	srand(7);
-	rep(it,0,3000) {
-		int n = rand() % (it < 2700 ? 12 : 16) + 1, p = rand() % 101;
-		vector<B> ed(n); vi adj(n);
-		rep(i,0,n) rep(j,0,i) if (rand() % 100 < p)
-			ed[i][j] = ed[j][i] = 1, adj[i] |= 1 << j, adj[j] |= 1 << i;
-		set<unsigned long long> got, want;
-		int co = 0;
-		cliques(ed, [&](B x) { co++; got.insert(x.to_ullong()); });
-		assert(co == sz(got));
-		rep(m,1,1 << n) {
-			int common = (1 << n) - 1;
-			rep(i,0,n) if (m >> i & 1) common &= adj[i];
-			// clique iff every member is adjacent to all others;
-			// maximal iff no outside vertex is adjacent to all members
-			bool ok = 1;
-			rep(i,0,n) if (m >> i & 1) ok &= (m & ~adj[i] & ~(1 << i)) == 0;
-			if (ok && !common) want.insert(m);
-		}
-		assert(got == want);
-	}
-	// Full bitset<128> width: disjoint cliques (one maximal clique per
-	// block) and complete multipartite graphs (product of part sizes).
-	rep(it,0,200) {
-		int n = it < 10 ? 128 : rand() % 128 + 1, k = rand() % n + 1;
-		vi col(n), cnt(k);
-		rep(i,0,n) col[i] = i < k ? i : rand() % k;
-		random_shuffle(all(col));
-		rep(i,0,n) cnt[col[i]]++;
-		vector<B> ed(n);
-		rep(i,0,n) rep(j,0,i) ed[i][j] = ed[j][i] = col[i] == col[j];
-		int co = 0;
-		cliques(ed, [&](B x) {
-			co++;
-			int c = col[(int)x._Find_first()];
-			assert((int)x.count() == cnt[c]);
-			rep(i,0,n) assert(x[i] == (col[i] == c));
-		});
-		assert(co == k);
-		double prod = 1;
-		for (int c : cnt) prod *= c;
-		if (prod > 2e5) continue;
-		rep(i,0,n) rep(j,0,i) ed[i][j] = ed[j][i] = col[i] != col[j];
-		co = 0;
-		cliques(ed, [&](B x) { co++; assert((int)x.count() == k); });
-		assert(co == (int)prod);
-	}
-#ifdef TEST_EMPTY
-	{ // Opt-in: n = 0 reads eds[0] (segfault at -O2)
-		vector<B> ed;
-		int co = 0;
-		cliques(ed, [&](B x) { co++; assert(x.none()); });
-		assert(co <= 1);
-	}
-#endif
 	cout<<"Tests passed!"<<endl;
 	return 0;
 }

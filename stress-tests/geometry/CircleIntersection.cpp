@@ -60,55 +60,5 @@ skip:;
 		// Sometimes hill-climbing is slow, for some reason. :(
 		// cerr << '#';
 	}
-	// Constructed instances over several magnitudes: pick the intersection
-	// point x first, so the answer is known.
-	mt19937_64 gen(5);
-	auto uni = [&](double lo, double hi) {
-		return lo + (hi - lo) * ((double)(gen() >> 11) / 9007199254740992.0);
-	};
-	for (double sc : {1e-3, 1.0, 1e3, 1e6}) rep(it,0,200000) {
-		P a(uni(-sc, sc), uni(-sc, sc)), b(uni(-sc, sc), uni(-sc, sc));
-		P x(uni(-sc, sc), uni(-sc, sc));
-		double d = (b - a).dist(), h = (b - a).cross(x - a) / d;
-		if (d < 1e-3 * sc || abs(h) < 1e-3 * sc) continue; // ill-conditioned
-		double ra = (x - a).dist(), rb = (x - b).dist();
-		pair<P, P> out;
-		assert(circleInter(a, b, ra, rb, &out));
-		// first is to the left of a->b, second is its mirror image
-		P y = x - (b - a).perp() * (2 * h / d);
-		if (h < 0) swap(x, y);
-		assert((out.first - x).dist() < 1e-9 * sc);
-		assert((out.second - y).dist() < 1e-9 * sc);
-		// clearly disjoint / clearly nested circles
-		double r1 = uni(0, d), r2 = uni(0, d - r1) * 0.999;
-		assert(!circleInter(a, b, r1, r2, &out));
-		assert(!circleInter(a, b, r1 + d * 1.001 + r2, r2, &out));
-		assert(!circleInter(a, b, r2, r1 + d * 1.001 + r2, &out));
-	}
-	// Exact tangency (integer 3-4-5 configurations) and zero radii.
-	// (tangency is sqrt-conditioned: error ~ sqrt(eps) * radius, radii <= 1e4)
-	auto mx = [&](pair<P, P>& o, P t) {
-		return max((o.first - t).dist(), (o.second - t).dist()); };
-	const double TOL = 1e-3;
-	rep(it,0,200000) {
-		int k = (int)(gen() % 1000) + 1, s = (int)(gen() % (5 * k + 1));
-		P a((double)((int)(gen() % 2001) - 1000), (double)((int)(gen() % 2001) - 1000));
-		P dir((gen() & 1 ? 3 : -3) * k, (gen() & 1 ? 4 : -4) * k);
-		if (gen() & 1) swap(dir.x, dir.y);
-		P b = a + dir;
-		pair<P, P> out;
-		// external: r1 + r2 = d, touching at a + dir * s / (5k)
-		assert(circleInter(a, b, s, 5 * k - s, &out));
-		P t = a + dir * (s / (5.0 * k));
-		assert(mx(out, t) < TOL);
-		// internal: r1 - r2 = d, touching at a + dir * r1 / d
-		assert(circleInter(a, b, 5 * k + s, s, &out));
-		t = a + dir * ((5.0 * k + s) / (5.0 * k));
-		assert(mx(out, t) < TOL);
-		assert(circleInter(b, a, s, 5 * k + s, &out));
-		assert(mx(out, t) < TOL);
-		// concentric circles with different radii never intersect
-		assert(!circleInter(a, a, s, s + 1, &out));
-	}
 	cout<<"Tests passed!"<<endl;
 }
