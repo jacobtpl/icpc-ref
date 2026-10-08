@@ -8,7 +8,7 @@
  * $s = \lfloor\sqrt n\rfloor$, \texttt{lo[x]} is the answer for $x \le s$ and
  * \texttt{hi[i]} the answer for $\lfloor n/i \rfloor$, $1 \le i \le s$, so
  * $\pi(n)$ = \texttt{hi[1]}. Counts fit in ll. For sums with $n > 4 \cdot 10^9$
- * use \texttt{T = \_\_int128} (or an unsigned/mod type for the sum modulo).
+ * use \texttt{T = \_\_int128} (or ull for the sum mod $2^{64}$).
  * Time: $O(n^{3/4})$, memory $O(\sqrt n)$. $n=10^{11}$ in 0.15s, $n=10^{12}$ in 0.7s.
  * Usage: PrimeCount pc(n); pc.hi[1]; pc.get(n / 7);
  * Status: stress-tested
