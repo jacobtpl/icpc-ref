@@ -12,11 +12,14 @@
  *  \texttt{Graphic}: element $i$ is edge \texttt{ed[i]} of a graph
  *  on vertices $0..V-1$, independent = forest (loops, multi-edges
  *  fine). \texttt{Colorful}: element $i$ has colour \texttt{col[i]}
- *  in $[0, sz(cap))$, at most \texttt{cap[c]} $\ge 0$ of colour $c$.
+ *  in $[0,$ \texttt{sz(cap)}$)$, at most \texttt{cap[c]} $\ge 0$ of
+ *  colour $c$. Starts from a greedy common independent set.
  *  Returns the elements of the answer in increasing order.
+ *  The exchange graph takes $O(rn)$ memory.
  * Time: With answer size $r$: $O(r^2)$ calls to init and
  *  $O(r^2 n)$ calls to ok. For the matroids below
- *  $O(r^2 (n + V))$ times $\alpha$; $n=2000$, $r=200$ in $<1$s.
+ *  $O(r^2 (n + V))$ times $\alpha$. Rounds = $r$ minus greedy size:
+ *  random $n=5000$, $r=500$ in 0.3s, $r=1000$ in 4s.
  * Usage: Graphic a{V, edges}; Colorful b{col, cap};
  *  vi res = matroidIsect(sz(edges), a, b);
  * Status: stress-tested against brute force
@@ -47,6 +50,9 @@ struct Colorful {
 template<class A, class B>
 vi matroidIsect(int n, A& a, B& b) {
 	vector<bool> in(n);
+	vi S; a.init(S); b.init(S);
+	rep(i,0,n) if (a.ok(i) && b.ok(i)) // greedy start
+		in[i] = 1, S.pb(i), a.init(S), b.init(S);
 	for (;;) {
 		vi I, J, q, par(n, -2), snk(n);
 		vector<vi> g(n);
