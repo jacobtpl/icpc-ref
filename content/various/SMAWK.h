@@ -11,7 +11,7 @@
  *  Values are only compared with $<$ and $>$. Negating $f$ gives maxima only if $-A$
  *  satisfies the condition (e.g. inverse Monge $A$); for row maxima of a Monge $A$ use
  *  $g(i, j) = -f(i, m-1-j)$: row $i$'s rightmost maximum is at column $m-1-$ans$[i]$.
- *  Mainly pays off over D\&C when $f$ is expensive or $m \gg n$.
+ *  Fewer calls to $f$ than D\&C, but rarely faster unless $f$ is expensive.
  * Time: O(N + M) calls to $f$
  * Usage: vi opt = smawk(n, m, [\&](int i, int j) { return cost(i, j); });
  * Status: stress-tested
@@ -25,7 +25,8 @@ void smawkRec(F& f, vi& ans, int s, vi c) {
 	vi d;
 	for (int x : c) {
 		while (!d.empty() &&
-			f(sz(d)*s-1, d.back()) > f(sz(d)*s-1, x)) d.pop_back();
+			f(sz(d)*s-1, d.back()) > f(sz(d)*s-1, x))
+			d.pop_back();
 		if (sz(d) < n) d.push_back(x);
 	}
 	smawkRec(f, ans, 2 * s, d);
