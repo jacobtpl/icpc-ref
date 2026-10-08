@@ -15,7 +15,7 @@
  * Usage:
  *  XorBasis B; B.add(5); B.add(3);
  *  B.has(6); // true
- *  B.maxXor(); B.kth(2); // 7, 5
+ *  B.maxXor(); B.kth(2); // 6, 5
  * Status: stress-tested against subset enumeration
  */
 #pragma once
