@@ -9,9 +9,10 @@
  *  A matroid is any struct with \texttt{init(S)}, which loads an
  *  independent set $S$ (list of elements), and \texttt{ok(e)}, which
  *  tells if $S \cup \{e\}$ is independent for $e \notin S$.
- *  Graphic: element $i$ is edge \texttt{ed[i]} of a graph on $n$
- *  vertices, independent = forest (loops, multi-edges fine).
- *  Colorful: at most \texttt{cap[c]} elements of colour $c$.
+ *  \texttt{Graphic}: element $i$ is edge \texttt{ed[i]} of a graph
+ *  on vertices $0..V-1$, independent = forest (loops, multi-edges
+ *  fine). \texttt{Colorful}: element $i$ has colour \texttt{col[i]}
+ *  in $[0, sz(cap))$, at most \texttt{cap[c]} $\ge 0$ of colour $c$.
  *  Returns the elements of the answer in increasing order.
  * Time: With answer size $r$: $O(r^2)$ calls to init and
  *  $O(r^2 n)$ calls to ok. For the matroids below
@@ -25,9 +26,9 @@
 #include "../data-structures/UnionFind.h"
 
 struct Graphic {
-	int n; vector<pii> ed; UF uf{0};
+	int V; vector<pii> ed; UF uf{0};
 	void init(const vi& S) {
-		uf = UF(n);
+		uf = UF(V);
 		for (int i : S) uf.join(ed[i].first, ed[i].second);
 	}
 	bool ok(int i) {
