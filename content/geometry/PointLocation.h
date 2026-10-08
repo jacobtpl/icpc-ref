@@ -37,7 +37,7 @@ vi pointLocation(vector<pair<P, P>> s, const vector<P>& q) {
 		return x ? x < 0 : c.cross(d, b) < 0;
 	};
 	set<int, decltype(cmp)> act(cmp);
-	vector<tuple<P, int, int>> ev; // 0 = end, 1 = start, 2 = query
+	vector<tuple<P, int, int>> ev; // 0 end, 1 start, 2 query
 	rep(i,0,n) ev.emplace_back(s[i].second, 0, i),
 		ev.emplace_back(s[i].first, 1, i);
 	rep(i,n,n+m) ev.emplace_back(s[i].first, 2, i);
