@@ -82,11 +82,17 @@ T kthCoef(poly P, poly Q, ll k) {
 	}
 	return sz(P) ? P[0]/Q[0] : 0;
 }
-// a[k] = c[1]*a[k-1] + ... + c[n]*a[k-n], given s = a[0..n-1]
-T solve_linrec(poly s, poly c, int n, ll k) {
-	poly Q(n+1); Q[0] = 1; rep(i,1,n+1) Q[i] = -c[i];
-	return kthCoef(RSZ(conv(RSZ(s,n),Q),n), Q, k);
-}
+// solve recurrence with initial vals s[0], s[1]... s[n-1]
+// a[k] = c[1]*a[k-1] + c[2]*a[k-2] + ... c[n]*a[k-n]
+mint solve_linrec(vector<mint> s, vector<mint> c, int n, ll k) {
+    poly f(n+1, 0);
+    f[n] = 1;
+    for (int i=0;i<n;i++) f[i] = mint(-c[n-i]);
+    poly r = xkmodf(k, f); r.resize(n);
+    mint ans(0);
+    for (int i = 0; i < n; i++) ans += r[i] * mint(s[i]);
+    return ans;
+} // 902e38
 // returns f(x+c)
 poly taylorShift(poly f, T c) {
 	int n = sz(f); poly F(n+1,1), A(n), B(n); T p = 1;
