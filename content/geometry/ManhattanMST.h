@@ -8,7 +8,7 @@
  * |p.x - q.x| + |p.y - q.y|. Edges are in the form (distance, src, dst). Use a
  * standard MST algorithm on the result to find the final MST.
  * Distances must fit in an int (ok if all $|x|,|y| \le 5\cdot10^8$); otherwise
- * make P and the edges ll.
+ * make P, the edges and the sweep map ll.
  * Time: O(N \log N)
  * Status: Stress-tested
  */

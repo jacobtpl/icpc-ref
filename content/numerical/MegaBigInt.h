@@ -5,7 +5,7 @@
  * Source: My head
  * Description: what it says.
  * a / b truncates toward zero, but BigInt \% BigInt (b > 0) is in [0, b), so
- * (a/b)*b + a\%b != a for a < 0. BigInt \% long long keeps the sign of a.
+ * (a/b)*b + a\%b != a when a < 0 and b does not divide a. BigInt \% long long keeps the sign of a.
  * Usage: just do it
  * Status: prob works
  */
@@ -281,7 +281,7 @@ struct BigInt {
 
     void operator/=(long long v) {
         assert(v > 0);  // operator / not well-defined for v <= 0.
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             *this /= BigInt(v);
             return ;
         }
@@ -298,7 +298,7 @@ struct BigInt {
     BigInt operator/(long long v) const {
         assert(v > 0);  // operator / not well-defined for v <= 0.
 
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             return *this / BigInt(v);
         }
         BigInt res = *this;
@@ -319,7 +319,7 @@ struct BigInt {
     }
 
     void operator*=(long long v) {
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             *this *= BigInt(v);
             return ;
         }
@@ -350,7 +350,7 @@ struct BigInt {
     }
 
     BigInt operator*(long long v) const {
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             return *this * BigInt(v);
         }
         BigInt res = *this;

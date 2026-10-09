@@ -13,7 +13,7 @@
  * Gomory-Hu, but Gusfield's simplified version: "Very simple methods for all
  * pairs network flow analysis". PushRelabel is used here, but any flow
  * implementation that supports `leftOfMinCut` also works (the Dinic.h in
- * this notebook does not: no leftOfMinCut/calc, and its Edge clashes).
+ * this notebook does not: it has no leftOfMinCut/calc).
  */
 #pragma once
 

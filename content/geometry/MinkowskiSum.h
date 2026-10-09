@@ -23,7 +23,7 @@ vP minkowski_sum(vP a, vP b) {
 		result.pb(a[i]+b[j]);
 		P u = a[i+1]-a[i], v = b[j+1]-b[j];
 		auto crs = u.cross(v);
-		if (!crs && u.dot(v) < 0) crs = P() < u ? 1 : -1;
+		if (!crs && sgn(u.x)*sgn(v.x) + sgn(u.y)*sgn(v.y) < 0) crs = P() < u ? 1 : -1;
 		if (i == sz(a)-2) crs = -1;
 		if (j == sz(b)-2) crs = 1;
 		i += (crs >= 0);
