@@ -8,6 +8,8 @@
  * their operands unless those are older. \texttt{step()} freezes all existing
  * trees (they stay valid forever) and returns a fresh modifiable copy.
  * Needs C++17 (evaluation order of \texttt{N[x].c[d] = f()}).
+ * Nodes are never freed: call \texttt{PAVL::reset()} between testcases
+ * (invalidates every existing tree).
  * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
  *  PAVL b = a.step(); // a is now immutable
  *  auto [l, r] = b.split(1); // consumes b, not a
@@ -91,6 +93,7 @@ struct PAVL {
 		return { PAVL(l), PAVL(r) };
 	}
 	PAVL step() { ++T; return clone(root); }
+	static void reset() { N.clear(); T = 0; }
 	Node& get_root() { return N[root]; }
 };
 typedef PAVL::Node Node;
