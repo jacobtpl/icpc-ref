@@ -4,9 +4,12 @@
  * License: CC0
  * Description: pi[x] computes the length of the longest prefix of s that ends at x, other than s[0...x] itself (abacaba -> 0010123).
  * Can be used to find all occurrences of a string.
- * Empty patterns match at every position, including the end.
- * match uses a zero byte as a separator; match2 supports arbitrary bytes.
- * Time: O(n)
+ * match runs pi on pat + (zero byte) + s; inputs must be zero-free.
+ * match2 computes pi only on pat, then scans s; arbitrary bytes are supported.
+ * Both take O(n+m) time, with O(n+m) vs O(m) extra space excluding output
+ * (n = sz(s), m = sz(pat)).
+ * Empty pat is a special case; handle it separately.
+ * Time: O(n+m)
  * Status: Tested on kattis:stringmatching
  */
 #pragma once
@@ -21,22 +24,12 @@ vi pi(const string& s) {
 	return p;
 }
 vi match(const string& s, const string& pat) {
-	if (pat.empty()) {
-		vi res(sz(s)+1);
-		iota(all(res), 0);
-		return res;
-	}
 	vi p = pi(pat + '\0' + s), res;
 	rep(i,sz(p)-sz(s),sz(p))
 		if (p[i] == sz(pat)) res.push_back(i - 2 * sz(pat));
 	return res;
 }
 vi match2(const string& s, const string& pat) { // only compute pi for pat
-	if (pat.empty()) {
-		vi res(sz(s)+1);
-		iota(all(res), 0);
-		return res;
-	}
 	vi p = pi(pat), res;
 	int cp = 0;
 	rep(i,0,sz(s)) {
