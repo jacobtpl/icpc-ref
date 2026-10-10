@@ -57,24 +57,15 @@ poly exp(poly A, int n) { assert(A[0].v == 0);
 	} /// We know that Q=A' is B'/B to x-1 places, we want to find B'/B to 2x-1 places
 	return RSZ(B,n);
 } // 203953
-poly pow(poly A, ll b, int n) {
-    A.resize(n);
-    if (b==0) { poly r(n,0); r[0]=1; return r; }
-    int t = -1;
-    for (int i = 0; i < n; i++) if (A[i].v != 0) { t = i; break; }
-    if (t == -1) return poly(n, 0);
-    mint fac = A[t];
-    for (int i = 0; i < n; i++) A[i] /= fac;
-    poly p(A.begin()+t, A.end());
-    p.resize(n);
-    poly q = log(p, n);
-    poly r = exp(q * mint(b), n) * pow(fac, b);
-    if (t == 0) return r;
-    if (b >= n || b*t >= n) return poly(n, 0);
-    r.insert(r.begin(), t*b, mint(0));
-    r.resize(n);
-    return r;
-} // 7b303d
+poly pow(poly A, ll b, int n) { // A^b mod x^n
+	A.resize(n); int t = 0; while (t < n && !A[t].v) t++;
+	if (!b) { poly r(n); r[0] = 1; return r; }
+	if (t == n || (t && b >= n) || t*b >= n) return poly(n);
+	int k = int(n-t*b); mint c = A[t];
+	poly p = RSZ(poly(begin(A)+t, end(A))/c, k);
+	p = exp(log(p,k)*mint(b),k)*pow(c,b);
+	p.insert(begin(p), t*b, 0); return p;
+}
 poly mod(const poly& f, const poly& g) { return quoRem(f,g).second; }
 poly xkmodf(ll k, poly f) {
     poly r{1}, a{0,1};
@@ -84,6 +75,16 @@ poly xkmodf(ll k, poly f) {
     }
     return r;
 } // ef2278
+// [x^k] P/Q in O(d log d log k), Q[0] != 0, deg P < deg Q = d
+T kthCoef(poly P, poly Q, ll k) {
+	for (; k; k /= 2) {
+		poly R = Q; for (int i = 1; i < sz(R); i += 2) R[i] = -R[i];
+		poly A = conv(P,R), B = conv(Q,R); P.clear(), Q.clear();
+		for (int i = k&1; i < sz(A); i += 2) P.pb(A[i]);
+		for (int i = 0; i < sz(B); i += 2) Q.pb(B[i]);
+	}
+	return sz(P) ? P[0]/Q[0] : 0;
+}
 // solve recurrence with initial vals s[0], s[1]... s[n-1]
 // a[k] = c[1]*a[k-1] + c[2]*a[k-2] + ... c[n]*a[k-n]
 mint solve_linrec(vector<mint> s, vector<mint> c, int n, ll k) {
@@ -95,3 +96,11 @@ mint solve_linrec(vector<mint> s, vector<mint> c, int n, ll k) {
     for (int i = 0; i < n; i++) ans += r[i] * mint(s[i]);
     return ans;
 } // 902e38
+// returns f(x+c)
+poly taylorShift(poly f, T c) {
+	int n = sz(f); poly F(n+1,1), A(n), B(n); T p = 1;
+	rep(i,1,n+1) F[i] = F[i-1]*T(i);
+	rep(i,0,n) A[n-1-i] = f[i]*F[i], B[i] = p/F[i], p *= c;
+	A = conv(A,B); rep(i,0,n) f[i] = A[n-1-i]/F[i];
+	return f;
+}
