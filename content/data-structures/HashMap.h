@@ -6,6 +6,8 @@
  * Description: Hash map with mostly the same API as unordered\_map, but \tilde
  * 3x faster. Uses 1.5x memory.
  * Initial capacity must be a power of 2 (if provided).
+ * Every new table and every \texttt{clear()} costs time proportional to the
+ * initial capacity, so drop that argument when there are many small testcases.
  */
 #pragma once
 

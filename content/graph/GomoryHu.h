@@ -12,7 +12,8 @@
  * Details: The implementation used here is not actually the original
  * Gomory-Hu, but Gusfield's simplified version: "Very simple methods for all
  * pairs network flow analysis". PushRelabel is used here, but any flow
- * implementation that supports `leftOfMinCut` also works.
+ * implementation that supports `leftOfMinCut` also works (the Dinic.h in
+ * this notebook does not: it has no leftOfMinCut/calc).
  */
 #pragma once
 
@@ -23,7 +24,7 @@ vector<Edge> gomoryHu(int N, vector<Edge> ed) {
 	vector<Edge> tree;
 	vi par(N);
 	rep(i,1,N) {
-		PushRelabel D(N); // Dinic also works
+		PushRelabel D(N);
 		for (Edge t : ed) D.addEdge(t[0], t[1], t[2], t[2]);
 		tree.push_back({i, par[i], D.calc(i, par[i])});
 		rep(j,i+1,N)

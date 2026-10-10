@@ -3,7 +3,9 @@
  * Date: 2023-05-01
  * License: CC0
  * Source: My head
- * Description: what it says
+ * Description: what it says.
+ * a / b truncates toward zero, but BigInt \% BigInt (b > 0) is in [0, b), so
+ * (a/b)*b + a\%b != a when a < 0 and b does not divide a. BigInt \% long long keeps the sign of a.
  * Usage: just do it
  * Status: prob works
  */
@@ -47,14 +49,12 @@ struct BigInt {
         *this = v;
     }
     BigInt& operator = (long long v) {
-        sign = 1;
-        if (v < 0) {
-            sign = -1;
-            v = -v;
-        }
+        sign = v < 0 ? -1 : 1;
+        unsigned long long u = v; // -LLONG_MIN overflows
+        if (v < 0) u = -u;
         a.clear();
-        for (; v > 0; v = v / BASE)
-            a.push_back(v % BASE);
+        for (; u > 0; u = u / BASE)
+            a.push_back((int) (u % BASE));
         return *this;
     }
 
@@ -279,9 +279,9 @@ struct BigInt {
         return divmod(*this, v).second;
     }
 
-    void operator/=(int v) {
+    void operator/=(long long v) {
         assert(v > 0);  // operator / not well-defined for v <= 0.
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             *this /= BigInt(v);
             return ;
         }
@@ -295,10 +295,10 @@ struct BigInt {
         trim();
     }
 
-    BigInt operator/(int v) const {
+    BigInt operator/(long long v) const {
         assert(v > 0);  // operator / not well-defined for v <= 0.
 
-        if (llabs(v) >= BASE) {
+        if (v >= BASE || v <= -BASE) {
             return *this / BigInt(v);
         }
         BigInt res = *this;
@@ -318,8 +318,8 @@ struct BigInt {
         return m * sign;
     }
 
-    void operator*=(int v) {
-        if (llabs(v) >= BASE) {
+    void operator*=(long long v) {
+        if (v >= BASE || v <= -BASE) {
             *this *= BigInt(v);
             return ;
         }
@@ -349,8 +349,8 @@ struct BigInt {
         trim();
     }
 
-    BigInt operator*(int v) const {
-        if (llabs(v) >= BASE) {
+    BigInt operator*(long long v) const {
+        if (v >= BASE || v <= -BASE) {
             return *this * BigInt(v);
         }
         BigInt res = *this;
@@ -394,17 +394,19 @@ struct BigInt {
                 swap(x[i], x[j]);
         }
 
+        // Exact roots: accumulating w *= wlen loses too much precision for large n.
+        vector<complex<double> > rt(n / 2);
+        for (int i = 0; i < n / 2; ++i) {
+            double ang = 2 * 3.14159265358979323846 * i / n * (invert ? -1 : 1);
+            rt[i] = complex<double>(cos(ang), sin(ang));
+        }
         for (int len = 2; len <= n; len <<= 1) {
-            double ang = 2 * 3.14159265358979323846 / len * (invert ? -1 : 1);
-            complex<double> wlen(cos(ang), sin(ang));
             for (int i = 0; i < n; i += len) {
-                complex<double> w(1);
                 for (int j = 0; j < len / 2; ++j) {
                     complex<double> u = x[i + j];
-                    complex<double> v = x[i + j + len / 2] * w;
+                    complex<double> v = x[i + j + len / 2] * rt[n / len * j];
                     x[i + j] = u + v;
                     x[i + j + len / 2] = u - v;
-                    w *= wlen;
                 }
             }
         }
@@ -453,7 +455,7 @@ struct BigInt {
         return res;
     }
 
-    typedef vector<long long> vll;
+    typedef vector<unsigned long long> vll; // karatsuba intermediates wrap mod 2^64
 
     static vll karatsubaMultiply(const vll &a, const vll &b) {
         int n = a.size();
@@ -523,7 +525,7 @@ struct BigInt {
         *this = *this * v;
     }
     BigInt operator*(const BigInt &v) const {
-        if (a.size() * v.a.size() <= 1000111) return mul_simple(v);
+        if (a.size() * v.a.size() <= 1000111 || min(a.size(), v.a.size()) <= 1000) return mul_simple(v);
         if (a.size() > 500111 || v.a.size() > 500111) return mul_fft(v);
         return mul_karatsuba(v);
     }
@@ -568,7 +570,7 @@ struct BigInt {
 
         int n = a.a.size();
 
-        int firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
+        int firstDigit = (int) sqrtl((long double) a.a[n - 1] * BASE + a.a[n - 2]);
         int norm = BASE / (firstDigit + 1);
         a *= norm;
         a *= norm;
@@ -576,7 +578,7 @@ struct BigInt {
             a.a.push_back(0);
 
         BigInt r = (long long) a.a[n - 1] * BASE + a.a[n - 2];
-        firstDigit = (int) sqrt((double) a.a[n - 1] * BASE + a.a[n - 2]);
+        firstDigit = (int) sqrtl((long double) a.a[n - 1] * BASE + a.a[n - 2]);
         int q = firstDigit;
         BigInt res;
 

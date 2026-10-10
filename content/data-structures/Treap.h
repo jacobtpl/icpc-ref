@@ -12,14 +12,18 @@
 
 struct Node {
 	Node *l = 0, *r = 0;
-	int val, y, c = 1;
-	Node(int val) : val(val), y(rand()) {}
+	int val, y, c = 1, minval, lazyadd = 0; bool rev = 0;
+	Node(int val) : val(val), y(rand()), minval(val) {}
 	void recalc();
 	void pushdown();
 };
 int cnt(Node* n) { return n ? n->c : 0; }
 void ladd(Node *n, int add) {n->val+=add;n->minval+=add;n->lazyadd+=add;}
-void Node::recalc() { c = cnt(l) + cnt(r) + 1;} // update range vals if needed
+void Node::recalc() { // update range vals if needed
+	c = cnt(l) + cnt(r) + 1; minval = val;
+	if (l) minval = min(minval, l->minval);
+	if (r) minval = min(minval, r->minval);
+}
 void Node::pushdown() {
 	if (lazyadd) {
 		if (l) ladd(l, lazyadd);
@@ -31,10 +35,11 @@ void Node::pushdown() {
 		rev=0;}
 }
 template<class F> void each(Node* n, F f) {
-	if (n) { each(n->l, f); f(n->val); each(n->r, f); }
+	if (n) { n->pushdown(); each(n->l, f); f(n->val); each(n->r, f); }
 }
 pair<Node*, Node*> split(Node* n, int k) { // splits so left side has k nodes
 	if (!n) return {};
+	n->pushdown();
 	if (cnt(n->l) >= k) { // "n->val >= k" for lower_bound(k)
 		auto pa = split(n->l, k);
 		n->l = pa.second;

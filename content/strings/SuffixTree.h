@@ -8,16 +8,19 @@
  *  The root is 0 (has l = -1, r = 0), non-existent children are -1.
  *  To get a complete tree, append a dummy symbol -- otherwise it may contain
  *  an incomplete path (still useful for substring matching, though).
+ *  Memory is allocated from the length of the string, so building many
+ *  small trees (multitest) is fine.
  * Time: $O(26N)$
  * Status: stress-tested a bit
  */
 #pragma once
 
 struct SuffixTree {
-	enum { N = 200010, ALPHA = 26 }; // N ~ 2*maxlen+10
+	enum { ALPHA = 26 };
 	int toi(char c) { return c - 'a'; }
 	string a; // v = cur node, q = cur position
-	int t[N][ALPHA],l[N],r[N],p[N],s[N],v=0,q=0,m=2;
+	int N,v=0,q=0,m=2; // N = max number of nodes
+	vector<array<int,ALPHA>> t; vi l,r,p,s;
 
 	void ukkadd(int i, int c) { suff:
 		if (r[v]<=q) {
@@ -36,11 +39,10 @@ struct SuffixTree {
 		}
 	}
 
-	SuffixTree(string a) : a(a) {
-		fill(r,r+N,sz(a));
-		memset(s, 0, sizeof s);
-		memset(t, -1, sizeof t);
-		fill(t[1],t[1]+ALPHA,0);
+	SuffixTree(string a) : a(a), N(2*sz(a)+2),
+			t(N), l(N), r(N,sz(a)), p(N), s(N) {
+		for (auto& x : t) x.fill(-1);
+		t[1].fill(0);
 		s[0] = 1; l[0] = l[1] = -1; r[0] = r[1] = p[0] = p[1] = 0;
 		rep(i,0,sz(a)) ukkadd(i, toi(a[i]));
 	}

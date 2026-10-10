@@ -29,7 +29,7 @@ void prep(vector<P3>& p) { // rearrange points such that
 	int dim = 1; 
 	rep(i,1,sz(p)) 
 		if (dim == 1) {
-			if (p[0] != p[i]) swap(p[1],p[i]), ++dim;
+			if (!(p[0] == p[i])) swap(p[1],p[i]), ++dim;
 		} else if (dim == 2) {
 			if (!collinear(p[0],p[1],p[i])) 
 				swap(p[2],p[i]), ++dim;

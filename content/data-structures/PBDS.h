@@ -44,8 +44,7 @@ void pbds() {
     int l=1, r=3;
     rope<int> cur = v.substr(l, r-l+1); // 2 3 4
     v.erase(l, r-l+1); // 1 5 6
-	v.insert(v.mutable_begin() + 2, cur);
     v.insert(v.mutable_begin(), cur); //to start (2 3 4 1 5 6)
-    // v.insert(v.mutable_reference_at(0), cur); // to ONE AFTER start (1 2 3 4 5 6)
+    // v.insert(1, cur); // to ONE AFTER start (1 2 3 4 5 6)
     // v.insert(v.mutable_begin() + 2, cur); // to TWO AFTER start (1 5 2 3 4 6)
 }

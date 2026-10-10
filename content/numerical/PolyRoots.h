@@ -3,8 +3,10 @@
  * Date: 2004-02-08
  * License: CC0
  * Description: Finds the real roots to a polynomial.
+ * Needs degree $\ge 1$ and a non-zero leading coefficient. Roots of even multiplicity
+ * are missed or reported twice. Roots outside [xmin, xmax] can also be returned.
  * Usage: polyRoots({{2,-3,1}},-1e9,1e9) // solve x^2-3x+2 = 0
- * Time: O(n^2 \log(1/\epsilon))
+ * Time: O(n^3 \log(1/\epsilon))
  */
 #pragma once
 

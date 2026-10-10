@@ -4,6 +4,8 @@
  * License: CC0
  * Description: Solves $A * x = b$. If there are multiple solutions, an arbitrary one is returned.
  *  Returns rank, or -1 if no solutions. Data in $A$ and $b$ is lost.
+ *  eps is an absolute tolerance: scale the input to $O(1)$ (or raise eps), otherwise
+ *  consistent rank-deficient systems may give -1 or a too large rank.
  * Time: O(n^2 m)
  * Status: tested on kattis:equationsolver, and bruteforce-tested mod 3 and 5 for n,m <= 3
  */

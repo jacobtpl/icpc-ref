@@ -1,9 +1,9 @@
 /**
  * Author: Siyong
  * Date: 2023
- * Description: FWHT
- * Time: O(N \log N)
+ * Description: FWHT (in place). The size of $a$ must be a power of two ($\ge 1$).
  * For inverse fwht: call fwht and divide all elements by (2 ** L) (size of array)
+ * Time: O(N \log N)
  */
 template<typename T>
 void fwht(vector<T>& a)

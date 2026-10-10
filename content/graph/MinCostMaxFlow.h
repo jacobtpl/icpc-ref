@@ -1,9 +1,14 @@
 /**
  * Author: Siyong, modified from Kactl Implementation
  * Date: April 4, 2024
- * Description: Min-cost max-flow. All capacities are 0. Flows are initialized to be negative.
- * Status: Tested on kattis:mincostmaxflow
- * Time: Originally O(E^2)
+ * Description: Min-cost max-flow. Multi-edges are allowed. An edge stores flow = -(residual capacity),
+ *  so the flow sent over an added edge e (not a self-loop) is -ed[e.n][e.rev].flow.
+ *  If costs can be negative, call setpi before maxflow; negative cost cycles are not supported.
+ *  With C = F = int, every shortest path cost and every difference of two such costs
+ *  (these are the reduced distances) must stay below INFC ($\approx 2^{29}$), and the total flow
+ *  below $2^{31}$; otherwise change the typedefs to ll.
+ * Status: Tested on kattis:mincostmaxflow, stress-tested
+ * Time: $O(F E \log(V))$ where F is max flow. $O(VE)$ for setpi.
  */
 
 // #include <bits/extc++.h>
@@ -20,11 +25,11 @@ struct MCMF {
 	vector<size_t> par;
 
 	MCMF(int N) :
-		N(N), ed(N), dist(N), pi(N), par(N), amt(N) {}
+		N(N), ed(N), dist(N), pi(N), amt(N), par(N) {}
 
 	void addEdge(int u, int v, F f, C c) {
-		ed[u].emplace_back(v, -f, c, ed[v].size());
-		ed[v].emplace_back(u, 0, -c, ed[u].size()-1);
+		ed[u].push_back({v, -f, c, ed[v].size()});
+		ed[v].push_back({u, 0, -c, ed[u].size()-1});
 	}
 
 	void path(int s) { // 417ab0
@@ -71,4 +76,4 @@ struct MCMF {
 					if (f < 0 && ckmin(pi[to], pi[i] + c)) ch = 1;
 		assert(it >= 0); // negative cost cycle
 	}
-}; // 0b54fa without setpi; 88d7c5 with setpi
+}; // 1c3c23 without setpi; 4f8c64 with setpi

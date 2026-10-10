@@ -7,7 +7,7 @@ using T = double; // or mint
 const double EPS = 1e-9; // adjust?
 int getRow(vector<vector<double>>& m, int R, int i, int nex) {
 	pair<double,int> bes{0,-1}; // find row with max abs value
-	rep(j,nex,R) ckmax(bes,{abs(m[j][i]),j}); 
+	rep(j,nex,R) ckmax(bes,make_pair(abs(m[j][i]),j)); 
 	return bes.first < EPS ? -1 : bes.second; }
 int getRow(vector<vector<mint>>& m, int R, int i, int nex) {
 	rep(j,nex,R) if (m[j][i] != 0) return j;

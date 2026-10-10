@@ -27,7 +27,7 @@ vi match(const string& s, const string& pat) {
 vi match2(const string& s, const string& pat) { // only compute pi for pat
 	vi p = pi(pat), res;
 	int cp = 0;
-	rep(i,1,sz(s)) {
+	rep(i,0,sz(s)) {
 		int g = cp;
 		while (g && s[i] != pat[g]) g = p[g-1];
 		cp = g + (s[i] == pat[g]);

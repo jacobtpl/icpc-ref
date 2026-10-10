@@ -48,8 +48,9 @@ ll example_filteredDotProduct(int n, short* a, short* b) {
 		mi va = L(a[i]), vb = L(b[i]); i += 16;
 		va = _mm256_and_si256(_mm256_cmpgt_epi16(vb, va), va);
 		mi vp = _mm256_madd_epi16(va, vb);
-		acc = _mm256_add_epi64(_mm256_unpacklo_epi32(vp, zero),
-			_mm256_add_epi64(acc, _mm256_unpackhi_epi32(vp, zero)));
+		mi s = _mm256_srai_epi32(vp, 31); // sign-extend
+		acc = _mm256_add_epi64(_mm256_unpacklo_epi32(vp, s),
+			_mm256_add_epi64(acc, _mm256_unpackhi_epi32(vp, s)));
 	}
 	union {ll v[4]; mi m;} u; u.m = acc; rep(i,0,4) r += u.v[i];
 	for (;i<n;++i) if (a[i] < b[i]) r += a[i]*b[i]; // <- equiv

@@ -3,16 +3,22 @@
  * Date: idk
  * License: CC0
  * Source: stanford-notebook
- * Description: Dinic's without scaling
+ * Description: Dinic's without scaling. Self-loops are ignored; requires
+ * $S \ne T$ (otherwise MaxFlow never returns). The $i$-th added non-loop edge
+ * is E[2*i], with its flow in E[2*i].flow. After MaxFlow, $d[v] \le N$ iff
+ * $v$ is on the source side of a min cut. Recursion depth is up to $V$.
+ * Time: $O(V^2 E)$, $O(\sqrt{V}E)$ for bipartite matching
+ * Usage: Dinic d(n); d.AddEdge(u, v, cap); ll f = d.MaxFlow(s, t);
+ * Status: stress-tested
  */
 
-struct Edge {
-  int u, v;
-  ll cap, flow;
-  Edge() {}
-  Edge(int u, int v, ll cap): u(u), v(v), cap(cap), flow(0) {}
-};
 struct Dinic {
+  struct Edge {
+    int u, v;
+    ll cap, flow;
+    Edge() {}
+    Edge(int u, int v, ll cap): u(u), v(v), cap(cap), flow(0) {}
+  };
   int N;
   vector<Edge> E;
   vector<vector<int>> g;

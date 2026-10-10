@@ -1,8 +1,9 @@
 /**
  * Author: Benq
- * Description: General max weight max matching with 1-based indexing.
- 	* Edge weights must be positive, combo of UnweightedMatch and
- 	* Hungarian. 1-INDEXED NODES
+ * Description: General max weight matching with 1-based indexing
+ 	* (weight is maximized, NOT cardinality: path 1,3,1 gives \{3,1\}).
+ 	* Edge weights must be in $[1, 2^{29})$, combo of UnweightedMatch and
+ 	* Hungarian. 1-INDEXED NODES. Requires $N < SZ$ (declare globally).
  * Time: O(N^3)?
  * Source: 
 	* https://github.com/koosaga/DeobureoMinkyuParty
@@ -130,6 +131,7 @@ template<int SZ> struct WeightedMatch {
 				if (S[x] == -1) ckmin(d,eDelta(g[slack[x]][x]));
 				else if (S[x] == 0) ckmin(d,eDelta(g[slack[x]][x])/2);
 			} // edge weights shouldn't go below 0
+			if (d == INT_MAX) return 0; // no slack left, avoid overflow
 			rep(u,1,N+1) {
 				if (S[st[u]] == 0) {
 					if (lab[u] <= d) return 0; // why?
