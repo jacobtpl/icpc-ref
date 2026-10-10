@@ -37,7 +37,7 @@ struct AhoCorasick {
             for (auto p : nodes[v].next) {
                 int x = p.second;
                 nodes[x].link = nx(nodes[v].link, p.first);
-                // update output if needed
+                nodes[x].output |= nodes[nodes[x].link].output;
                 q.push(x);
             }
         }
