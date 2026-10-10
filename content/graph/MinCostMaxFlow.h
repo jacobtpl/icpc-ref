@@ -2,9 +2,10 @@
  * Author: Siyong, modified from Kactl Implementation
  * Date: April 4, 2024
  * Description: Min-cost max-flow. Multi-edges are allowed. An edge stores flow = -(residual capacity),
- *  so the flow sent over an added edge e is -ed[e.n][e.rev].flow.
+ *  so the flow sent over an added edge e (not a self-loop) is -ed[e.n][e.rev].flow.
  *  If costs can be negative, call setpi before maxflow; negative cost cycles are not supported.
- *  With C = F = int, every shortest path cost must stay below INFC ($2^{29}$) and the total flow
+ *  With C = F = int, every shortest path cost and every difference of two such costs
+ *  (these are the reduced distances) must stay below INFC ($\approx 2^{29}$), and the total flow
  *  below $2^{31}$; otherwise change the typedefs to ll.
  * Status: Tested on kattis:mincostmaxflow, stress-tested
  * Time: $O(F E \log(V))$ where F is max flow. $O(VE)$ for setpi.
