@@ -49,14 +49,27 @@ struct SuffixTree {
 	// example: find longest common substring of lowercase strings
 	pii best;
 	int lcs(int node, int i1, int i2, int olen) {
-		if (l[node] <= i1 && i1 < r[node]) return 1;
-		if (l[node] <= i2 && i2 < r[node]) return 2;
-		int mask = 0, len = node ? olen + (r[node] - l[node]) : 0;
-		rep(c,0,ALPHA) if (t[node][c] != -1)
-			mask |= lcs(t[node][c], i1, i2, len);
-		if (mask == 3)
-			best = max(best, {len, r[node] - len});
-		return mask;
+		vi order{node}, len(m), mask(m);
+		len[node] = node ? olen : 0;
+		rep(i,0,sz(order)) {
+			int u = order[i];
+			if (l[u] <= i1 && i1 < r[u]) mask[u] = 1;
+			else if (l[u] <= i2 && i2 < r[u]) mask[u] = 2;
+			else {
+				if (u) len[u] += r[u] - l[u];
+				rep(c,0,ALPHA) {
+					int w = t[u][c];
+					if (w != -1) len[w] = len[u], order.push_back(w);
+				}
+			}
+		}
+		for (int i = sz(order); i--;) {
+			int u = order[i];
+			if (mask[u] == 3)
+				best = max(best, {len[u], r[u] - len[u]});
+			if (u != node) mask[p[u]] |= mask[u];
+		}
+		return mask[node];
 	}
 	static pii LCS(string s, string t) {
 		SuffixTree st(s + (char)('z' + 1) + t + (char)('z' + 2));

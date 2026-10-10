@@ -53,7 +53,7 @@ struct SuffixArray {
 			if (s.compare(sa[m], sz(t), t) >= 0) e = m; // not strict
 			else b = m+1;
 		}
-		if (s.compare(sa[b], sz(t), t) != 0) return mp(-1,-1);
+		if (s.compare(sa[b], sz(t), t) != 0) return {-1,-1};
 		pair<int,int> ans{b,-1};
 		b=1,e=sz(sa)-1;
 		while (b<e) {
