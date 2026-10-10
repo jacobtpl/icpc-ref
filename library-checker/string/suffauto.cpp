@@ -69,8 +69,8 @@ int main() {
 	int N = s.size();
 
 	vector<int> sloc(N+1);
-	for(int i = 0;i < N; ++i)
-		sloc[i] = sa.append(sloc[i-1], s[N-i-1]);
+	for(int i = 1;i <= N; ++i)
+		sloc[i] = sa.append(sloc[i-1], s[N-i]);
 
 	vector<map<char, tuple<int, int, int> > > treeAdj(sa.N); // node, [s[l]...s[r])
 	vector<char> vis(sa.N);
@@ -112,4 +112,3 @@ int main() {
 		printf("%d%c", ans[i], " \n"[i+1==ans.size()]);
 	return 0;
 }
-
