@@ -32,6 +32,12 @@ vector<F> multiply(const Mat& a, const vector<F>& x) {
 }
 
 int main() {
+	Mat empty;
+	assert(det(empty)==1 && matInv(empty)==0);
+	assert(gauss(empty)==make_pair(F(1),0));
+	vector<F> freeVars(3), noRhs;
+	assert(solveLinear(empty,noRhs,freeVars)==0);
+	assert(freeVars==vector<F>(3,F(0)));
 	mt19937 rng(654123);
 	rep(it,0,4000) {
 		int n=int(rng()%4)+1, den=int(rng()%5)+1;
@@ -53,6 +59,17 @@ int main() {
 		assert(solveLinear(copy,rhs,result)==rank);
 		assert(multiply(a,result)==b);
 		if (want!=0) assert(result==x);
+		vector<vector<double>> floating(n,vector<double>(n));
+		rep(i,0,n) rep(j,0,n) floating[i][j]=double(a[i][j]);
+		auto fcopy=floating;
+		assert(abs(det(fcopy)-double(want))<1e-8);
+		fcopy=floating; assert(gauss(fcopy).second==rank);
+		fcopy=floating; assert((matInv(fcopy)==n)==(want!=0));
+		if (want!=0) rep(i,0,n) rep(j,0,n) {
+			double sum=0;
+			rep(k,0,n) sum+=floating[i][k]*fcopy[k][j];
+			assert(abs(sum-(i==j))<1e-8);
+		}
 	}
 	rep(it,0,2000) {
 		int n=int(rng()%4)+1, m=int(rng()%5)+1;
