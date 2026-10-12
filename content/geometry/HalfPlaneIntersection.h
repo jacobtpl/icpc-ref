@@ -8,6 +8,8 @@
    * With \texttt{RayT<ll>} every decision is exact (\_\_int128 products) for
    * $|p| \le 10^9$, $|dp| \le 2 \cdot 10^9$ and only the returned vertices
    * are rounded (long double); use it for integer input.
+   * Floating rays with integer-valued coordinates within these bounds
+   * also use the exact integer predicates.
    * With floating point rays products are formed in long double and a
    * determinant within \texttt{eps} times the sum of the magnitudes of
    * its terms counts as zero, i.e. the configuration as degenerate
@@ -33,8 +35,23 @@ typedef RayT<double> Ray;
 template<class T, class F =
 	conditional_t<is_integral_v<T>, long double, T>>
 vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
-		bool add_bounds = false, long double eps = 1e-13) {
+	bool add_bounds = false, long double eps = 1e-13) {
 	typedef Point<T> P; typedef RayT<T> R;
+	if constexpr (is_floating_point_v<T>) {
+		auto integer = [](T x, T bound) {
+			return abs(x) <= bound && trunc(x) == x; };
+		if (all_of(all(rays), [&](const R& r) {
+			return integer(r.p.x, T(1e9)) && integer(r.p.y, T(1e9)) &&
+				integer(r.dp.x, T(2e9)) && integer(r.dp.y, T(2e9)); })) {
+			vector<RayT<ll>> exact;
+			for (const R& r : rays) exact.push_back({
+				Point<ll>((ll)r.p.x, (ll)r.p.y), Point<ll>((ll)r.dp.x, (ll)r.dp.y)});
+			vector<Point<F>> res;
+			for (auto p : halfPlaneIsect(exact, add_bounds))
+				res.emplace_back(F(p.x), F(p.y));
+			return res;
+		}
+	}
 	const bool I = is_integral_v<T>;
 	typedef conditional_t<is_integral_v<T>, __int128, long double> W;
 	W E = I ? W(0) : W(eps);

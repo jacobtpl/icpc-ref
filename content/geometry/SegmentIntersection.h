@@ -7,8 +7,9 @@
 \begin{minipage}{65mm}
 If a unique intersection point between the line segments going from s1 to e1 and from s2 to e2 exists then it is returned.
 If no intersection point exists an empty vector is returned. If infinitely many exist a vector with 2 elements is returned, containing the endpoints of the common line segment.
-The wrong position will be returned if P is Point<ll> and the intersection point does not have integer coordinates.
-Products of three coordinates are used in intermediate steps so watch out for overflow if using int or long long.
+With integer points the answer is truncated toward zero. Use floating points for non-integer intersections.
+For Point<ll>, coordinates up to $10^9$ are supported; construction products are widened to \_\_int128.
+Floating point sign tests are exact comparisons, so nearly touching segments can require a tolerance policy.
 \end{minipage}
 \begin{minipage}{15mm}
 \includegraphics[width=\textwidth]{content/geometry/SegmentIntersection}
@@ -28,8 +29,14 @@ template<class P> vector<P> segInter(P a, P b, P c, P d) {
 	auto oa = c.cross(d, a), ob = c.cross(d, b),
 	     oc = a.cross(b, c), od = a.cross(b, d);
 	// Checks if intersection is single non-endpoint point.
-	if (sgn(oa) * sgn(ob) < 0 && sgn(oc) * sgn(od) < 0)
-		return {(a * ob - b * oa) / (ob - oa)};
+	if (sgn(oa) * sgn(ob) < 0 && sgn(oc) * sgn(od) < 0) {
+		typedef decltype(a.x) T;
+		if constexpr (is_integral_v<T>) {
+			auto coord = [&](T x, T y) {
+				return T(((__int128)x * ob - (__int128)y * oa) / (ob - oa)); };
+			return {P(coord(a.x, b.x), coord(a.y, b.y))};
+		} else return {a + (b - a) * (oa / (oa - ob))};
+	}
 	set<P> s;
 	if (onSegment(c, d, a)) s.insert(a);
 	if (onSegment(c, d, b)) s.insert(b);

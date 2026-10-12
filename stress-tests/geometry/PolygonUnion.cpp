@@ -200,9 +200,6 @@ void testRandom(int n, int numPts = 10, int lim = 5, bool brute = false) {
         if (polygonArea2(polygons.back()) < 0) {
             reverse(all(polygons.back()));
         }
-        // genPolygon sometimes backtracks along a line or crosses itself. Such
-        // input violates polyUnion's contract and its "area" depends on the
-        // origin used for summation, so regenerate instead of testing it.
         if (!isSimple(polygons.back())) polygons.pop_back(), i--;
     }
     auto val1 = polyUnion(polygons);

@@ -4,8 +4,7 @@
  * Description: Computes the Delaunay triangulation of a set of points
  * as a list of counter-clockwise triangles.
  * Each circumcircle contains none of the input points.
- * Wrapper around FastDelaunay (the old version lifted the points to
- * a 3D hull in doubles and was wrong beyond coordinates of about $10^3$).
+ * Wrapper around FastDelaunay.
  * Duplicate points are merged. Fewer than three distinct points or
  * all points on a line give no triangles; cocircular points give
  * any valid triangulation.

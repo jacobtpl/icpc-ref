@@ -17,6 +17,7 @@
 
 typedef Point<double> P;
 P polygonCenter(const vector<P>& v) {
+	if (v.empty()) return P(NAN, NAN);
 	P res(0, 0); double A = 0;
 	rep(i,1,sz(v)-1) {
 		P a = v[i] - v[0], b = v[i+1] - v[0];
@@ -27,6 +28,7 @@ P polygonCenter(const vector<P>& v) {
 }
 Point<long double> polygonCenter(const vector<Point<ll>>& v) {
 	typedef long double ld;
+	if (v.empty()) return Point<ld>(NAN, NAN);
 	__int128 A = 0, X = 0, Y = 0;
 	rep(i,1,sz(v)-1) {
 		Point<ll> a = v[i] - v[0], b = v[i+1] - v[0];
