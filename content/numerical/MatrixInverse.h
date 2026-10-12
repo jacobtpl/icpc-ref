@@ -11,10 +11,7 @@
 #pragma once
 
 using T = double; // or mint
-#define ABS(x) fabs(x)
-#define ISZERO(x) (fabs(x) < 1e-12)
-// #define ABS(x) (x.v)
-// #define ISZERO(x) (x.v == 0)
+template<class T>
 int matInv(vector<vector<T>>& A) {
 	int n = sz(A); vi col(n);
 	vector<vector<T>> tmp(n, vector<T>(n));
@@ -23,9 +20,12 @@ int matInv(vector<vector<T>>& A) {
 	rep(i,0,n) {
 		int r = i, c = i;
 		rep(j,i,n) rep(k,i,n)
-			if (ABS(A[j][k]) > ABS(A[r][c]))
+			if (abs(A[j][k]) > abs(A[r][c]))
 				r = j, c = k;
-		if (ISZERO(A[r][c])) return i;
+		bool zero = A[r][c] == 0;
+		if constexpr (is_floating_point<T>::value)
+			zero = abs(A[r][c]) < 1e-12;
+		if (zero) return i;
 		A[i].swap(A[r]); tmp[i].swap(tmp[r]);
 		rep(j,0,n)
 			swap(A[j][i], A[j][c]), swap(tmp[j][i], tmp[j][c]);

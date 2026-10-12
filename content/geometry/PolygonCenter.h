@@ -12,8 +12,9 @@
 #include "Point.h"
 
 typedef Point<double> P;
+template<class P>
 P polygonCenter(const vector<P>& v) {
-	P res(0, 0); double A = 0;
+	P res(0, 0); decltype(P().x) A = 0;
 	for (int i = 0, j = sz(v) - 1; i < sz(v); j = i++) {
 		res = res + (v[i] + v[j]) * v[j].cross(v[i]);
 		A += v[j].cross(v[i]);

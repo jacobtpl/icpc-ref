@@ -1,0 +1,124 @@
+# Exact fractions
+
+Paste `content/number-theory/Fraction.h` after the contest template.
+It uses `long long` numerator/denominator storage and GNU `__int128`
+intermediates. It has no external dependencies. C++17 is needed for the
+numeric-type dispatch in the algebra and half-plane routines.
+
+```cpp
+Fraction a(1, 3), b(2, 5);
+assert(a + b == Fraction(11, 15));
+assert(2 * a == Fraction(2, 3));
+cout << a;               // 1/3
+cin >> b;                // one integer or p/q token, e.g. -6/8
+double approximate = double(a);
+```
+
+`p` and `q` are coprime, `q > 0`, and zero is `0/1`. Do not mutate these
+fields. Arithmetic, all six comparisons, compound assignments, unary signs,
+`abs`, explicit `bool`, and explicit `double`/`long double` conversions are
+provided. Integer literals work on either side of arithmetic and comparison.
+Constructor arguments must fit in `long long`; floating-point arguments are
+rejected instead of silently truncating. To represent a decimal exactly,
+write `Fraction(1, 10)`, not `0.1`.
+
+## Range and cost
+
+Every result is reduced **before** narrowing back to `long long`. Products,
+cross products used for comparison, and sums of two numerator products fit in
+signed `__int128` for valid stored fractions. This includes `LLONG_MIN`:
+normalization never negates it in `long long` or calls `std::gcd` on it.
+
+For example, `Fraction(LLONG_MAX, 2) * Fraction(2, LLONG_MAX)` is exactly one,
+and `Fraction(LLONG_MIN, LLONG_MIN)` is also one. An unrepresentable reduced
+result throws `overflow_error`; a zero denominator or division by zero throws
+`domain_error`. Failed compound assignment leaves its left operand unchanged.
+Invalid input sets the stream's fail bit and leaves the destination unchanged.
+
+This is a bounded exact type, not a big integer. Every intermediate **fraction**
+in an algorithm must fit, even if the algorithm's final answer is small.
+Repeated geometric constructions can grow denominators quickly. In particular,
+`-Fraction(LLONG_MIN)` and `abs(Fraction(LLONG_MIN))` cannot be represented.
+Keep overflow checks enabled; compiling with `NDEBUG` does not remove them.
+Arithmetic runs Euclid on at most 128-bit integers, while comparisons are
+constant-time cross products. There is no per-testcase initialization or pool.
+
+## Geometry
+
+```cpp
+using Q = Point<Fraction>;
+auto [kind, p] = lineInter(Q(0,0), Q(3,3), Q(0,2), Q(3,0));
+assert(kind == 1 && p == Q(Fraction(6,5), Fraction(6,5)));
+vector<Q> triangle = {Q(0,0), Q(2,0), Q(0,1)};
+auto h = convexHull(triangle);
+Fraction area = polygonArea2(h) / 2;
+```
+
+The following accept fraction points directly, with no epsilon:
+
+- `Point` / `Point3D`: arithmetic, ordering, equality, dot/cross products,
+  squared distances, and 2D perpendicular vectors.
+- `sideOf` (the overload without epsilon), `onSegment`, `lineInter`,
+  `segInter`, `lineProj` (projection and reflection).
+- `convexHull`, `hullDiameter`, `inHull`, `inPolygon`, `lineHull`, `extrVertex`.
+- `polygonArea2`, `polygonCenter`, `polygonCut`, `polyUnion`,
+  `linearTransformation`, `ccCenter`, and `signedPolyVolume`.
+- `halfPlaneIsect` with `vector<RayT<Fraction>>`; the existing `Ray` alias is
+  still `RayT<double>`. Fraction instantiations use exactly zero tolerance.
+  Existing preconditions still apply: bounded, nonzero-area intersection;
+  valid nonzero ray directions. `add_bounds` clips to the existing
+  `[0, 10^9]` square and may exceed fraction storage limits in constructions.
+
+Notebook headers retain their existing example `P`/`T` aliases for existing
+callers. When combining snippets, choose one alias (e.g. `using P =
+Point<Fraction>`) rather than pasting conflicting `Point<ll>` and
+`Point<double>` aliases. The templates also accept `Point<Fraction>` under
+another name without changing the example aliases. Existing geometry
+preconditions, such as a nonempty hull or a nondegenerate triangle, remain.
+
+Lengths, normalized vectors, arbitrary rotations, and general circle
+intersection coordinates are not necessarily rational. `dist`, `angle`,
+`phi`, and `theta` return approximate doubles. For `unit`, `normal`, `rotate`,
+circle routines, and other floating-point-only snippets, explicitly construct
+`Point<double>(double(p.x), double(p.y))` (and similarly in 3D). Those results
+do not have exact predicates. Use `dist2` for exact distance comparisons.
+
+## Algebra and other snippets
+
+`Matrix<Fraction, N>`, `det`, `gauss`, `matInv`, `solveLinear`, `tridiagonal`,
+and `interpolate` accept fraction data directly. Elimination uses exact zero
+tests for fractions and preserves the existing tolerances for floating types.
+For example, a pivot of `Fraction(1, 1000000000000LL)` is nonzero.
+
+Other notebook snippets with a manually selected scalar alias can use
+`Fraction` when they need only field arithmetic and comparisons. Replace
+floating constants with exact fractions and epsilon tests with zero tests.
+For example, a scalar `max(x, 0.0)` becomes `max(x, Fraction(0))`.
+
+This does not turn every snippet into a rational algorithm: `Simplex` still
+uses floating infinities as result sentinels, and needs a separate status
+representation to use finite fractions. Integer/modular algorithms (NTT,
+modular FPS, bit operations, integer grid optimizations), transcendental
+functions, and numerical integration/root finding retain their original
+domains. There is no implicit conversion that silently approximates a
+fraction to make these compile.
+
+## Reproduce the tests
+
+From the repository root:
+
+```sh
+g++ -std=c++17 -O2 -Wall -Wextra -Wconversion stress-tests/number-theory/Fraction.cpp -o /tmp/fraction
+/tmp/fraction
+python3 stress-tests/number-theory/Fraction.py /tmp/fraction
+g++ -std=c++17 -O2 -Wall -Wextra -Wconversion stress-tests/geometry/Fraction.cpp -o /tmp/fraction-geometry
+/tmp/fraction-geometry
+g++ -std=c++17 -O2 -Wall -Wextra -Wconversion stress-tests/numerical/Fraction.cpp -o /tmp/fraction-algebra
+/tmp/fraction-algebra
+```
+
+The Python test uses the standard library's arbitrary-precision
+`fractions.Fraction` as an independent oracle, including normalization,
+`LLONG_MIN`/`LLONG_MAX`, cancellation, ordering, and overflow classification.
+The C++ suites exercise arithmetic identities, failure behavior, random exact
+geometry and linear algebra. They are also included in `make test`.
