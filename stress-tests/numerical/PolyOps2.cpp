@@ -1,7 +1,7 @@
 #include "../utilities/template.h"
 #define pb push_back
 
-#include "../../content/number-theory/SiyongModular.h"
+#include "../../content/number-theory/ModInt.h"
 #include "../../content/numerical/PolyOps.h"
 #include "../../content/numerical/PolyOps2.h"
 
