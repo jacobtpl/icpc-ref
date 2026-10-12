@@ -168,6 +168,26 @@ P rndUlp(int lim, long long ulps = 5) { return P(randNearIntUlps(lim, ulps), ran
 
 P rndEps(int lim, double eps) { return P(randNearIntEps(lim, eps), randNearIntEps(lim, eps)); }
 
+// Exact for the small integer coordinates used here: no two non-adjacent
+// edges share a point and adjacent edges do not overlap.
+bool isSimple(const vector<P> &p) {
+    int n = sz(p);
+    if (n < 3) return false;
+    auto on = [](P s, P e, P q) { return s.cross(e, q) == 0 && (s - q).dot(e - q) <= 0; };
+    rep(i, 0, n) rep(j, i + 1, n) {
+        P a = p[i], b = p[(i + 1) % n], c = p[j], d = p[(j + 1) % n];
+        if (j == i + 1 || (i == 0 && j == n - 1)) {
+            P s = j == i + 1 ? b : a, u = j == i + 1 ? a : b, w = j == i + 1 ? d : c;
+            if ((u - s).cross(w - s) == 0 && (u - s).dot(w - s) > 0) return false;
+            continue;
+        }
+        if (sgn(a.cross(b, c)) * sgn(a.cross(b, d)) < 0 && sgn(c.cross(d, a)) * sgn(c.cross(d, b)) < 0)
+            return false;
+        if (on(a, b, c) || on(a, b, d) || on(c, d, a) || on(c, d, b)) return false;
+    }
+    return true;
+}
+
 void testRandom(int n, int numPts = 10, int lim = 5, bool brute = false) {
     vector<vector<P>> polygons;
     for (int i = 0; i < n; i++) {
@@ -180,6 +200,10 @@ void testRandom(int n, int numPts = 10, int lim = 5, bool brute = false) {
         if (polygonArea2(polygons.back()) < 0) {
             reverse(all(polygons.back()));
         }
+        // genPolygon sometimes backtracks along a line or crosses itself. Such
+        // input violates polyUnion's contract and its "area" depends on the
+        // origin used for summation, so regenerate instead of testing it.
+        if (!isSimple(polygons.back())) polygons.pop_back(), i--;
     }
     auto val1 = polyUnion(polygons);
     vector<vector<blackhorse::pt>> polygons2;
