@@ -38,7 +38,7 @@ template<class T> struct Point3D {
 	F dist() const { // hypot only if dist2() over/underflows F
 		F d = F(dist2()), e = numeric_limits<F>::epsilon();
 		if (!is_floating_point_v<T> || isnormal(d*e) ||
-			(!x && !y && !z)) return sqrt(d);
+			(x == 0 && y == 0 && z == 0)) return sqrt(d);
 		return hypot(F(x), F(y), F(z));
 	}
 	//Azimuthal angle (longitude) to x-axis in interval [-pi, pi]

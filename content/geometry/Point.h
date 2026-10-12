@@ -45,7 +45,7 @@ struct Point {
 	T dist2() const { return x*x + y*y; }
 	F dist() const { // hypot only if dist2() over/underflows F
 		F d = F(dist2()), e = numeric_limits<F>::epsilon();
-		if (!is_floating_point_v<T> || isnormal(d*e) || (!x && !y))
+		if (!is_floating_point_v<T> || isnormal(d*e) || (x == 0 && y == 0))
 			return sqrt(d);
 		return hypot(F(x), F(y));
 	}

@@ -14,8 +14,8 @@ double sphericalDistance(double f1, double t1,
 	double x2 = sin(t2)*cos(f2), y2 = sin(t2)*sin(f2);
 	double z1 = cos(t1), z2 = cos(t2);
 	double dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
-	double sx = x2 + x1, sy = y2 + y1, sz = z2 + z1;
+	double ax = x2 + x1, ay = y2 + y1, az = z2 + z1;
 	double d = sqrt(dx*dx + dy*dy + dz*dz);
-	double s = sqrt(sx*sx + sy*sy + sz*sz);
+	double s = sqrt(ax*ax + ay*ay + az*az);
 	return radius*2*atan2(d, s);
 }
