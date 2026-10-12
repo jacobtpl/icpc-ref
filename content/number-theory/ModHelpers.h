@@ -1,13 +1,15 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Computes inv, fact, ifact
+ * Description: Computes inv, fact, ifact. Requires prime MOD and MV <= MOD.
+ *   Call init before use; choose requires 0 <= k <= n < MV.
  * Status: Tested many many times
  * Time: O(N)
  */
 #include "SiyongModular.h"
 
 int const MV = 2e6 + 10;
+static_assert(MV <= MOD);
 mint inv[MV], fact[MV], ifact[MV];
 void init() {
 	inv[1] = mint(1);
@@ -20,6 +22,6 @@ void init() {
 	}
 }
 mint choose(int n, int k) {
-	assert(0 <= k && k <= n); // or return 0
+	assert(0 <= k && k <= n && n < MV); // or return 0
 	return fact[n] * ifact[n-k] * ifact[k];
 }
