@@ -58,6 +58,16 @@ intersection coordinates. Accumulating many rational areas still needs a
 separate numeric choice: denominators can grow beyond `long long`, and
 subtracting large areas can require more floating-point precision.
 
+For triangle areas involving an intersection of integer-coordinate lines,
+[`lineInterArea2`](intersection-area.md) computes exact wide integer
+intermediates followed by one floating-point division, without constructing
+the intersection or a `Fraction`. Its derivation and diagram explain the
+shared-base area ratio.
+
+The [segment precision review](intersection-precision.md) gives concrete
+examples of floating-point misclassification and avoidable intermediate
+growth in the current coordinate formula.
+
 ## Geometry
 
 ```cpp
