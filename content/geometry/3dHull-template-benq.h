@@ -1,10 +1,13 @@
 /**
  * Author: Benq
- * Description: 3d hull helpers
+ * Description: 3d hull helpers.
+ *  Predicates are evaluated in T on coordinate differences and are
+ *  exact for integer coordinates of absolute value up to $5 \cdot 10^4$ with
+ *  T = double, $5 \cdot 10^5$ with long long, $10^{12}$ with \_\_int128.
  */
 
-using T = double;
-using P3 = Point3D<double>;
+using T = double; // or long long, __int128 (see above)
+using P3 = Point3D<T>;
 using vb = vector<bool>;
 
 mt19937 rng;

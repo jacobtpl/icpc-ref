@@ -7,8 +7,10 @@
  * Each circumcircle contains none of the input points.
  * There must be no duplicate points.
  * If all points are on a line, no triangles will be returned.
+ * Exact for integer coordinates of absolute value up to $10^9$ (cocircular points give any valid triangulation).
  * Should work for doubles as well, though there may be precision issues in 'circ'.
  * Returns triangles in order \{t[0][0], t[0][1], t[0][2], t[1][0], \dots\}, all counter-clockwise.
+ * All edge records live in \texttt{quads} and are freed when triangulate returns.
  * Time: O(n \log n)
  * Status: stress-tested
  */
@@ -22,12 +24,13 @@ typedef __int128_t lll; // (can be ll if coords are < 2e4)
 P arb(LLONG_MAX,LLONG_MAX); // not equal to any other point
 
 struct Quad {
-	Q rot, o; P p = arb; bool mark;
+	Q rot = 0, o = 0; P p = arb; bool mark = 0;
 	P& F() { return r()->p; }
 	Q& r() { return rot->rot; }
 	Q prev() { return rot->o->rot; }
 	Q next() { return r()->prev(); }
 } *H;
+deque<Quad> quads; // owns all edge records of the current call
 
 bool circ(P p, P a, P b, P c) { // is p in the circumcircle?
 	lll p2 = p.dist2(), A = a.dist2()-p2,
@@ -35,8 +38,14 @@ bool circ(P p, P a, P b, P c) { // is p in the circumcircle?
 	return p.cross(a,b)*C + p.cross(b,c)*A + p.cross(c,a)*B > 0;
 }
 Q makeEdge(P orig, P dest) {
-	Q r = H ? H : new Quad{new Quad{new Quad{new Quad{0}}}};
-	H = r->o; r->r()->r() = r;
+	Q r = H;
+	if (!r) {
+		Q q[4];
+		rep(i,0,4) quads.emplace_back(), q[i] = &quads.back();
+		rep(i,0,4) q[i]->rot = q[(i+1)%4];
+		r = q[0];
+	}
+	H = r->o;
 	rep(i,0,4) r = r->rot, r->p = arb, r->o = i & 1 ? r : r->r();
 	r->p = orig; r->F() = dest;
 	return r;
@@ -101,5 +110,10 @@ vector<P> triangulate(vector<P> pts) {
 	q.push_back(c->r()); c = c->next(); } while (c != e); }
 	ADD; pts.clear();
 	while (qi < sz(q)) if (!(e = q[qi++])->mark) ADD;
+	quads.clear(); H = 0;
 	return pts;
 }
+#undef H
+#undef valid
+#undef DEL
+#undef ADD
