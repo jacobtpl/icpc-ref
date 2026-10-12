@@ -6,6 +6,7 @@
    * Area of intersection should be sufficiently precise when all inputs
    * are integers with magnitude $\le 10^5$. Intersection must be bounded.
    * Probably works with floating point too (but EPS might need to be adjusted?).
+   * Use RayT<Fraction> for exact rational intersections with zero tolerance.
  * Time: O(N\log N)
  * Source: Own
  * Status: tested on
@@ -21,19 +22,28 @@ using vP = vector<P>;
 const double EPS = 1e-9; // adjust as needed
 
 // -1 if lower half, 0 if origin, 1 if upper half, needs to be int type
+template<class P>
 int half(P x) { return x.y != 0 ? sgn(x.y) : -sgn(x.x); }
+template<class P>
 bool angleCmp(P a, P b) { int A = half(a), B = half(b);
     return A == B ? a.cross(b) > 0 : A < B; }
 
-struct Ray {
+template<class T> struct RayT {
+	using P = Point<T>;
 	P p, dp; // origin, direction
-	P isect(const Ray& L) const {
+	P isect(const RayT& L) const {
 		return p+dp*(L.dp.cross(L.p-p)/L.dp.cross(dp)); }
-	bool operator<(const Ray& L) const {
+	bool operator<(const RayT& L) const {
 		return angleCmp(dp,L.dp); }
 };
+using Ray = RayT<double>;
 
-vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
+template<class T>
+vector<Point<T>> halfPlaneIsect(vector<RayT<T>> rays, bool add_bounds = false) {
+	using P = Point<T>;
+	using Ray = RayT<T>;
+	T eps = 0;
+	if constexpr (is_floating_point<T>::value) eps = T(EPS);
 	if (add_bounds) { // bound input by rectangle [0,DX] x [0,DY]
 		int DX = 1e9, DY = 1e9;
 		rays.pb({P{0,0},P{1,0}});
@@ -45,7 +55,7 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 	{ // remove parallel rays
 		vector<Ray> nrays;
 		for(auto& t: rays) {
-			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > EPS) { nrays.pb(t); continue; }
+			if (!sz(nrays) || nrays.back().dp.cross(t.dp) > eps) { nrays.pb(t); continue; }
 			// last two rays are parallel, keep only one
 			if (t.dp.cross(t.p-nrays.back().p) > 0) nrays.back() = t;
 		}
@@ -53,7 +63,7 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 	}
 	auto bad = [&](const Ray& a, const Ray& b, const Ray& c) {
 		P p1 = a.isect(b), p2 = b.isect(c);
-		if ((p2-p1).dot(b.dp) <= EPS) { /// this EPS is required ...
+		if ((p2-p1).dot(b.dp) <= eps) { /// tolerance for coincident intersections
 			if (a.dp.cross(c.dp) <= 0) return 2; // isect(a,b,c) = empty
 			return 1; // isect(a,c) == isect(a,b,c)
 		}
@@ -73,7 +83,7 @@ vP halfPlaneIsect(vector<Ray> rays, bool add_bounds = false) {
 		if (!bad(poly.back(),poly[0],poly[1])) break;
 	}
 	assert(sz(poly) >= 3); // expect nonzero area
-	vP poly_points; rep(i,0,sz(poly))
+	vector<P> poly_points; rep(i,0,sz(poly))
 		poly_points.pb(poly[i].isect(poly[(i+1)%sz(poly)]));
 	return poly_points;
 }
