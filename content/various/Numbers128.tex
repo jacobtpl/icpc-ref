@@ -1,0 +1,132 @@
+\subsection{Types, precision, and compiler support}
+
+\verb@__int128@ (also \verb@__int128_t@) is a signed integer in
+$[-2^{127},2^{127}-1]$; \verb@unsigned __int128@ (\verb@__uint128_t@)
+is in $[0,2^{128}-1]$. Signed overflow is undefined, even with 128 bits.
+Widen \emph{before} arithmetic: \verb@__int128(a)*b@, not
+\verb@__int128(a*b)@. For differences, widen before subtraction too.
+
+Typical x86-64 GNU C++ floating-point precision:
+\begin{center}
+\begin{tabular}{l|r|r}
+Type & Significand bits & Decimal digits (approx.) \\ \hline
+\verb@double@ & 53 & 16 \\
+\verb@long double@ & 64 & 19 \\
+\verb@__float128@ & 113 & 34
+\end{tabular}
+\end{center}
+
+\verb@long double@ is platform-dependent: 16 bytes of storage can mean
+80-bit extended precision plus padding, not quadruple precision. Check
+\verb@numeric_limits<long double>::digits@, or \verb@LDBL_MANT_DIG@
+from \verb@<cfloat>@; \verb@FLT128_MANT_DIG@ from \verb@<quadmath.h>@
+is 113. \verb@using LD = __float128;@ makes \verb@LD@ quadruple
+precision regardless of the alias's name.
+
+Both 128-bit types are compiler extensions, not C++17 additions. They work
+with \verb@g++ -std=c++17@ on supported targets; a newer language standard
+does not change \verb@long double@ precision. C++23 separately introduced
+the optional \verb@std::float128_t@ in \verb@<stdfloat>@. Availability
+depends on the compiler, standard library, and target.
+
+\subsection{Input and output}
+
+For the ordinary types, use matching formats:
+\begin{center}
+\begin{tabular}{l|l|l}
+Type & \verb@scanf@ & \verb@printf@ \\ \hline
+\verb@long long@ & \verb@%lld@ & \verb@%lld@ \\
+\verb@unsigned long long@ & \verb@%llu@ & \verb@%llu@ \\
+\verb@double@ & \verb@%lf@ & \verb@%f@ \\
+\verb@long double@ & \verb@%Lf@ & \verb@%Lf@
+\end{tabular}
+\end{center}
+
+These ordinary types support \verb@cin@ and \verb@cout@ directly.
+In GNU C++17, the 128-bit extension types have no direct standard stream
+overloads. Never pass \verb@__int128@ to \verb@%lld@ or
+\verb@__float128@ to \verb@%Lf@: mismatched variadic arguments are invalid.
+
+\subsubsection{Integer conversion}
+
+There is no standard \verb@scanf@ or \verb@printf@ format for
+\verb@__int128@. If input values fit in \verb@long long@, read that type
+and then widen. Otherwise read a string and parse it. The following helpers
+handle the full signed range, including the minimum value. \verb@parse128@
+accepts an optional sign and decimal digits; on invalid input or overflow
+it returns false without changing the output.
+
+\kactlimport{Int128IO.h}
+
+\begin{lstlisting}[language=C++]
+string token;
+__int128_t n;
+if (cin >> token && parse128(token, n))
+    cout << str128(n) << '\n';
+\end{lstlisting}
+
+\subsubsection{Quadruple-precision conversion}
+
+Use \verb@strtoflt128@ for input and \verb@quadmath_snprintf@ for output.
+Include \verb@<quadmath.h>@ and link with \verb@-lquadmath@:
+\begin{lstlisting}[language=bash]
+g++ -std=c++17 -O2 solution.cpp -lquadmath
+\end{lstlisting}
+
+This complete program assumes a valid floating-point input token:
+\begin{lstlisting}[language=C++,label=quadmath-example]
+#include <quadmath.h>
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string token;
+    if (!(cin >> token)) return 0;
+    __float128 x = strtoflt128(token.c_str(), nullptr);
+    char buf[128];
+    int n = quadmath_snprintf(buf, sizeof(buf), "%.36Qg", x);
+    if (n < 0 || n >= int(sizeof(buf))) return 1;
+    cout << buf << '\n';
+}
+\end{lstlisting}
+
+\verb@%.36Qg@ prints 36 significant digits, sufficient for binary128
+round trips. \verb@%.15Qf@ prints 15 digits after the decimal point;
+\verb@%Qe@ uses scientific notation. The format must contain exactly one
+conversion, with no surrounding text (not even a newline). Print text and
+newlines separately. A fixed-point result can require thousands of digits;
+check the returned length and increase the buffer if needed.
+
+Ordinary \verb@printf("%Qf", x)@ only works with some C-library hooks;
+do not rely on it. There is no portable matching \verb@scanf@ conversion.
+For unchecked input, use \verb@strtoflt128@'s end pointer to check that the
+whole token was read, and inspect \verb@errno@ for range errors.
+
+\subsection{Avoiding accidental precision loss}
+
+\begin{itemize}
+\item \verb@__float128 x = 0.1;@ first rounds the literal to \verb@double@.
+  Prefer \verb@__float128(1)/10@ or \verb@strtoflt128("0.1", nullptr)@.
+  GCC's \verb@Q@ literal suffix may need \verb@-fext-numeric-literals@
+  in strict C++ mode; the examples above do not need it.
+\item Basic 128-bit arithmetic does not require \verb@-lquadmath@.
+  Quadmath conversions and functions such as \verb@sqrtq@ and
+  \verb@fabsq@ do. Ordinary \verb@cmath@ overloads are not a substitute.
+\item \verb@cout << (long double)x@ is an approximate output shortcut,
+  not full-precision binary128 output. Cast only at the end, and only if
+  the problem's tolerance permits the loss. More printed digits cannot
+  recover precision already lost in a conversion or calculation.
+\item For integer-coordinate geometry, keep predicates in sufficiently
+  wide integer arithmetic and convert only when a division is required.
+  Approximate intersection coordinates can lose accuracy again when used
+  to calculate a thin triangle's area. More precision helps cancellation;
+  it does not make floating-point predicates exact. An algebraic area
+  formula may avoid constructing rounded coordinates altogether.
+\end{itemize}
+
+Sources: GCC's manuals for
+\href{https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html}{128-bit integers},
+\href{https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html}{floating types},
+\href{https://gcc.gnu.org/onlinedocs/libquadmath/I_002fO-Library-Routines.html}{quadmath I/O},
+and the \href{https://en.cppreference.com/w/cpp/types/floating-point.html}{C++23 fixed-width floating types}.
