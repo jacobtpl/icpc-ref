@@ -2,7 +2,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../../content/number-theory/mint.h"
+#include "../../content/number-theory/SiyongModular.h"
 
 template<class T> bool ckmax(T& a, T b) {
 	return b > a ? (a = b, true) : false;
