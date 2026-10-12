@@ -1,6 +1,6 @@
 #include "../utilities/template.h"
 
-#include "../../content/geometry/LineProjectionReflection.h"
+#include "../../content/geometry/LineProjRefl.h"
 #include "../../content/geometry/lineDistance.h"
 
 typedef Point<double> P;

@@ -8,6 +8,8 @@
  * 1 if the circles are tangent to each other (in which case .first = .second and the tangent line is perpendicular to the line between the centers).
  * .first and .second give the tangency points at circle 1 and 2 respectively.
  * To find the tangents of a circle with a point set r2 to 0.
+ * P must be a floating point Point. No epsilon is used; the count is exact for
+ * integer-valued input with $|x|,|y|,r \le 10^9$ (x86 long double).
  * Status: tested
  */
 #pragma once
@@ -16,13 +18,17 @@
 
 template<class P>
 vector<pair<P, P>> tangents(P c1, double r1, P c2, double r2) {
-	P d = c2 - c1;
-	double dr = r1 - r2, d2 = d.dist2(), h2 = d2 - dr * dr;
+	typedef long double ld; typedef decltype(c1.x) T;
+	static_assert(is_floating_point<T>::value, "use doubles");
+	ld x = (ld)c2.x - c1.x, y = (ld)c2.y - c1.y, dr = (ld)r1 - r2,
+	   d2 = x*x + y*y, h2 = d2 - dr*dr;
 	if (d2 == 0 || h2 < 0)  return {};
+	ld h = sqrtl(h2);
 	vector<pair<P, P>> out;
-	for (double sign : {-1, 1}) {
-		P v = (d * dr + d.perp() * sqrt(h2) * sign) / d2;
-		out.push_back({c1 + v * r1, c2 + v * r2});
+	for (ld sign : {-1, 1}) {
+		ld vx = (x*dr - y*h*sign)/d2, vy = (y*dr + x*h*sign)/d2;
+		out.push_back({P(T(c1.x + vx*r1), T(c1.y + vy*r1)),
+		               P(T(c2.x + vx*r2), T(c2.y + vy*r2))});
 	}
 	if (h2 == 0) out.pop_back();
 	return out; }
