@@ -69,8 +69,8 @@ int main() {
 	int N = s.size();
 
 	vector<int> sloc(N+1);
-	for(int i = 0;i < N; ++i)
-		sloc[i] = sa.append(sloc[i-1], s[N-i-1]);
+	for(int i = 1;i <= N; ++i)
+		sloc[i] = sa.append(sloc[i-1], s[N-i]);
 
 	vector<map<char, tuple<int, int, int> > > treeAdj(sa.N); // node, [s[l]...s[r])
 	vector<char> vis(sa.N);
@@ -97,19 +97,19 @@ int main() {
 		remap[sloc[i]] = N - i;
 	vi ans;
 
-	auto dfs = [&](auto &&self, int n, int d = 0) ->void{
-		if(treeAdj[n].empty())
+	vector<pii> stack{{0, 0}};
+	while(!stack.empty()) {
+		auto [n, d] = stack.back();
+		stack.pop_back();
+		if(treeAdj[n].empty() && d > 1)
 			ans.push_back(N - d);
-		for(auto [c, info]: treeAdj[n]){
-			auto [x, l, r] = info;
-			// printf("%d -> %c[%d %d %d]: %s\n", n, c, x, l, r, s.substr(l, r-l).c_str());
-			self(self, x, d + r-l);
+		for(auto it = treeAdj[n].rbegin(); it != treeAdj[n].rend(); ++it){
+			auto [x, l, r] = it->second;
+			stack.emplace_back(x, d + r-l);
 		}
-	};
-	dfs(dfs, 0);
+	}
 
 	for(int i = 0;i < ans.size(); ++i)
 		printf("%d%c", ans[i], " \n"[i+1==ans.size()]);
 	return 0;
 }
-
