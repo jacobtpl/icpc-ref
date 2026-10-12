@@ -75,6 +75,17 @@ int main() {
 		Q(Fraction(6,5),Fraction(6,5)));
 	assert(lineInter(Q(0,0),Q(1,1),Q(2,2),Q(3,3)).first==-1);
 	assert(lineInter(Q(0,0),Q(1,1),Q(0,1),Q(1,2)).first==0);
+	assert((segInter(Q(0,0),Q(3,3),Q(0,2),Q(3,0))==
+		vector<Q>{Q(Fraction(6,5),Fraction(6,5))}));
+	assert((segInter(Q(3,0),Q(0,0),Q(1,0),Q(4,0))==
+		vector<Q>{Q(1,0),Q(3,0)}));
+	assert((segInter(Q(0,0),Q(1,1),Q(1,1),Q(2,0))==vector<Q>{Q(1,1)}));
+	assert((segInter(Q(1,1),Q(1,1),Q(0,0),Q(2,2))==vector<Q>{Q(1,1)}));
+	assert(segInter(Q(0,0),Q(1,0),Q(2,0),Q(3,0)).empty());
+	const ll N=1000000000;
+	assert((segInter(Q(0,0),Q(1,Fraction(1,N)),
+		Q(0,Fraction(1,N)),Q(1,Fraction(1,N+1)))==
+		vector<Q>{Q(Fraction(N+1,N+2),Fraction(N+1,N*(N+2)))}));
 	auto small=rect(0,0,Fraction(1,1000000),Fraction(1,1000000));
 	vector<halfplane::RayT<Fraction>> tinyRays;
 	rep(i,0,4) tinyRays.push_back({small[i],small[(i+1)%4]-small[i]});
