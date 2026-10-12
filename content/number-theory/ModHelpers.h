@@ -6,7 +6,7 @@
  * Status: Tested many many times
  * Time: O(N)
  */
-#include "SiyongModular.h"
+#include "ModInt.h"
 
 int const MV = 2e6 + 10;
 static_assert(MV <= MOD);
