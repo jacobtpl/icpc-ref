@@ -17,7 +17,20 @@ template<class E, class F> void throws(F f) {
 	assert(caught);
 }
 
-int main(int argc, char**) {
+int main(int argc, char** argv) {
+	if (argc > 1 && string(argv[1]) == "--wide") {
+		ll ph, qh;
+		unsigned long long pl, ql;
+		const I base = I(1)<<64;
+		while (cin >> ph >> pl >> qh >> ql) {
+			try {
+				cout << Fraction::fromWide(I(ph)*base+I(pl), I(qh)*base+I(ql));
+			} catch (const domain_error&) { cout << "domain"; }
+			catch (const overflow_error&) { cout << "overflow"; }
+			cout << '\n';
+		}
+		return 0;
+	}
 	if (argc > 1) {
 		string op; ll a, b, c, d;
 		while (cin >> op >> a >> b >> c >> d) {
@@ -50,6 +63,17 @@ int main(int argc, char**) {
 	check(Fraction(LLONG_MIN)-Fraction(LLONG_MIN), 0, 1);
 	check(Fraction(LLONG_MIN)/Fraction(LLONG_MIN), 1, 1);
 	check(Fraction(LLONG_MIN, LLONG_MAX)+Fraction(1), -1, LLONG_MAX);
+	const I lo = -(I(1)<<126)-(I(1)<<126), hi = -(lo+1);
+	assert(Fraction::fromWide(lo,lo) == 1);
+	assert(Fraction::fromWide(hi,hi) == 1);
+	assert(Fraction::fromWide(0,lo) == 0);
+	assert(Fraction::fromWide(lo,lo/2) == 2);
+	assert(Fraction::fromWide(lo,I(1)<<64) == Fraction(LLONG_MIN));
+	assert(Fraction::fromWide(42) == 42);
+	throws<overflow_error>([&] { Fraction::fromWide(lo,-1); });
+	throws<overflow_error>([&] { Fraction::fromWide(1,lo); });
+	throws<overflow_error>([&] { Fraction::fromWide(hi,lo); });
+	throws<domain_error>([&] { Fraction::fromWide(lo,0); });
 	throws<domain_error>([] { Fraction(0,0); });
 	throws<domain_error>([] { Fraction(1)/0; });
 	throws<overflow_error>([] { Fraction(1, LLONG_MIN); });

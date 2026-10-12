@@ -75,6 +75,30 @@ def run(driver):
         want = expected(*row)
         assert result == want, (row, result, want)
     print(f"Python Fraction oracle passed ({len(rows)} cases)")
+    run_wide(driver)
+
+
+def run_wide(driver):
+    rng = random.Random(0x128)
+    low, high = -(1 << 127), (1 << 127) - 1
+    edges = [low, low+1, low//2, LOW-1, LOW, LOW+1, -1, 0,
+             1, HIGH-1, HIGH, HIGH+1, high//2, high-1, high]
+    rows = list(itertools.product(edges, repeat=2))
+    for _ in range(25000):
+        rows.append((rng.randint(low, high), rng.randint(low, high)))
+        p, q = rng.randint(LOW, HIGH), rng.randint(1, HIGH)
+        scale = rng.randint(1, high // max(abs(p), q))
+        rows.append((p*scale, q*scale*rng.choice([-1, 1])))
+    data = ''.join(' '.join(map(str, (*divmod(p, 1 << 64), *divmod(q, 1 << 64))))
+                   + '\n' for p, q in rows)
+    output = subprocess.run([str(driver), '--wide'], input=data,
+                            text=True, capture_output=True, check=True)
+    actual = output.stdout.splitlines()
+    assert len(actual) == len(rows), (len(actual), len(rows), output.stderr)
+    for (p, q), result in zip(rows, actual):
+        want = expected('ctor', p, q, 0, 1)
+        assert result == want, (p, q, result, want)
+    print(f'Python wide-ratio oracle passed ({len(rows)} cases)')
 
 
 if __name__ == "__main__":

@@ -18,8 +18,10 @@ double approximate = double(a);
 fields. Arithmetic, all six comparisons, compound assignments, unary signs,
 `abs`, explicit `bool`, and explicit `double`/`long double` conversions are
 provided. Integer literals work on either side of arithmetic and comparison.
-Constructor arguments must fit in `long long`; floating-point arguments are
-rejected instead of silently truncating. To represent a decimal exactly,
+Ordinary constructor arguments must fit in `long long`; floating-point arguments
+are rejected instead of silently truncating. `Fraction::fromWide(p,q)` accepts
+signed `__int128` arguments, reduces them before checking the storage limits,
+and throws if the reduced result still does not fit. To represent a decimal exactly,
 write `Fraction(1, 10)`, not `0.1`.
 
 ## Range and cost
@@ -28,6 +30,8 @@ Every result is reduced **before** narrowing back to `long long`. Products,
 cross products used for comparison, and sums of two numerator products fit in
 signed `__int128` for valid stored fractions. This includes `LLONG_MIN`:
 normalization never negates it in `long long` or calls `std::gcd` on it.
+Normalization uses unsigned magnitudes, so `fromWide` also handles the full
+signed 128-bit range, including its minimum value.
 
 For example, `Fraction(LLONG_MAX, 2) * Fraction(2, LLONG_MAX)` is exactly one,
 and `Fraction(LLONG_MIN, LLONG_MIN)` is also one. An unrepresentable reduced
@@ -66,9 +70,33 @@ shared-base area ratio.
 
 The [segment precision review](intersection-precision.md) gives concrete
 examples of floating-point misclassification and avoidable intermediate
-growth in the current coordinate formula.
+growth, and explains how the integer-input overload avoids these failures.
 
 ## Geometry
+
+For integer input with coordinates in `[-1e9,1e9]`, keep the input points
+integral and select the result scalar when calling `segInter`:
+
+```cpp
+using Z = Point<ll>;
+Z a(0,0), b(1000000000,1000000000), c(1000000000,0), d(0,1000000000);
+auto exact = segInter<Fraction>(a,b,c,d); // (500000000,500000000)
+auto approx = segInter<__float128>(a,b,c,d);
+auto usual = segInter(a,b,c,d);          // vector<Point<long double>>
+```
+
+This overload computes predicates and the complete coordinate numerators in
+`__int128`. It converts only the finished answers, so a representable Fraction
+coordinate is not rejected because a temporary numerator exceeded `long long`.
+The size is exact even with floating output: `0` for none, `1` for one point,
+and `2` for a nonzero-length overlap. Deduplication happens before conversion;
+two distinct overlap endpoints may round to equal floating points while the
+vector still correctly has size `2`. Integer output is not supported.
+
+The bound is a precondition, not a runtime range check. For noninteger inputs,
+the existing `segInter(Point<Fraction>,...)` and floating-input calls retain
+their scalar type and its arithmetic limits. The integer overload does not
+change `lineInter`, which still uses its input scalar for all arithmetic.
 
 ```cpp
 using Q = Point<Fraction>;

@@ -8,6 +8,7 @@
  *  does not fit, and domain\_error on division by zero. Do not modify
  *  p or q directly. Floating conversions are explicit; no epsilon is needed.
  *  Input accepts integer or p/q tokens; output is always p/q.
+ *  fromWide(p,q) reduces a signed 128-bit ratio before checking storage.
  * Usage: using P = Point<Fraction>;
  *  Fraction x(1, 3); // x + 2 == Fraction(7, 3)
  * Time: O(log M) per arithmetic operation (128-bit Euclid).
@@ -19,6 +20,7 @@ struct Fraction {
 	using I = __int128_t;
 	ll p = 0, q = 1;
 	Fraction(ll a = 0, ll b = 1) { *this = make(a, b); }
+	static Fraction fromWide(I p, I q = 1) { return make(p, q); }
 	template<class A, class B = int, enable_if_t<
 		is_floating_point<A>::value ||
 		is_floating_point<B>::value, int> = 0>
@@ -77,12 +79,15 @@ private:
 	Fraction(ll p, ll q, Raw) : p(p), q(q) {}
 	static Fraction make(I p, I q) {
 		if (!q) throw domain_error("Fraction: zero denominator");
-		if (q < 0) p = -p, q = -q;
-		I a = p < 0 ? -p : p, b = q;
-		while (b) { I r = a % b; a = b; b = r; }
-		p /= a; q /= a;
-		if (p < LLONG_MIN || p > LLONG_MAX || q > LLONG_MAX)
+		using U = __uint128_t;
+		bool neg = (p < 0) != (q < 0);
+		U n = p < 0 ? -U(p) : U(p), d = q < 0 ? -U(q) : U(q);
+		U a = n, b = d;
+		while (b) { U r = a % b; a = b; b = r; }
+		n /= a; d /= a;
+		if (n > U(LLONG_MAX) + neg || d > U(LLONG_MAX))
 			throw overflow_error("Fraction: reduced value out of range");
-		return Fraction((ll)p, (ll)q, Raw{});
+		ll num = neg && n ? -ll(n-1)-1 : ll(n);
+		return Fraction(num, (ll)d, Raw{});
 	}
 };
