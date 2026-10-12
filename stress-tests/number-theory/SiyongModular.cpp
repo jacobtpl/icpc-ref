@@ -160,9 +160,15 @@ void rejects(auto f) {
 int main() {
 	checkMod<1>(); checkMod<2>(); checkMod<12>(); checkMod<17>();
 	checkMod<MOD>(); checkMod<1000000007>();
-	checkMod<1224736769>(); checkMod<INT_MAX>();
+	checkMod<469762049>(); checkMod<1004535809>();
 	using Z = ModInt<1073741824>;
-	assert(Z(1073741823) + Z(1073741823) == 1073741822);
+	for (ll a : {0LL, 1LL, 536870911LL, 536870912LL, 1073741822LL, 1073741823LL})
+		for (ll b : {0LL, 1LL, 536870911LL, 536870912LL, 1073741822LL, 1073741823LL}) {
+			Z x(a), y(b);
+			assert((x+y).v == (a+b) % Z::mod());
+			x += y; assert(x.v == (a+b) % Z::mod());
+			x += x; assert(x.v == (2*(a+b)) % Z::mod());
+		}
 	vector<mint> v{1, 2, 3};
 	assert(find(all(v), mint(2)) == v.begin()+1);
 	assert(v == vector<mint>({1, 2, 3}));

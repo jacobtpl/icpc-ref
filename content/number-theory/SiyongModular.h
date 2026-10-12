@@ -1,7 +1,7 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Modular integers for $1 \le M \le \text{INT\_MAX}$.
+ * Description: Modular integers for $1 \le M \le 2^{30}$.
  *   Keep v in [0,M). Division requires a divisor coprime to M;
  *   pow requires a nonnegative integer exponent. Stream input uses ll.
  * Usage: using mint = ModInt<998244353>;
@@ -15,7 +15,7 @@ ll euclid(ll a, ll b, ll &x, ll &y) {
 	return y -= a/b * x, d;
 }
 template<int M> struct ModInt {
-	static_assert(M > 0);
+	static_assert(0 < M && M <= (1<<30));
 	int v;
 	constexpr explicit operator int() const {return v;}
 	static constexpr int mod() {return M;}
@@ -34,8 +34,8 @@ template<int M> struct ModInt {
 		assert(g == 1); return ModInt(x);
 	}
 	constexpr ModInt& operator+= (ModInt const& o) {
-		ll s = (ll)v + o.v;
-		v = int(s >= M ? s-M : s); return *this;}
+		if ((v += o.v) >= M) v -= M;
+		return *this;}
 	constexpr ModInt& operator-= (ModInt const& o) {
 		if ((v -= o.v) < 0) v += M;
 		return *this;}
