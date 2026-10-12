@@ -121,8 +121,12 @@ template<int M> void checkMod() {
 		assert(Z(static_cast<short>(i)).v == reduce<M>(i));
 	for (int i = SCHAR_MIN; i <= SCHAR_MAX; ++i)
 		assert(Z(static_cast<signed char>(i)).v == reduce<M>(i));
-	assert(Z(UCHAR_MAX).v == UCHAR_MAX % M);
-	assert(Z(USHRT_MAX).v == USHRT_MAX % M);
+	for (int i = CHAR_MIN; i <= CHAR_MAX; ++i)
+		assert(Z(static_cast<char>(i)).v == reduce<M>(i));
+	assert(Z(static_cast<unsigned char>(UCHAR_MAX)).v == UCHAR_MAX % M);
+	assert(Z(static_cast<unsigned short>(USHRT_MAX)).v == USHRT_MAX % M);
+	assert(Z(LONG_MIN).v == reduce<M>(LONG_MIN));
+	assert(Z(ULONG_MAX).v == int(ULONG_MAX % M));
 	assert(Z::raw(M-1) == Z(M-1));
 	stringstream input("-1 " + to_string(LLONG_MIN) + " " + to_string(LLONG_MAX));
 	Z a;
