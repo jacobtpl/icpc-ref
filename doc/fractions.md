@@ -43,6 +43,21 @@ Keep overflow checks enabled; compiling with `NDEBUG` does not remove them.
 Arithmetic runs Euclid on at most 128-bit integers, while comparisons are
 constant-time cross products. There is no per-testcase initialization or pool.
 
+Even integer coordinates bounded by `1e9` can produce intersection coordinates
+whose reduced numerators do not fit. For example, the segments
+`(0,0)--(1000000000,1)` and `(0,1000000000)--(999999999,0)` intersect at
+an x-coordinate of `999999999000000000000000000/1000000000999999999`.
+`segInter` with `Point<Fraction>` correctly throws on this input.
+
+For this coordinate bound, ratios describing the position along the original
+segments still fit: their numerators and denominators are determinants of
+integer differences, bounded in magnitude by `8e18`. Compute determinants
+before constructing the ratio, using `Point<__int128_t>` where needed.
+An area-only calculation can often use these ratios without constructing the
+intersection coordinates. Accumulating many rational areas still needs a
+separate numeric choice: denominators can grow beyond `long long`, and
+subtracting large areas can require more floating-point precision.
+
 ## Geometry
 
 ```cpp

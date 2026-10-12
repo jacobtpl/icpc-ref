@@ -86,6 +86,11 @@ int main() {
 	assert((segInter(Q(0,0),Q(1,Fraction(1,N)),
 		Q(0,Fraction(1,N)),Q(1,Fraction(1,N+1)))==
 		vector<Q>{Q(Fraction(N+1,N+2),Fraction(N+1,N*(N+2)))}));
+	bool overflow=false;
+	try {
+		segInter(Q(0,0),Q(N,1),Q(0,N),Q(N-1,0));
+	} catch (const overflow_error&) { overflow=true; }
+	assert(overflow);
 	auto small=rect(0,0,Fraction(1,1000000),Fraction(1,1000000));
 	vector<halfplane::RayT<Fraction>> tinyRays;
 	rep(i,0,4) tinyRays.push_back({small[i],small[(i+1)%4]-small[i]});
