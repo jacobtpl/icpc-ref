@@ -4,11 +4,16 @@
 
 #include "../../content/graph/WeightedMatching.h"
 #include <bits/extc++.h> /// include-line, keep-include
+template<class T> bool ckmin(T& a, const T& b) {
+    if (a <= b) return false;
+    a = b;
+    return true;
+}
 #include "../../content/graph/MinCostMaxFlow.h"
 
 void test(int N, int mxCost, int iters) {
     for (int it = 0; it < iters; it++) {
-        int n = randRange(0, N), m = randRange(0, N);
+        int n = randIncl(0, N), m = randIncl(0, N);
         if (n > m)
             swap(n, m);
 
@@ -40,10 +45,49 @@ void test(int N, int mxCost, int iters) {
             used.insert(matching.second[i]);
         }
         assert(matchSum == matching.first);
-        return;
     }
 }
+template<class T>
+void verifyBrute(const vector<vector<T>>& cost) {
+    int n = sz(cost), m = n ? sz(cost[0]) : 0;
+    vi cols(m);
+    iota(all(cols), 0);
+    T best = numeric_limits<T>::max();
+    do {
+        T sum = 0;
+        rep(i,0,n) sum += cost[i][cols[i]];
+        best = min(best, sum);
+    } while (next_permutation(all(cols)));
+    auto [value, matching] = hungarian(cost);
+    assert(value == best && sz(matching) == n);
+    T sum = 0;
+    set<int> used;
+    rep(i,0,n) {
+        assert(0 <= matching[i] && matching[i] < m);
+        assert(used.insert(matching[i]).second);
+        sum += cost[i][matching[i]];
+    }
+    assert(sum == value);
+}
+
 signed main() {
+    assert(hungarian({}).first == 0);
+    assert(hungarian({{3, 1}, {2, 4}}).first == 3);
+    const vector<vector<ll>> large = {{4000000000LL, -5000000000LL},
+                                     {-6000000000LL, 7000000000LL}};
+    verifyBrute(large);
+    mt19937_64 rng(17);
+    rep(it,0,2000) {
+        int n = int(rng() % 5), m = n + int(rng() % (7 - n));
+        vector<vector<ll>> cost(n, vector<ll>(m));
+        vector<vector<double>> realCost(n, vector<double>(m));
+        rep(i,0,n) rep(j,0,m) {
+            cost[i][j] = ll(rng() % 2000000000000001ULL) - 1000000000000000LL;
+            realCost[i][j] = double(int(rng() % 81) - 40) / 4;
+        }
+        verifyBrute(cost);
+        verifyBrute(realCost);
+    }
     test(25, 5, 1000);
     test(100, 1000, 100);
     test(100, 1, 50);
