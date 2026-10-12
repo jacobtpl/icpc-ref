@@ -1,25 +1,27 @@
 /**
- * Author: Benq
+ * Author: Benq, adapted
  * Date: Unknown
- * Description: Computes the Delaunay triangulation of a set of points.
+ * Description: Computes the Delaunay triangulation of a set of points
+ * as a list of counter-clockwise triangles.
  * Each circumcircle contains none of the input points.
- * Time: O(hull3d)
- * Status: https://dmoj.ca/problem/cco08p6
+ * Wrapper around FastDelaunay (the old version lifted the points to
+ * a 3D hull in doubles and was wrong beyond coordinates of about $10^3$).
+ * Duplicate points are merged. Fewer than three distinct points or
+ * all points on a line give no triangles; cocircular points give
+ * any valid triangulation.
+ * Exact for integer coordinates of absolute value up to $10^9$.
+ * Time: O(n \log n)
+ * Status: stress-tested against exact oracle
  */
+#pragma once
 
-using P = Point<ll>;
+#include "FastDelaunay.h"
+
 vector<array<P,3>> triHull(vector<P> p) {
-	vector<P3> p3; vector<array<P,3>> res; for (auto &x:p) p3.pb(P3{x.x,x.y,x.dist2()});
-	bool ok = 0; for (auto &t:p3) ok |= !coplanar(p3[0],p3[1],p3[2],t);
-	if (!ok) { // all points concyclic
-		sort(1+all(p),[&p](P a, P b) { 
-			return (a-p.front()).cross(b-p.front())>0; });
-		rep(i,1,sz(p)-1) res.pb({p.front(),p[i],p[i+1]});
-	} else {
-		#define nor(z) P(p3[z].x,p3[z].y)
-		for(auto &t:hull3dFast(p3)) 
-			if (cross(p3[t[0]],p3[t[1]],p3[t[2]]).dot(P3{0,0,1}) < 0)
-				res.pb({nor(t[0]),nor(t[2]),nor(t[1])});
-	}
+	sort(all(p)); p.erase(unique(all(p)), p.end());
+	vector<P> t = triangulate(p);
+	vector<array<P,3>> res;
+	for (int i = 0; i < sz(t); i += 3)
+		res.push_back({t[i], t[i+1], t[i+2]});
 	return res;
 }
