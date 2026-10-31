@@ -18,6 +18,7 @@
 
 typedef Point<ll> P;
 
+template<class P>
 bool inHull(const vector<P>& l, P p, bool strict = true) {
 	int a = 1, b = sz(l) - 1, r = !strict;
 	if (sz(l) < 3) return r && onSegment(l[0], l.back(), p);
