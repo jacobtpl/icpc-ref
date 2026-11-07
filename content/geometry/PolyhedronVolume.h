@@ -7,7 +7,7 @@
  *  far from the origin. signedPolyVolume6 returns six times the volume in the
  *  coordinate type: exact for integers while (number of faces) $\cdot 6D^3$ fits,
  *  $D$ being the largest coordinate difference. signedPolyVolume returns a
- *  double for integer coordinates and otherwise the coordinate type (Fraction is exact).
+ *  double for integer coordinates (also \_\_int128) and otherwise the coordinate type (Fraction is exact).
  * Status: tested
  */
 #pragma once
@@ -32,6 +32,7 @@ auto signedPolyVolume6(const V& p, const L& trilist) {
 template<class V, class L>
 auto signedPolyVolume(const V& p, const L& trilist) {
 	typedef decltype(p[0].x) T;
-	typedef conditional_t<is_integral<T>::value, double, T> R;
+	typedef conditional_t<is_floating_point<T>::value ||
+		is_class<T>::value, T, double> R; // ll, __int128 -> double
 	return R(signedPolyVolume6(p, trilist)) / 6;
 }

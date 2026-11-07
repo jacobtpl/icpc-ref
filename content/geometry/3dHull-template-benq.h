@@ -5,6 +5,10 @@
  *  exact for integer coordinates of absolute value up to $5 \cdot 10^4$ with
  *  T = double, $5 \cdot 10^5$ with long long, $10^{12}$ with \_\_int128.
  */
+#pragma once
+
+#include "Point3D.h"
+
 
 using T = double; // or long long, __int128 (see above)
 using P3 = Point3D<T>;

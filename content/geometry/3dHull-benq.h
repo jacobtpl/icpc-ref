@@ -9,10 +9,15 @@
  * Time: O(n^2, n \log n)
  * Status: tested on SPOJ CH3D
  */
+#pragma once
+
+#include "Point3D.h"
+
 
 using T = double; // or long long, __int128 (see above)
 using P3 = Point3D<T>;
 using vb = vector<bool>;
+typedef pair<int,int> pi;
 
 mt19937 rng;
 P3 cross(const P3& a, const P3& b, const P3& c) {
