@@ -4,7 +4,9 @@
  * License: CC0
  * Source: My head with inspiration from tinyKACTL
  * Description: Class to handle points in the plane.
- * 	T can be e.g. double or long long. (Avoid int.)
+ * 	T can be e.g. double, long long or Fraction. (Avoid int.)
+ * 	Fraction supports rational operations; unit/normal/rotate require
+ * 	a floating-point type. dist/angle return approximate doubles.
  * Status: Works fine, used a lot
  */
 #pragma once
@@ -27,7 +29,7 @@ struct Point {
 	T dist2() const { return x*x + y*y; }
 	double dist() const { return sqrt((double)dist2()); }
 	// angle to x-axis in interval [-pi, pi]
-	double angle() const { return atan2(y, x); }
+	double angle() const { return atan2((double)y, (double)x); }
 	P unit() const { return *this/dist(); } // makes dist()=1
 	P perp() const { return P(-y, x); } // rotates +90 degrees
 	P normal() const { return perp().unit(); }
