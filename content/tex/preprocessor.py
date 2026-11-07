@@ -190,7 +190,7 @@ def processraw(caption, instream, outstream, listingslang = 'raw'):
         print(source, file=outstream)
         print(r"\end{lstlisting}", file=outstream)
     except:
-        print("\kactlerror{Could not read source.}", file=outstream)
+        print(r"\kactlerror{Could not read source.}", file=outstream)
 
 def parse_include(line):
     line = line.strip()
@@ -285,7 +285,7 @@ def main():
         elif language == "rawpy":
             processraw(caption, instream, outstream, 'Python')
         else:
-            raise ValueError("Unkown language: " + str(language))
+            raise ValueError("Unknown language: " + str(language))
     except (ValueError, getopt.GetoptError, IOError) as err:
         print(str(err), file=sys.stderr)
         print("\t for help use --help", file=sys.stderr)

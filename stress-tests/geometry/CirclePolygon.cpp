@@ -1,6 +1,6 @@
 #include "../utilities/template.h"
 
-#include "../../content/geometry/CirclePolygonIntersection.h"
+#include "../../content/geometry/CirclePolyIntersection.h"
 #include "../utilities/genPolygon.h"
 
 namespace orig{
@@ -33,6 +33,9 @@ long double circlePoly(P c, long double r, vector<P> poly) {
 }
 
 signed main() {
+    double nearCentre = circlePoly(P(0,0), 1,
+        {P(1e6,0), P(1e-9,1e-9), P(0,1e6)});
+    assert(abs(nearCentre + acos(-1.) / 4) < 1e-8);
     ios::sync_with_stdio(0);
     cin.tie(0);
     const int lim=5;
