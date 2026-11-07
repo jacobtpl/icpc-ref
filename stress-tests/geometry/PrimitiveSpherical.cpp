@@ -38,7 +38,13 @@ int main() {
 	for (double delta : {1e-3, 1e-6, 1e-9, 1e-12})
 		assert(abs(sphericalDistance(0, PI / 2, delta, PI / 2, 1) / delta
 			- 1) < 1e-15);
-	assert(sphericalDistance(0.3, 0.7, 0.3, 0.7, 5) == 0);
+	{ // identical points give exactly 0, also when not constant folded
+		volatile double vf = 0.3, vt = 0.7;
+		double c = sphericalDistance(0.3, 0.7, 0.3, 0.7, 5),
+			v = sphericalDistance(vf, vt, vf, vt, 5);
+		if (c != 0 || v != 0) printf("identical points: %a %a\n", c, v);
+		assert(c == 0 && v == 0);
+	}
 	assert(abs(sphericalDistance(0, 0, 0, PI / 2, 2) - PI) < 1e-15);
 	assert(abs(sphericalDistance(0, PI / 2, PI / 2, PI / 2, 3) - 1.5 * PI)
 		< 1e-15);
