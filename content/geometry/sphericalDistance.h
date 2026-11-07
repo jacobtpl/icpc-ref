@@ -13,9 +13,10 @@ double sphericalDistance(double f1, double t1,
 	double x1 = sin(t1)*cos(f1), y1 = sin(t1)*sin(f1);
 	double x2 = sin(t2)*cos(f2), y2 = sin(t2)*sin(f2);
 	double z1 = cos(t1), z2 = cos(t2);
-	double dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
-	double ax = x2 + x1, ay = y2 + y1, az = z2 + z1;
-	double d = sqrt(dx*dx + dy*dy + dz*dz);
-	double s = sqrt(ax*ax + ay*ay + az*az);
-	return radius*2*atan2(d, s);
+	typedef long double ld; // no FMA contraction: exact 0 if equal
+	ld dx = (ld)x2 - x1, dy = (ld)y2 - y1, dz = (ld)z2 - z1;
+	ld ax = (ld)x2 + x1, ay = (ld)y2 + y1, az = (ld)z2 + z1;
+	ld d = sqrtl(dx*dx + dy*dy + dz*dz);
+	ld s = sqrtl(ax*ax + ay*ay + az*az);
+	return (double)(radius*2*atan2l(d, s));
 }
