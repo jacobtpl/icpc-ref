@@ -8,6 +8,13 @@
 
 typedef Point<double> P;
 int main() {
+	vector<P> thin = {P(1e7+0.3,1e7+0.3+1e-6),
+		P(1e7+10.7,1e7+10.7-1e-6), P(1e7+11.4,1e7+11.4+1e-6)};
+	auto clipped = polygonCut(thin, P(1e7-1.7,1e7-1.7), P(1e7+12.3,1e7+12.3));
+	assert(sz(clipped) == 3);
+	assert((clipped[0] - P(1e7+5.5,1e7+5.5)).dist() < 1e-7);
+	assert(clipped[1] == thin[1]);
+	assert((clipped[2] - P(1e7+11.05,1e7+11.05)).dist() < 1e-7);
 	rep(it,0,500) {
 		int N = rand() % 10 + 3;
 		vector<P> ps;

@@ -1,0 +1,27 @@
+name: Modular arithmetic
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test modular arithmetic and FPS integration
+        env:
+          CXX: ${{ matrix.compiler }}
+        run: |
+          ulimit -c 0
+          for source in stress-tests/number-theory/ModInt.cpp stress-tests/numerical/PolyOps2.cpp; do
+            "$CXX" -std=c++20 -O2 -g -Wall -Wextra -Wconversion \
+              -fsanitize=address,undefined -fno-sanitize-recover=all "$source" -o "$RUNNER_TEMP/test"
+            "$RUNNER_TEMP/test"
+          done
