@@ -42,7 +42,7 @@ int main() {
 		volatile double vf = 0.3, vt = 0.7;
 		double c = sphericalDistance(0.3, 0.7, 0.3, 0.7, 5),
 			v = sphericalDistance(vf, vt, vf, vt, 5);
-		if (c != 0 || v != 0) printf("identical points: %a %a\n", c, v);
+		if (c != 0 || v != 0) fprintf(stderr, "identical points: %a %a\n", c, v);
 		assert(c == 0 && v == 0);
 	}
 	assert(abs(sphericalDistance(0, 0, 0, PI / 2, 2) - PI) < 1e-15);
