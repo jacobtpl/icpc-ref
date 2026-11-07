@@ -1,0 +1,45 @@
+name: Geometry
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [g++, clang++]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Geometry stress tests
+        env:
+          CXX: ${{ matrix.compiler }}
+        run: |
+          ulimit -c 0
+          for source in stress-tests/geometry/*.cpp; do
+            echo "::group::$source"
+            "$CXX" -std=c++20 -O2 -Wall -Wconversion "$source" -o "$RUNNER_TEMP/test"
+            "$RUNNER_TEMP/test" | tee "$RUNNER_TEMP/out"
+            grep -q "Tests passed!" "$RUNNER_TEMP/out"
+            echo "::endgroup::"
+          done
+      - name: Geometry regression tests with sanitizers
+        env:
+          CXX: ${{ matrix.compiler }}
+          ASAN_OPTIONS: detect_leaks=1
+        run: |
+          ulimit -c 0
+          for source in stress-tests/geometry/{Primitive,PolygonRobustness,CircleRobustness,TriangulationRobustness,SpatialRobustness}*.cpp \
+              stress-tests/geometry/{FastDelaunay,ManhattanMST,PolygonUnion}.cpp; do
+            echo "::group::$source"
+            "$CXX" -std=c++20 -O2 -g -Wall -Wextra -Wconversion \
+              -fsanitize=address,undefined -fno-sanitize-recover=all "$source" -o "$RUNNER_TEMP/test"
+            "$RUNNER_TEMP/test" | tee "$RUNNER_TEMP/out"
+            grep -q "Tests passed!" "$RUNNER_TEMP/out"
+            echo "::endgroup::"
+          done

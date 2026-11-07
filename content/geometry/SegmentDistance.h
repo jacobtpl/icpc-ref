@@ -6,6 +6,7 @@
  * Description:\\
 \begin{minipage}{65mm}
 Returns the shortest distance between point p and the line segment from point s to e.
+Works for any Point<T>; with Point<ll> (coordinates up to $10^9$) everything but the final division is exact, which double input cannot give near the segment.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-10mm}
@@ -20,9 +21,11 @@ Returns the shortest distance between point p and the line segment from point s 
 
 #include "Point.h"
 
-typedef Point<double> P;
-double segDist(P s, P e, P p) {
-	if (s==e) return (p-s).dist();
-	auto d = (e-s).dist2(), t = min(d,max(.0,(p-s).dot(e-s)));
-	return ((p-s)*d-(e-s)*t).dist()/d;
+typedef Point<double> P; // default only; segDist is generic
+template<class P> auto segDist(P s, P e, P p) {
+	P v = e - s, w = p - s, u = p - e;
+	typedef decltype(v.dist()) F;
+	if (w.dot(v) <= 0) return w.dist(); // also s == e
+	if (u.dot(v) >= 0) return u.dist();
+	return abs((F)v.cross(w)) / v.dist();
 }
