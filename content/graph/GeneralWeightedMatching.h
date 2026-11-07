@@ -1,6 +1,7 @@
 /**
  * Author: Benq
- * Description: General max weight max matching with 1-based indexing.
+ * Description: General max weight matching with 1-based indexing
+ 	* (weight is maximized, NOT cardinality).
  	* Edge weights must be positive, combo of UnweightedMatch and
  	* Hungarian. 1-INDEXED NODES
  * Time: O(N^3)?
