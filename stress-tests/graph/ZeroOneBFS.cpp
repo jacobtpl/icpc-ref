@@ -7,24 +7,16 @@ int main() {
 	rep(it,0,5000) {
 		int n = rand() % 9 + 1, m = rand() % 20;
 		vector<vector<pair<int, int>>> g(n);
-		vector<vector<pair<int, ll>>> gl(n);
 		rep(i,0,m) {
 			int a = rand() % n, b = rand() % n, w = rand() % 2;
 			g[a].emplace_back(b, w);
-			gl[a].emplace_back(b, w);
 		}
 		int k = rand() % 3 + 1;
 		vi src;
 		rep(i,0,k) src.push_back(rand() % n);
 
 		auto [dist, par] = zeroOneBFS(g, src);
-		auto r = dijkstra<ll>(n, [&] {
-			vector<pair<int, ll>> s;
-			for (int x : src) s.emplace_back(x, 0);
-			return s;
-		}(), less<ll>(), [&](int u, ll du, auto push) {
-			for (auto [v, w] : gl[u]) push(v, du + w);
-		});
+		auto r = dijkstra(g, src);
 		rep(i,0,n) {
 			assert((dist[i] != -1) == (bool)r.seen[i]);
 			if (dist[i] == -1) continue;

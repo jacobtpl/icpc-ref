@@ -65,6 +65,15 @@ struct BigBits {
 	}
 };
 
+// the distance policy plugged into dijkstra(): D = root of a persistent bitset
+struct Big {
+	BigBits* t;
+	typedef int D;
+	D zero() { return 0; }
+	D add(D d, int x) { return t->add(d, x); }
+	bool less(D a, D b) { return t->less(a, b); }
+};
+
 int main() {
 	rep(it,0,300) {
 		int n = rand() % 7 + 1, m = rand() % 12, X = rand() % 3 ? 4 : 40;
@@ -78,21 +87,17 @@ int main() {
 		}
 		int s = rand() % n;
 		BigBits bb;
-		auto r = dijkstra<int>(n, {{s, 0}},
-			[&](int a, int b) { return bb.less(a, b); },
-			[&](int u, int du, auto push) {
-				for (auto [v, x] : g[u]) push(v, bb.add(du, x));
-			});
+		auto r = dijkstra(g, {s}, Big{&bb});
 		vector<vector<pair<int, ll>>> g2(n);
 		rep(u,0,n) for (auto [v, x] : g[u]) g2[u].emplace_back(v, 1LL << x);
-		auto d = dijkstra(g2, s);
+		auto d = dijkstra(g2, {s});
 		rep(i,0,n) {
-			assert((d[i] != LLONG_MAX) == (bool)r.seen[i]);
+			assert(d.seen[i] == r.seen[i]);
 			if (!r.seen[i]) continue;
-			assert(bb.value(r.dist[i], 0, B) == d[i]);
+			assert(bb.value(r.dist[i], 0, B) == d.dist[i]);
 			ll len = 0; int v = i;
 			while (r.par[v] != -1) { assert(w[r.par[v]][v] >= 0); len += w[r.par[v]][v]; v = r.par[v]; }
-			assert(v == s && len == d[i]);
+			assert(v == s && len == d.dist[i]);
 		}
 	}
 	// carries across many bits: path of 1e5 edges of weight 2^0, plus one edge 2^16
@@ -102,11 +107,7 @@ int main() {
 		rep(i,0,n-1) g[i].push_back({i + 1, 0});
 		g[0].push_back({n - 1, 16});
 		BigBits bb;
-		auto r = dijkstra<int>(n, {{0, 0}},
-			[&](int a, int b) { return bb.less(a, b); },
-			[&](int u, int du, auto push) {
-				for (auto [v, x] : g[u]) push(v, bb.add(du, x));
-			});
+		auto r = dijkstra(g, {0}, Big{&bb});
 		assert(bb.value(r.dist[n-1], 0, B) == (1 << 16) && r.par[n-1] == 0);
 		assert(bb.value(r.dist[n-2], 0, B) == n - 2);
 	}
