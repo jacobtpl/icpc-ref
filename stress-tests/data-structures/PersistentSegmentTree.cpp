@@ -23,7 +23,8 @@ void run(int n, bool useBuild) {
 	pst::reset();
 	vector<ll> init(n);
 	if (useBuild) for (ll& x : init) x = ra() % 21 - 10;
-	int r0 = useBuild ? pst::build(init, 0, n) : 0;
+	vector<int> init32(all(init));
+	int r0 = useBuild ? pst::build(init32, 0, n) : 0;
 	vector<pair<int, vector<ll>>> vers = {{r0, init}};
 	rep(it,0,3000) {
 		pst::step();
