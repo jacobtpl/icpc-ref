@@ -3,21 +3,34 @@
  * Date: 2026-11-08
  * License: CC0
  * Source: folklore
- * Description: SPFA (queue-based Bellman-Ford) on \texttt{g[u] = \{(v, w)\}}
- * with negative weights allowed; several sources (all at distance 0).
- * Returns \texttt{dist/par} (valid iff \texttt{seen[v]}; unreachable otherwise)
- * and \texttt{negCycle}: the vertices of a negative cycle reachable from a
- * source, in order, or empty if none (then all dists are final).
- * When to use: negative edges but no cycles expected (difference constraints,
- * potentials for min-cost flow / Johnson). Difference constraints
- * $x_v - x_u \le w$: add edge $u \to v$ weight $w$, run from all vertices as
- * sources (or a super-source), feasible iff \texttt{negCycle} empty, then
- * $x_v = \texttt{dist[v]}$ is a solution ($x_v \ge x_u + w$ becomes $v \to u$
- * with weight $-w$). Worst case is $O(VE)$ and it is easy to hit: a long
- * path plus random shortcut edges already takes minutes at $V = 2 \cdot 10^5$,
- * and CF hacks target it. For nonnegative weights use Dijkstra; for a
- * hack-proof negative-weight run use \texttt{BellmanFord.h}.
- * Usage: auto r = spfa(g, {s}); if (!r.negCycle.empty()) ...; else r.dist[v]
+ * Description: SPFA (queue-based Bellman-Ford) on g[u] = {(v, w)}; negative
+ * weights allowed, several sources (all at distance 0). Result: dist/par are
+ * valid iff seen[v] (par = -1 for sources). negCycle = vertices of a negative
+ * cycle reachable from a source, in edge order (c0 -> c1 -> ... -> ck -> c0);
+ * empty means no such cycle and all dists are final.
+ * When to use: negative edges but (usually) no negative cycle: difference
+ * constraints, potentials for Johnson / min-cost flow. Worst case is O(VE)
+ * and easy to hit (a long path plus random shortcut edges already takes
+ * minutes at V = 2e5; CF hacks target it). Nonnegative weights -> Dijkstra;
+ * hack-proof negative weights -> BellmanFord.h.
+ * Detection: a relaxation in pass n-1 proves a negative cycle (Bellman-Ford
+ * bound); the cycle is read off the parent graph, which is also checked every
+ * n relaxations so an early cycle is found without waiting n passes.
+ *
+ * Basic use:
+ *   vector<vector<pair<int, ll>>> g(n);   // g[u].push_back({v, w});
+ *   auto r = spfa(g, {s});
+ *   if (!r.negCycle.empty()) { ... }      // e.g. print r.negCycle
+ *   else if (r.seen[t]) cout << r.dist[t];
+ *
+ * Difference constraints x[v] - x[u] <= w. (x[v] - x[u] >= w is
+ * x[u] - x[v] <= -w; equality = both.) Every vertex is a source, which is
+ * the same as a super-source with 0-edges to all:
+ *   for (auto [u, v, w] : cons) g[u].push_back({v, w});
+ *   vi allv(n); iota(all(allv), 0);
+ *   auto r = spfa(g, allv);
+ *   if (!r.negCycle.empty()) { ... }      // infeasible
+ *   else { ... }                          // x[v] = r.dist[v] (all <= 0) is a solution
  * Time: O(VE) worst case, usually much faster
  * Status: stress-tested against BellmanFord
  */
