@@ -3,15 +3,22 @@
  * Date: 2023-05-25
  * License: CC0
  * Source: me
- * Description: Persistent AVL tree with split. Nodes made since the last
- * \texttt{step()} are modified in place, so \texttt{split} and \texttt{+} destroy
- * their operands unless those are older. \texttt{step()} freezes all existing
- * trees and returns a fresh modifiable copy. Nodes are never freed: call
- * \texttt{PAVL::reset()} between testcases (invalidates every existing tree).
+ * Description: Persistent AVL tree, a sequential container
+ *  with split/merge by 0-indexed position. Nodes made since
+ *  the last step() are modified in place, so split and +
+ *  destroy their operands unless those are older. step()
+ *  freezes all existing trees and returns a fresh modifiable
+ *  copy. Nodes are never freed: call PAVL::reset() between
+ *  testcases (invalidates every existing tree).
+ *  To augment, add fields to Node and fill in up (pull) and
+ *  down (lazy push); down must first clone children:
+ *  \texttt{c[i] = clone(c[i])}, or old versions get corrupted.
+ *  clone may reallocate N: never keep a Node\& across it.
  * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
  *  PAVL b = a.step(); // a is now immutable
  *  auto [l, r] = b.split(1); // consumes b, not a
  * Time: O(\log N)
+ * Status: stress-tested
  */
 struct PAVL {
 	struct Node {
@@ -29,7 +36,7 @@ struct PAVL {
 	static int clone(int n) {
 		if (n == -1) return -1; //assert(N[n].t >= t);
 		if (N[n].t == T) return n;
-		return N.push_back(N[n]), N.back().t = T, N.size() - 1;
+		return N.push_back(N[n]), N.back().t = T, sz(N) - 1;
 	}
 	static int gh(int n) { return n != -1 ? N[n].h : 0; }
 	static int gs(int n) { return n != -1 ? N[n].s : 0; }
@@ -83,7 +90,7 @@ struct PAVL {
 	PAVL(int v) : root(v) {}
 	int root;
 	PAVL() : root(-1) {}
-	PAVL(Node&& n) : root(N.size()) { N.push_back(n); }
+	PAVL(Node&& n) : root(sz(N)) { N.push_back(n); }
 	friend PAVL operator+(PAVL a, PAVL b) { return merge(a.root, b.root); }
 	tuple<PAVL, PAVL> split(int k) {
 		auto [l, r] = split(root, k);
