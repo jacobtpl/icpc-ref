@@ -3,7 +3,7 @@
 #include "../../content/data-structures/Treap.h"
 
 typedef vector<ll> vl;
-vl tour(pt t) { vl v; each(t, [&](ll x) { v.push_back(x); }); return v; }
+vl tour(pt t) { vl v; each(t, [&](pt x) { v.push_back(x->val); }); return v; }
 
 int main() {
 	srand(7);
@@ -28,7 +28,7 @@ int main() {
 				if (l > r) swap(l, r);
 				r++;
 				if (k == 2) {
-					t = onRange(t, l, r, [&](pt x) { x->flip ^= 1; });
+					t = onRange(t, l, r, [&](pt x) { rev(x); });
 					reverse(ref.begin() + l, ref.begin() + r);
 				} else if (k == 3) {
 					ll v = rand() % 21 - 10;
