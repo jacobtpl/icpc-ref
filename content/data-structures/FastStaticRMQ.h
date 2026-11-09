@@ -2,7 +2,7 @@
  * Author: brunomont, CF
  * Description: Static RMQ
  * min(V[a], V[a + 1], ... V[b]) in constant time.
- * Usage: RMQ rmq(values); rmq.query(inclusive, exclusive);
+ * Usage: RMQ rmq(values); rmq.query(inclusive, inclusive);
  * Time: $O(N + Q)$
  * Status: tested
  */
@@ -14,7 +14,7 @@ template<typename T> struct RMQ {
 	int op(int x, int y) { return v[x] < v[y] ? x : y; }
 	int msb(int x) { return __builtin_clz(1)-__builtin_clz(x); }
 	int small(int r, int sz = b) { return r-msb(mask[r]&((1<<sz)-1)); }
-	rmq(const vector<T>& v_) : v(v_), n(v.size()), mask(n), t(n) {
+	RMQ(const vector<T>& v_) : v(v_), n(v.size()), mask(n), t(n) {
 		for (int i = 0, at = 0; i < n; mask[i++] = at |= 1) {
 			at = (at<<1)&((1<<b)-1);
 			while (at and op(i, i-msb(at&-at)) == i) at ^= at&-at;
