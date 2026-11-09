@@ -1,36 +1,21 @@
 /**
- * Author: Siyong Huang, Devin
+ * Author: Siyong Huang
  * Date: 2023-05-01
  * License: CC0
- * Source: My head; extras after
- *  https://cp-algorithms.com/string/suffix-automaton.html
+ * Source: My head
  * Description: Generalized suffix automaton. State 0 is the
  * empty string; \texttt{append(p, c)} returns the state of
  * (a string of state $p$) + $c$. Each state $v \ne 0$ holds the
  * substrings that are suffixes of its longest one with length in
  * $(dis[link[v]], dis[v]]$; they all have the same end
  * positions. At most $2n$ states and $3n$ transitions.
- * \texttt{order}: states by increasing \texttt{dis} (a
- * topological order of \texttt{adj}, children before parents
- * in the link tree when reversed).
- * \texttt{occ(s)}: for every state, the number of occurrences
- * in $s$ of each of its substrings ($s$ must have been added;
- * entry 0 is meaningless).
- * \texttt{distinct}: number of distinct non-empty substrings.
- * \texttt{kth(k)}: $k$-th (0-indexed, $0 \le k <$
- * \texttt{distinct()}) distinct non-empty substring in sorted
- * order (by \texttt{char}, which is usually signed).
- * \texttt{lcs(t)}: \{length, start in $t$\} of a longest
- * substring of $t$ that is a substring of an added string.
+ * See SuffixAutomatonExamples.h for common uses.
  * Time: \texttt{append} is amortized $O(\log \Sigma)$, so
- * building is $O(n \log \Sigma)$. \texttt{order}, \texttt{occ},
- * \texttt{distinct} are $O(n)$, \texttt{kth} is
- * $O(n + |ans| \Sigma)$, \texttt{lcs} is $O(|t| \log \Sigma)$.
+ * building is $O(n \log \Sigma)$.
  * Usage:
  *  SA sa; int p = 0;
  *  for (char c : s) p = sa.append(p, c);
  *  // for another string, start again from p = 0
- *  vi cnt = sa.occ(s); // cnt[p] = 1 here (p = whole s)
  * Status: stress-tested
  */
 #pragma once
@@ -72,47 +57,5 @@ struct SA {
 		else
 			link[n] = go(p, c);
 		return n;
-	}
-	vi order() {
-		vi c(N + 1), o(N);
-		rep(i,0,N) c[dis[i] + 1]++;
-		rep(i,0,N) c[i + 1] += c[i];
-		rep(i,0,N) o[c[dis[i]]++] = i;
-		return o;
-	}
-	vi occ(const string& s) {
-		vi r(N), o = order();
-		int p = 0;
-		for (char c : s) r[p = adj[p][c]]++;
-		for (int i = N; --i;) r[link[o[i]]] += r[o[i]];
-		return r;
-	}
-	ll distinct() {
-		ll r = 0;
-		rep(i,1,N) r += dis[i] - dis[link[i]];
-		return r;
-	}
-	string kth(ll k) {
-		vi o = order();
-		vector<ll> d(N, 1);
-		for (int i = N; i--;)
-			for (auto [c, v] : adj[o[i]]) d[o[i]] += d[v];
-		string r;
-		int p = 0;
-		for (k++; k--;) for (auto [c, v] : adj[p]) {
-			if (k < d[v]) { r += c, p = v; break; }
-			k -= d[v];
-		}
-		return r;
-	}
-	pii lcs(const string& t) {
-		pii r;
-		int p = 0, l = 0;
-		rep(i,0,sz(t)) {
-			while (p && !adj[p].count(t[i])) l = dis[p = link[p]];
-			if (adj[p].count(t[i])) p = adj[p][t[i]], l++;
-			r = max(r, pii(l, i + 1 - l));
-		}
-		return r;
 	}
 };

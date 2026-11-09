@@ -1,6 +1,6 @@
 #include "../utilities/template.h"
 
-#include "../../content/strings/SuffixAutomaton.h"
+#include "../../content/strings/SuffixAutomatonExamples.h"
 
 // Ordering used by map<char> (plain char), which is what kth() sorts by.
 bool charLess(const string& a, const string& b) {
@@ -46,7 +46,7 @@ void check(const vector<string>& strs, const vector<string>& probes) {
 	rep(i,0,sz(strs)) assert(walk(sa, strs[i]) == ends[i]);
 
 	// order: permutation sorted by dis
-	vi o = sa.order();
+	vi o = saOrder(sa);
 	assert(sz(o) == N);
 	vi seen(N);
 	rep(i,0,N) assert(0 <= o[i] && o[i] < N && !seen[o[i]]++);
@@ -78,7 +78,7 @@ void check(const vector<string>& strs, const vector<string>& probes) {
 		assert(walk(sa, shorter) == sa.link[v]);
 	}
 	assert(total == sz(subs));
-	assert(sa.distinct() == sz(subs));
+	assert(saDistinct(sa) == sz(subs));
 
 	// membership
 	for (auto& w : subs) assert(walk(sa, w) != -1);
@@ -88,11 +88,11 @@ void check(const vector<string>& strs, const vector<string>& probes) {
 	// kth vs sorted (by plain char) list of substrings
 	vector<string> sorted(all(subs));
 	sort(all(sorted), charLess);
-	rep(k,0,sz(sorted)) assert(sa.kth(k) == sorted[k]);
+	rep(k,0,sz(sorted)) assert(saKth(sa, k) == sorted[k]);
 
 	// occ vs naive counting, for each added string
 	for (auto& s : strs) {
-		vi cnt = sa.occ(s);
+		vi cnt = saOcc(sa, s);
 		assert(sz(cnt) == N);
 		rep(v,1,N) {
 			int lo = sa.dis[sa.link[v]], hi = sa.dis[v];
@@ -103,7 +103,7 @@ void check(const vector<string>& strs, const vector<string>& probes) {
 
 	// lcs vs brute force
 	for (auto& t : probes) {
-		pii r = sa.lcs(t);
+		pii r = saLcs(sa, t);
 		int best = 0;
 		rep(i,0,sz(t)) rep(j,i+1,sz(t)+1)
 			if (subs.count(t.substr(i, j - i))) best = max(best, j - i);
@@ -117,11 +117,11 @@ void testEdge() {
 	// nothing added
 	{
 		SA sa;
-		assert(sa.N == 1 && sa.distinct() == 0);
-		assert(sa.order() == vi{0});
-		assert(sa.lcs("abc") == pii(0, 3));
-		assert(sa.lcs("") == pii(0, 0));
-		assert(sa.occ("") == vi{0});
+		assert(sa.N == 1 && saDistinct(sa) == 0);
+		assert(saOrder(sa) == vi{0});
+		assert(saLcs(sa, "abc") == pii(0, 3));
+		assert(saLcs(sa, "") == pii(0, 0));
+		assert(saOcc(sa, "") == vi{0});
 	}
 	check({""}, {"", "a"});
 	check({"", "", ""}, {"", "a"});
@@ -158,20 +158,20 @@ void testOverflow() {
 		distinct -= k;
 	}
 	assert(distinct > INT_MAX);
-	assert(sa.distinct() == distinct);
-	assert(sa.kth(0) == "a");
-	assert(sa.kth(distinct - 1) == s.substr(suf[n-1]));
-	assert(sa.kth(distinct - 2) == s.substr(suf[n-1], sz(s) - suf[n-1] - 1));
-	assert(sa.kth(1) == (count(all(s), 'a') > 0 && s.find("aa") != string::npos ? "aa" : "ab"));
-	vi cnt = sa.occ(s);
+	assert(saDistinct(sa) == distinct);
+	assert(saKth(sa, 0) == "a");
+	assert(saKth(sa, distinct - 1) == s.substr(suf[n-1]));
+	assert(saKth(sa, distinct - 2) == s.substr(suf[n-1], sz(s) - suf[n-1] - 1));
+	assert(saKth(sa, 1) == (count(all(s), 'a') > 0 && s.find("aa") != string::npos ? "aa" : "ab"));
+	vi cnt = saOcc(sa, s);
 	assert(cnt[p] == 1 && cnt[walk(sa, "a")] == count(all(s), 'a'));
 	ll tot = 0;
 	rep(v,1,sa.N) tot += (ll)cnt[v] * (sa.dis[v] - sa.dis[sa.link[v]]);
 	assert(tot == (ll)n * (n + 1) / 2);
-	assert(sa.lcs(s) == pii(n, 0));
-	assert(sa.lcs("xyz" + s.substr(100, 50) + "xyz") == pii(50, 3));
+	assert(saLcs(sa, s) == pii(n, 0));
+	assert(saLcs(sa, "xyz" + s.substr(100, 50) + "xyz") == pii(50, 3));
 	string t = randString(n, 3, false);
-	pii r = sa.lcs(t);
+	pii r = saLcs(sa, t);
 	assert(walk(sa, t.substr(r.second, r.first)) != -1);
 	assert(r.second + r.first == sz(t) || walk(sa, t.substr(r.second, r.first + 1)) == -1);
 }
@@ -185,7 +185,7 @@ void testPerf() {
 	ll edges = 0;
 	rep(i,0,sa.N) edges += sz(sa.adj[i]);
 	assert(edges <= 3 * sz(s));
-	sa.order(); sa.occ(s); sa.distinct(); sa.kth(sa.distinct() - 1); sa.lcs(s);
+	saOrder(sa); saOcc(sa, s); saDistinct(sa); saKth(sa, saDistinct(sa) - 1); saLcs(sa, s);
 }
 
 int main() {
