@@ -3,7 +3,6 @@
 
 #include "../../content/number-theory/ModInt.h"
 #include "../../content/numerical/PolyOps.h"
-#include "../../content/numerical/PolyOps2.h"
 
 mt19937 rng(2);
 int rnd(int a, int b) { return uniform_int_distribution<int>(a, b)(rng); }
@@ -20,6 +19,12 @@ poly naivePow(poly a, ll b, int n) {
 }
 
 int main() {
+	rep(it,0,1000) {
+		poly a = rp(rnd(0, 30)), b = rp(rnd(0, 30)), c;
+		if (sz(a) && sz(b)) c.resize(sz(a)+sz(b)-1);
+		rep(i,0,sz(a)) rep(j,0,sz(b)) c[i+j] += a[i]*b[j];
+		assert(eq(a*b, c));
+	}
 	rep(it,0,5000) {
 		int n = rnd(1, 12);
 		poly a = rp(rnd(0, n+2));
