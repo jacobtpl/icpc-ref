@@ -83,16 +83,17 @@ int main() {
 			assert(tot < 0);
 		}
 	}
-	// large: 2e5-node random graph with nonnegative weights (no cycle) and the
-	// same graph plus one far-away negative cycle (must be found quickly)
+	// large: 2e5-node random sparse graph (no cycle), then the same graph with
+	// one planted negative cycle. NB: a long path plus random shortcut edges is
+	// an SPFA killer (minutes at this size), hence the random graph here.
 	{
 		int n = 200000;
 		vector<vector<pair<int, ll>>> g(n);
-		rep(i,0,n-1) g[i].emplace_back(i + 1, rand() % 100);
-		rep(i,0,n) g[rand() % n].emplace_back(rand() % n, rand() % 100);
+		rep(i,0,n-1) g[i].emplace_back(i + 1, 1000000000);
+		rep(i,0,3*n) g[rand() % n].emplace_back(rand() % n, rand() % 100);
 		auto r = spfa(g, {0});
 		assert(r.negCycle.empty() && r.seen[n-1]);
-		g[n-1].emplace_back(n - 2, -1000);
+		g[n-1].emplace_back(n - 2, -2000000000);
 		g[n-2].emplace_back(n - 1, 5);
 		auto r2 = spfa(g, {0});
 		assert(sz(r2.negCycle) == 2);
