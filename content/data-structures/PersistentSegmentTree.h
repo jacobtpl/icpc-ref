@@ -32,12 +32,14 @@ struct Node {
 	ll v = 0, lz = 0; /* Customize below */
 	static Node new_leaf(ll val) { Node n; n.v = val; return n; }
 	// empty_range(lo, hi) = untouched segment; must equal
-	// up(empty_range(lo, m), empty_range(m, hi))
+	// up(empty_range(lo, m), empty_range(m, hi), lo, hi)
 	static Node empty_range(int, int) { return Node(); }
 	void apply(ll x, int lo, int hi) {
 		v += x * (hi - lo), lz += x;
 	}
-	void up(const Node& a, const Node& b) { v = a.v + b.v; }
+	void up(const Node& a, const Node& b, int lo, int hi) {
+		v = a.v + b.v;
+	}
 	void down(Node& a, Node& b, int lo, int hi) {
 		int m = lo + (hi - lo) / 2;
 		a.apply(lz, lo, m), b.apply(lz, m, hi), lz = 0;
@@ -56,7 +58,7 @@ int clone(int x, int lo, int hi) {
 }
 void up(int x, int lo, int hi) {
 	int m = lo + (hi - lo) / 2;
-	N[x].up(get(N[x].c[0], lo, m), get(N[x].c[1], m, hi));
+	N[x].up(get(N[x].c[0], lo, m), get(N[x].c[1], m, hi), lo, hi);
 }
 void down(int x, int lo, int hi) { // x must be cloned
 	int m = lo + (hi - lo) / 2;
@@ -86,7 +88,7 @@ Node query(Node x, int lo, int hi, int l, int r) {
 	int m = lo + (hi - lo) / 2;
 	Node a = get(x.c[0], lo, m), b = get(x.c[1], m, hi), res;
 	x.down(a, b, lo, hi);
-	res.up(query(a, lo, m, l, r), query(b, m, hi, l, r));
+	res.up(query(a, lo, m, l, r), query(b, m, hi, l, r), lo, hi);
 	return res;
 }
 Node query(int x, int lo, int hi, int l, int r) {
