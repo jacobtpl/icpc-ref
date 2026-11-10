@@ -28,7 +28,8 @@
 
 namespace pst {
 struct Node {
-	array<int, 2> c = {0, 0}; int t = -1; /* Customize below */
+	array<int, 2> c = {0, 0}; int t = -1;
+	// Customize below
 	ll v = 0, lz = 0;
 	static Node new_leaf(ll val) { Node n; n.v = val; return n; }
 	// empty_range(lo, hi) = untouched segment; must equal
