@@ -15,6 +15,8 @@
  *  Floating T: eps = 0 only works in general position. If four points
  *  can be (nearly) coplanar pass eps around 1e-9 * D^3 for double, where
  *  D is the largest coordinate difference.
+ *  The error of the input must be well below that eps (100 times
+ *  is enough): points at about eps from a face plane can break it.
  *  Only fails (assert) if all points are within eps of one plane.
  *  Every test uses coordinate differences, so only D matters, not the
  *  offset from the origin: exact while 6D^3 fits in T (long long:
@@ -30,13 +32,14 @@
 
 #include "Point3D.h"
 
-template<class P3, class T = decltype(P3().x)>
-vector<array<int,3>> hull3dFast(const vector<P3>& A, T eps = 0) {
+template<class P3>
+vector<array<int,3>> hull3dFast(const vector<P3>& A,
+		decltype(P3().x) eps = 0) {
 	int n = sz(A);
 	vi o(n); iota(all(o), 0); shuffle(all(o), mt19937(5));
 	auto vol = [&](int a, int b, int c, int d) { // >eps: d sees abc
 		return (A[b]-A[a]).cross(A[c]-A[a]).dot(A[d]-A[a]); };
-	auto ab = [](T x) { return x < 0 ? -x : x; };
+	auto ab = [](auto x) { return x < 0 ? -x : x; };
 	// start from a fat tetrahedron: farthest point, then farthest
 	// from that line, then farthest from that plane
 	auto far = [&](int k, auto f) {

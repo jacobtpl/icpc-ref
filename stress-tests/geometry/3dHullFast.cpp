@@ -251,6 +251,10 @@ int main() {
 		if (abs(vol - want) > 1e-7 * want) fail("hull3dFast eps: volume", p);
 		cases++;
 	}
+	{ // an int eps must not make the tests run in int
+		vector<P3> A{P3(0,0,0), P3(.5,0,0), P3(0,.5,0), P3(0,0,.5)};
+		assert(sz(hull3dFast(A, 0)) == 4);
+	}
 	{ // speed: 2e5 points on a sphere and 2e5 lifted grid points
 		auto t0 = chrono::steady_clock::now();
 		int n = 200000;
