@@ -26,10 +26,11 @@ pair<P, P> closest(vector<P> v) {
 	set<P> S;
 	sort(all(v), [](P a, P b) { return a.y < b.y; });
 	pair<T, pair<P, P>> ret{(v[0] - v[1]).dist2(), {v[0], v[1]}};
-	int j = 0;
+	int j = 0, i = 0;
 	for (P p : v) {
-		P d{1 + T(gsqrt(F(ret.first))), 0};
-		while (v[j].y <= p.y - d.x) S.erase(v[j++]);
+		P d{T(gsqrt(F(ret.first))) + !geoFloat<T>, 0};
+		while (j < i && v[j].y <= p.y - d.x) S.erase(v[j++]);
+		i++;
 		auto lo = S.lower_bound(p - d), hi = S.upper_bound(p + d);
 		for (; lo != hi; ++lo)
 			ret = min(ret, {(*lo - p).dist2(), {*lo, p}});
