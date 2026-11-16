@@ -40,8 +40,8 @@ signed main() {
         assert(edges.size() <= 4*pts.size());
         sort(all(edges));
         UF uf(sz(pts));
-        int cost = 0, joined = 0;
-        for (auto e: edges) if (uf.join(e[1], e[2])) cost += e[0], joined++;
+        ll cost = 0; int joined = 0;
+        for (auto e: edges) if (uf.join((int)e[1], (int)e[2])) cost += e[0], joined++;
         if (num_pts > 0) assert(joined == num_pts - 1);
         assert(cost == rectilinear_mst_n(pts));
     }

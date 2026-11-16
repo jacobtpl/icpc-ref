@@ -1,16 +1,23 @@
 /**
  * Author: Benq
- * Description: 3d hull helpers
+ * Description: 3d hull helpers.
+ *  Predicates are evaluated in T on coordinate differences and are
+ *  exact for integer coordinates of absolute value up to 5e4 with
+ *  T = double, 5e5 with long long, 1e12 with __int128.
  */
+#pragma once
 
-using T = double;
-using P3 = Point3D<double>;
+#include "Point3D.h"
+
+
+using T = double; // or long long, __int128 (see above)
+using P3 = Point3D<T>;
 using vb = vector<bool>;
 
 mt19937 rng;
 P3 cross(const P3& a, const P3& b, const P3& c) {
 	return (b-a).cross(c-a); }
-P3 perp(const P3& a, const P3& b, const P3& c) {
+P3::PF perp(const P3& a, const P3& b, const P3& c) {
 	return cross(a,b,c).unit(); }
 bool isMult(const P3& a, const P3& b) { // for long longs
 	P3 c = a.cross(b);
