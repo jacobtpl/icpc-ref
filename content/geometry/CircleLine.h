@@ -6,6 +6,8 @@
  * Description: Finds the intersection between a circle and a line.
  * Returns a vector of either 0, 1, or 2 intersection points
  * (empty if a = b). P must be a floating point Point.
+ * Points are built from the foot of the perpendicular through c, so a
+ * small circle far from a and b keeps its two distinct intersections.
  * No epsilon is used. The count is exact for integer-valued input with
  * |x|,|y|,r <= 1e9 (x86 long double; the sign of
  * r^2|ab|^2 - s^2 is then computed exactly with fma).
@@ -22,12 +24,13 @@ vector<P> circleLine(P c, double r, P a, P b) {
 	static_assert(is_floating_point<T>::value, "use doubles");
 	ld x = (ld)b.x - a.x, y = (ld)b.y - a.y, u = (ld)c.x - a.x,
 	   v = (ld)c.y - a.y, L = x*x + y*y, s = x*v - y*u,
-	   t = x*u + y*v, rr = (ld)r*r, w = s*s, N = rr*L - w;
+	   rr = (ld)r*r, w = s*s, N = rr*L - w;
 	if (L == 0) return {};
 	if (fabsl(N) < w * 1e-6L) // cancellation: exact sign (Kahan)
 		N = fmal(rr, L, -w) + fmal(-s, s, w);
 	if (N < 0) return {};
-	auto at = [&](ld k) { return P(T(a.x+x*k), T(a.y+y*k)); };
-	if (N == 0) return {at(t / L)};
-	ld q = sqrtl(N);
-	return {at((t - q) / L), at((t + q) / L)}; }
+	ld fx = c.x + y*s/L, fy = c.y - x*s/L; // foot of c, near c
+	auto at = [&](ld k) { return P(T(fx+x*k), T(fy+y*k)); };
+	if (N == 0) return {at(0)};
+	ld q = sqrtl(N) / L;
+	return {at(-q), at(q)}; }

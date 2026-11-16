@@ -10,8 +10,11 @@
  * |x|,|y| < 2^30 and only the ratios and the sum are floating point,
  * so prefer it for integer input (in double the tests are only exact
  * for integers up to about 3e7). With Fraction everything is exact
- * and a Fraction is returned. The area is summed relative to a
- * polygon vertex, so far-away input does not cancel.
+ * and a Fraction is returned. With double each edge term is
+ * (A-O) x (B-O) for a vertex O of the last polygon, as an
+ * fma-compensated long double determinant: the error per edge is about
+ * 1e-19 |A-O| |B-O|, so input far from the origin is fine as long
+ * as the polygons are near each other (else use ll or Fraction).
  * Time: $O(N^2)$, where $N$ is the total number of points
  * Status: stress-tested, Submitted on ECNA 2017 Problem A
  */
@@ -33,6 +36,14 @@ PolyUnionT<P> polyUnion(vector<vector<P>>& poly) {
 	R ret = 0;
 	P O;
 	for (auto& p : poly) if (sz(p)) O = p[0];
+	auto crs = [&](P a, P b) { // (a-O).cross(b-O), compensated
+		if constexpr (is_floating_point<T>::value) {
+			typedef long double ld;
+			ld x = (ld)a.x - O.x, y = (ld)a.y - O.y;
+			ld u = (ld)b.x - O.x, v = (ld)b.y - O.y, w = y*u;
+			return R(fmal(x, v, -w) + fmal(-y, u, w));
+		} else return R((a - O).cross(b - O));
+	};
 	rep(i,0,sz(poly)) rep(v,0,sz(poly[i])) {
 		P A = poly[i][v], B = poly[i][(v + 1) % sz(poly[i])];
 		vector<pair<R, int>> segs = {{0, 0}, {1, 0}};
@@ -58,7 +69,7 @@ PolyUnionT<P> polyUnion(vector<vector<P>>& poly) {
 			if (!cnt) sum += segs[j].first - segs[j - 1].first;
 			cnt += segs[j].second;
 		}
-		ret += R((A - O).cross(B - O)) * sum;
+		ret += crs(A, B) * sum;
 	}
 	return ret / 2;
 }

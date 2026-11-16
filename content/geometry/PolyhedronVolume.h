@@ -7,7 +7,9 @@
  *  far from the origin. signedPolyVolume6 returns six times the volume in the
  *  coordinate type: exact for integers while (number of faces) * 6D^3 fits,
  *  D being the largest coordinate difference. signedPolyVolume returns a
- *  double for integer coordinates (also __int128) and otherwise the coordinate type (Fraction is exact).
+ *  double for integer coordinates (also __int128; each face is evaluated
+ *  in the coordinate type, so only 6D^3 must fit, and summed in double)
+ *  and otherwise the coordinate type (Fraction is exact).
  * Status: tested
  */
 #pragma once
@@ -18,21 +20,25 @@ template<class F> auto triIdx(const F& f, long) ->
 	decltype(array<int,3>{{f[0], f[1], f[2]}}) {
 	return {{f[0], f[1], f[2]}}; }
 
-template<class V, class L>
-auto signedPolyVolume6(const V& p, const L& trilist) {
-	decltype(p[0].x) v = 0;
+template<class R, class V, class L>
+R polyVolume6(const V& p, const L& trilist) { // faces summed in R
+	R v = 0;
 	int o = -1;
 	for (auto& f : trilist) {
 		auto i = triIdx(f, 0);
 		if (o < 0) o = i[0];
-		v += (p[i[0]]-p[o]).cross(p[i[1]]-p[o]).dot(p[i[2]]-p[o]);
+		v += R((p[i[0]]-p[o]).cross(p[i[1]]-p[o]).dot(p[i[2]]-p[o]));
 	}
 	return v;
+}
+template<class V, class L>
+auto signedPolyVolume6(const V& p, const L& trilist) {
+	return polyVolume6<decltype(p[0].x)>(p, trilist);
 }
 template<class V, class L>
 auto signedPolyVolume(const V& p, const L& trilist) {
 	typedef decltype(p[0].x) T;
 	typedef conditional_t<is_floating_point<T>::value ||
 		is_class<T>::value, T, double> R; // ll, __int128 -> double
-	return R(signedPolyVolume6(p, trilist)) / 6;
+	return polyVolume6<R>(p, trilist) / 6;
 }

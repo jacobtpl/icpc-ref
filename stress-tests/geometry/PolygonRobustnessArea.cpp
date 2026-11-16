@@ -172,6 +172,24 @@ void testUnion() {
 		ps.push_back({DP(a+5,b+5), DP(a+6,b+5), DP(a+5,b+6)});
 		assert(polyUnion(ps) == 2);
 	}
+	{ // review reproducer: disjoint polygons far apart, any order
+		vector<DP> small = {DP(0,0), DP(4,0), DP(4,4), DP(0,4)};
+		for (double o : {1e9, -1e9, 1e12}) {
+			vector<DP> big = {DP(o,o), DP(o+1024,o), DP(o+1024,o+1024), DP(o,o+1024)};
+			vector<vector<DP>> ps = {small, big}, qs = {big, small};
+			assert(fabs(polyUnion(ps) - 1048592) < 1e-6);
+			assert(fabs(polyUnion(qs) - 1048592) < 1e-6);
+			vector<vector<DP>> three = {big, small, big};
+			assert(fabs(polyUnion(three) - 1048592) < 1e-6);
+		}
+		ll M = (1LL << 30) - 1; // ll: raw products stay below 2^63
+		vector<IP> a = {IP(-M,-M), IP(M,-M), IP(M,M), IP(-M,M)};
+		vector<IP> b = {IP(-M,-M), IP(-M+2,-M), IP(-M+2,-M+2), IP(-M,-M+2)};
+		vector<vector<IP>> ab = {a, b}, ba = {b, a};
+		double want = 4.0 * (double)M * (double)M;
+		assert(fabs(polyUnion(ab) - want) <= 1e-6 * want);
+		assert(fabs(polyUnion(ba) - want) <= 1e-6 * want);
+	}
 	{
 		vector<vector<DP>> none;
 		assert(polyUnion(none) == 0);
