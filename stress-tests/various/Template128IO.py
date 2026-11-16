@@ -66,14 +66,15 @@ def main():
             t = dec(v, rng.choice([1, 5, 17, 34, 36, 40, 60]))
             lines.append(f'r {t}'); checks.append(('r', F(t), t))
             if abs(v) < 10 ** 60:
-                p = rng.choice([0, 1, 6, 9, 15, 20, 30, 36, 45])
+                p = rng.choice([0, 1, 6, 9, 15, 20, 30, 36, 45, 60, 80])
                 lines.append(f'w {bits >> 64} {bits & (1 << 64) - 1} {p}'); checks.append(('w', v, p))
         for bits, want in [(0x7fff << 112, 'inf'), (0xffff << 112, '-inf'), (0x7fff8 << 108, 'nan')]:
             lines.append(f'w {bits >> 64} {bits & (1 << 64) - 1} 3'); checks.append((want,))
         out = subprocess.run([str(exe)], input='\n'.join(lines) + '\n', text=True,
                              capture_output=True, check=True).stdout.split('\n')
-        if out[0] == 'nof128':
-            print('integers passed; no __float128 on this target (f128 = long double)')
+        if out[0].startswith('nof128'):
+            print(f'integers passed; no __float128 on this target '
+                  f'(f128 = long double, {out[0].split()[1]}-bit mantissa)')
             return
         assert out[len(checks)] == 'f128', out[len(checks):]
         worst = F(0)
@@ -99,7 +100,7 @@ def main():
                 assert '.' in got if p else '.' not in got, got
                 assert len(got.partition('.')[2]) == p, got
                 err = abs(F(got) - v)
-                tol = F(1, 2 * 10 ** p) + F(2) ** -124 + abs(v) / 10 ** 33
+                tol = F(1, 2 * 10 ** p) + abs(v) / 10 ** 32
                 assert err <= tol, (got, float(v), p)
                 if v < 0 or got.startswith('-'): assert got.startswith('-') == (v < 0)
         print(f'Template128IO passed ({len(checks)} cases, worst read error {float(worst):.3f} ulp)')

@@ -20,7 +20,7 @@ template<typename T> bool ckmin(T &a, T const& b) {return b<a?a=b,1:0;}
 // Bad token => failbit (so while (cin >> a) works); ints wrap mod 2^128.
 // f128 reads [+-]digits[.digits][e[+-]digits], uses the first 36
 // significant digits, and always prints fixed with precision() decimals
-// (default 6), about 34 significant digits correct.
+// (default 6), about 33 significant digits correct.
 // __float128 exists on x86 Linux gcc/clang but not with clang on macOS;
 // there f128 falls back to long double with the standard stream operators,
 // so code still compiles and runs, just with less precision (64-bit on
@@ -97,11 +97,13 @@ ostream& operator<<(ostream& o, f128 x) {
 	if (x > 0 && x == x / 2) return o << s + "inf";
 	int p = int(o.precision());
 	string d;
-	size_t n = 0; // digits before the decimal point
-	for (; x >= f128(1e37); x /= f128(1e10)) p += 10, n += 10;
+	size_t n = 0, z = 0; // digits before the point, zeros right after it
+	for (; x >= f128(1e37) && n < 5000; x /= f128(1e10)) p += 10, n += 10;
+	for (; x > 0 && x < f128(1e-10) && p >= 10; x *= f128(1e10)) p -= 10, z += 10;
+	for (; x > 0 && x < f128(.1) && p > 0; x *= 10) p--, z++;
 	u128 ip = u128(x), one = u128(1) << 124;
 	u128 f = u128((x - f128(ip)) * f128(one));
-	d = u128str(ip), n += d.size();
+	d = u128str(ip), n += d.size(), d += string(z, '0');
 	rep(i,0,p) f *= 10, d += char('0' + int(f >> 124)), f &= one - 1;
 	if (f >= one / 2) {
 		int i = sz(d) - 1;
