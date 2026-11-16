@@ -23,8 +23,10 @@ template<class A, class T = GeoR<A>>
 T sphericalDistance(A f1, type_identity_t<T> t1,
 		type_identity_t<T> f2, type_identity_t<T> t2,
 		type_identity_t<T> radius) {
-	T x1 = gsin(t1)*gcos(T(f1)), y1 = gsin(t1)*gsin(T(f1)), z1 = gcos(t1);
-	T x2 = gsin(t2)*gcos(f2), y2 = gsin(t2)*gsin(f2), z2 = gcos(t2);
+	// volatile: no FMA contraction of x2 - x1, so equal points give 0
+	volatile T X1 = gsin(t1)*gcos(T(f1)), Y1 = gsin(t1)*gsin(T(f1)),
+		X2 = gsin(t2)*gcos(f2), Y2 = gsin(t2)*gsin(f2);
+	T x1 = X1, y1 = Y1, x2 = X2, y2 = Y2, z1 = gcos(t1), z2 = gcos(t2);
 	T dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
 	T ax = x2 + x1, ay = y2 + y1, az = z2 + z1;
 	T d = gsqrt(dx*dx + dy*dy + dz*dz);
