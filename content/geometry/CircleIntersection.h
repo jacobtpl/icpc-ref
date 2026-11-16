@@ -4,7 +4,7 @@
  * License: CC0
  * Description: Computes the pair of points at which two circles intersect. Returns false in case of no intersection.
  * Asserts on identical circles. No epsilon is used: tangent circles give two equal points.
- * The yes/no answer is exact for integer-valued input with $|x|,|y|,r \le 10^9$
+ * The yes/no answer is exact for integer-valued input with |x|,|y|,r <= 1e9
  * (squared distances then fit the 64-bit mantissa of x86 long double).
  * Status: stress-tested
  */

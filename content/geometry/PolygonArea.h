@@ -7,10 +7,10 @@
  *  Clockwise enumeration gives negative area. Empty input gives 0.
  *  Coordinates are taken relative to v[0], so a small polygon far from
  *  the origin does not cancel in floating point.
- *  With T = ll every term is exact for $|x|,|y| < 2^{30}$ (about $1.07\cdot 10^9$)
+ *  With T = ll every term is exact for |x|,|y| < 2^30 (about 1.07e9)
  *  and so is the result; the running sum of a non-convex polygon can
  *  exceed the result, so near that limit accumulate in a wider type:
- *  \texttt{polygonArea2<ll, \_\_int128>(v)}.
+ *  polygonArea2<ll, __int128>(v).
  * Status: Stress-tested and tested on kattis:polygonarea
  */
 #pragma once

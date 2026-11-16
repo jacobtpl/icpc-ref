@@ -7,10 +7,10 @@
  * Each circumcircle contains none of the input points.
  * There must be no duplicate points.
  * If all points are on a line, no triangles will be returned.
- * Exact for integer coordinates of absolute value up to $10^9$ (cocircular points give any valid triangulation).
+ * Exact for integer coordinates of absolute value up to 1e9 (cocircular points give any valid triangulation).
  * Should work for doubles as well, though there may be precision issues in 'circ'.
  * Returns triangles in order \{t[0][0], t[0][1], t[0][2], t[1][0], \dots\}, all counter-clockwise.
- * All edge records live in \texttt{quads} and are freed when triangulate returns.
+ * All edge records live in quads and are freed when triangulate returns.
  * Time: O(n \log n)
  * Status: stress-tested
  */

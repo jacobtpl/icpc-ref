@@ -4,8 +4,8 @@
  *  *No four points must be coplanar*, or else random results will be returned.
  *  All faces will point outwards.
  *  Predicates are evaluated in T on coordinate differences and are
- *  exact for integer coordinates of absolute value up to $5 \cdot 10^4$ with
- *  T = double, $5 \cdot 10^5$ with long long, $10^{12}$ with \_\_int128.
+ *  exact for integer coordinates of absolute value up to 5e4 with
+ *  T = double, 5e5 with long long, 1e12 with __int128.
  * Time: O(n^2, n \log n)
  * Status: tested on SPOJ CH3D
  */

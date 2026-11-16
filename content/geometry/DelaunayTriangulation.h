@@ -7,7 +7,7 @@
  *  Calls trifun(i,j,k) with the indices of every triangle, counter-clockwise.
  *  If any three points are collinear or any four are on the same circle, behavior is undefined
  *  (use FastDelaunay for such input).
- *  Integer coordinates are lifted exactly in \_\_int128: valid for absolute values up to $10^9$.
+ *  Integer coordinates are lifted exactly in __int128: valid for absolute values up to 1e9.
  *  Floating point coordinates are centred and lifted in long double, which is not exact.
  * Time: O(n^2)
  * Status: stress-tested

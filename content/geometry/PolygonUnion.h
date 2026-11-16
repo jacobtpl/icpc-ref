@@ -7,9 +7,9 @@
  * convex). The points within each polygon must be given in CCW order.
  * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
  * T can be double, ll or Fraction. With ll all side tests are exact for
- * $|x|,|y| < 2^{30}$ and only the ratios and the sum are floating point,
+ * |x|,|y| < 2^30 and only the ratios and the sum are floating point,
  * so prefer it for integer input (in double the tests are only exact
- * for integers up to about $3\cdot 10^7$). With Fraction everything is exact
+ * for integers up to about 3e7). With Fraction everything is exact
  * and a Fraction is returned. The area is summed relative to a
  * polygon vertex, so far-away input does not cancel.
  * Time: $O(N^2)$, where $N$ is the total number of points

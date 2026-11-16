@@ -7,8 +7,8 @@
  * of point p across line ab instead. Requires a != b (asserted). The result
  * is p plus an offset, so doubles lose no digits to the absolute position.
  * For Point<ll>
- * coordinates must be at most $10^9$ in absolute value (triple products are
- * done in \_\_int128) and each coordinate of the offset is truncated toward
+ * coordinates must be at most 1e9 in absolute value (triple products are
+ * done in __int128) and each coordinate of the offset is truncated toward
  * zero when the desired point doesn't have integer coordinates.
  * Status: stress-tested
  */

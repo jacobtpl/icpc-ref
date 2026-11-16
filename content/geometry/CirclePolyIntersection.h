@@ -6,7 +6,7 @@
  * Description: Returns the area of the intersection of a circle with a
  * ccw polygon. Chords are built from the foot of the perpendicular from
  * the centre to each edge line, so small circles far from the vertices
- * are fine (e.g. $r=1$, coordinates $10^9$).
+ * are fine (e.g. r=1, coordinates 1e9).
  * Time: O(n)
  * Status: Tested on GNYR 2019 Gerrymandering, stress-tested
  */

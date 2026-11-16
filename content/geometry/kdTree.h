@@ -6,10 +6,10 @@
  * owned by the tree and refer to each other by index, so trees are freed on
  * destruction and can be copied, moved and assigned freely.
  * Squared distances are ll: tree points and queries need
- * $|x|, |y| \le 2^{30}-1$ (about $1.07 \cdot 10^9$), so that
- * dist2 $\le 8 \cdot (2^{30}-1)^2 < 2^{63}$. Duplicate points are fine.
- * nearest on an empty tree returns \{INF, P()\}.
- * Time: build O(N \log N). nearest is O(\log N) on average for random
+ * |x|, |y| <= 2^30-1 (about 1.07e9), so that
+ * dist2 <= 8 * (2^30-1)^2 < 2^63. Duplicate points are fine.
+ * nearest on an empty tree returns {INF, P()}.
+ * Time: build O(N log N). nearest is O(log N) on average for random
  * points, but O(N) in the worst case (e.g. points on a circle or diagonal).
  * Status: Stress-tested
  */

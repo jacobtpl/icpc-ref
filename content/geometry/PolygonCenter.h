@@ -7,7 +7,7 @@
  *  (zero area gives NaN, or throws for Fraction). Moments are taken
  *  relative to v[0], so the error is relative to the size of the polygon,
  *  not to its distance from the origin; Fraction input is exact. The ll
- *  overload sums exactly in \_\_int128 for $|x|,|y| < 2^{30}$ and divides once.
+ *  overload sums exactly in __int128 for |x|,|y| < 2^30 and divides once.
  * Time: O(n)
  * Status: Tested
  */

@@ -7,10 +7,10 @@
  *  The first four points must not be coplanar either.
  *  All faces will point outwards.
  *  Works on any Point3D<T>; all tests use coordinate differences, so
- *  only the extent $D$ (largest coordinate difference) matters:
- *  integer input is exact while $6D^3$ fits in T (double: $D \le 1.1 \cdot 10^5$
- *  if the coordinates themselves are below $2^{53}$, long long: $D \le 10^6$,
- *  \_\_int128: $D \le 2 \cdot 10^{12}$).
+ *  only the extent D (largest coordinate difference) matters:
+ *  integer input is exact while 6D^3 fits in T (double: D <= 1.1e5
+ *  if the coordinates themselves are below 2^53, long long: D <= 1e6,
+ *  __int128: D <= 2e12).
  * Time: O(n^2)
  * Status: tested on SPOJ CH3D
  */

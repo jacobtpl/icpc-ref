@@ -2,12 +2,12 @@
  * Author: Mattias de Zalenski
  * Date: 2002-11-04
  * Description: Magic formula for the volume of a polyhedron. Faces should point outwards.
- *  Faces are triangles given as \{a,b,c\} members or as array<int,3> (both hull versions).
+ *  Faces are triangles given as {a,b,c} members or as array<int,3> (both hull versions).
  *  Coordinates are taken relative to a vertex, so the result does not degrade
  *  far from the origin. signedPolyVolume6 returns six times the volume in the
- *  coordinate type: exact for integers while (number of faces) $\cdot 6D^3$ fits,
- *  $D$ being the largest coordinate difference. signedPolyVolume returns a
- *  double for integer coordinates (also \_\_int128) and otherwise the coordinate type (Fraction is exact).
+ *  coordinate type: exact for integers while (number of faces) * 6D^3 fits,
+ *  D being the largest coordinate difference. signedPolyVolume returns a
+ *  double for integer coordinates (also __int128) and otherwise the coordinate type (Fraction is exact).
  * Status: tested
  */
 #pragma once

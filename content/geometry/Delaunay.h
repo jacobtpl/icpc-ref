@@ -8,8 +8,8 @@
  * Duplicate points are merged. Fewer than three distinct points or
  * all points on a line give no triangles; cocircular points give
  * any valid triangulation.
- * Exact for integer coordinates of absolute value up to $10^9$.
- * Time: O(n \log n)
+ * Exact for integer coordinates of absolute value up to 1e9.
+ * Time: O(n log n)
  * Status: stress-tested against exact oracle
  */
 #pragma once

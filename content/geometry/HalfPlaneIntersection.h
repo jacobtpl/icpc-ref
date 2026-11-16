@@ -2,23 +2,23 @@
  * Author: Benq
  * Description: Returns vertices of half-plane intersection in CCW order.
    * A half-plane is the area to the left of a ray, which is defined
-   * by a point \texttt{p} and a nonzero direction \texttt{dp}.
-   * Returns \{\} unless the intersection is bounded with positive area
+   * by a point p and a nonzero direction dp.
+   * Returns {} unless the intersection is bounded with positive area
    * (so also when it is empty, a point, a segment or unbounded).
-   * With \texttt{RayT<ll>} every decision is exact (\_\_int128 products) for
-   * $|p| \le 10^9$, $|dp| \le 2 \cdot 10^9$ and only the returned vertices
+   * With RayT<ll> every decision is exact (__int128 products) for
+   * |p| <= 1e9, |dp| <= 2e9 and only the returned vertices
    * are rounded (long double); use it for integer input.
    * Floating rays with integer-valued coordinates within these bounds
    * also use the exact integer predicates.
-   * \texttt{RayT<Fraction>} is exact throughout and returns Fraction vertices.
+   * RayT<Fraction> is exact throughout and returns Fraction vertices.
    * With floating point rays products are formed in long double and a
-   * determinant within \texttt{eps} times the sum of the magnitudes of
+   * determinant within eps times the sum of the magnitudes of
    * its terms counts as zero, i.e. the configuration as degenerate
-   * (parallel rays, or a vertex on a third line). Keep \texttt{eps} near
-   * rounding error: features smaller than \texttt{eps} times the distance
-   * between the origins \texttt{p} are lost. The tests are invariant under
-   * translation and under scaling of the input or of any \texttt{dp}.
-   * \texttt{add\_bounds} clips to $[0,10^9]^2$ (not to negative coordinates).
+   * (parallel rays, or a vertex on a third line). Keep eps near
+   * rounding error: features smaller than eps times the distance
+   * between the origins p are lost. The tests are invariant under
+   * translation and under scaling of the input or of any dp.
+   * add_bounds clips to [0,1e9]^2 (not to negative coordinates).
  * Time: O(N\log N)
  * Source: Own
  * Status: stress-tested against exact brute force; older version tested on

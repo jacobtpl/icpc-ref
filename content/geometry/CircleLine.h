@@ -7,8 +7,8 @@
  * Returns a vector of either 0, 1, or 2 intersection points
  * (empty if a = b). P must be a floating point Point.
  * No epsilon is used. The count is exact for integer-valued input with
- * $|x|,|y|,r \le 10^9$ (x86 long double; the sign of
- * $r^2|ab|^2 - s^2$ is then computed exactly with fma).
+ * |x|,|y|,r <= 1e9 (x86 long double; the sign of
+ * r^2|ab|^2 - s^2 is then computed exactly with fma).
  * Status: unit tested
  */
 

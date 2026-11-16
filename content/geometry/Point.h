@@ -6,13 +6,13 @@
  * Description: Class to handle points in the plane.
  * 	T can be e.g. double, long double, long long or Fraction. (Avoid int.)
  * 	Integer T: dist2, dot and cross are evaluated in T, so with
- * 	long long keep $|x|,|y| \le 10^9$ ($2 \cdot 10^9$ for dist2/dist
+ * 	long long keep |x|,|y| <= 1e9 (2e9 for dist2/dist
  * 	of a single point); operator/ truncates. Lengths, angles, unit,
  * 	normal and rotate use F = T if T is floating, else double
  * 	(also for Fraction), and never truncate.
  * 	Floating dist() is safe for all magnitudes.
  * 	mulDiv(a,b,c) is a*b/c with the product of integers kept in
- * 	\_\_int128 (truncates toward zero).
+ * 	__int128 (truncates toward zero).
  * Status: Works fine, used a lot
  */
 #pragma once

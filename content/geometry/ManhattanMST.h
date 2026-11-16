@@ -8,9 +8,9 @@
  * |p.x - q.x| + |p.y - q.y|. Edges are in the form (distance, src, dst). Use a
  * standard MST algorithm on the result to find the final MST.
  * Takes Point<int> or Point<ll>; all arithmetic and the returned weights are
- * ll. Exact for any int input, and for ll input with $|x|, |y| \le 2 \cdot 10^{18}$
+ * ll. Exact for any int input, and for ll input with |x|, |y| <= 2e18
  * (weights are at most 4 max|coord|). The MST total is the caller's sum:
- * it fits in ll while $(N-1) \cdot 4 \max|coord| < 2^{63}$.
+ * it fits in ll while (N-1) * 4 max|coord| < 2^63.
  * Time: O(N \log N)
  * Status: Stress-tested
  */

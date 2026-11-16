@@ -7,7 +7,7 @@
  * Works in coordinates relative to one of the points, so the tolerance is
  * relative to the spread of the points, not to their distance from the
  * origin. Duplicate and collinear points are fine; empty input gives radius 0.
- * Points up to $10^{-12} r$ outside the circle are accepted.
+ * Points up to 1e-12 * r outside the circle are accepted.
  * Time: expected O(n)
  * Status: stress-tested
  */

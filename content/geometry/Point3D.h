@@ -6,7 +6,7 @@
  * Description: Class to handle points in 3D space.
  * 	T can be e.g. double, long double, long long or Fraction.
  * 	Integer T: dot, cross and dist2 are evaluated in T (with long long
- * 	keep coordinates of the operands $\le 10^9$) and operator/ truncates.
+ * 	keep coordinates of the operands <= 1e9) and operator/ truncates.
  * 	Lengths, angles, unit, normal and rotate use F = T if T is
  * 	floating, else double (also for Fraction), and never truncate.
  * Usage:

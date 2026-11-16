@@ -2,10 +2,10 @@
  * Author: Benq
  * Description: Minkowski sum of two convex polygons given in CCW order.
  * Either input may also be a single point, a segment (two points) or
- * have collinear/repeated boundary vertices; an empty input gives \{\}.
+ * have collinear/repeated boundary vertices; an empty input gives {}.
  * Returns the strictly convex hull of the sum in CCW order starting
  * from its lexicographically smallest vertex (1 or 2 points if degenerate).
- * P is Point<T>; with T = ll it is exact for $|x|,|y| < 2^{30}$. Output
+ * P is Point<T>; with T = ll it is exact for |x|,|y| < 2^30. Output
  * coordinates are up to twice the input, so halve that bound if the
  * result is fed to another cross product.
  * example: diameter of hull A is max in A+(-A)

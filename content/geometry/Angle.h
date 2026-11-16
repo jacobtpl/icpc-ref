@@ -6,10 +6,10 @@
  * Description: A class for ordering angles (as represented by integer points and
  *  a number of rotations around the origin). Useful for rotational sweeping.
  *  Sometimes also represents points or vectors.
- *  Comparison is exact for all long long coordinates (\_\_int128 products);
- *  $+$, $-$ need the sums to fit. angleDiff needs $|x|,|y| \le 2 \cdot 10^9$ and
- *  returns an unreduced vector with coordinates up to $2 \max(|x|,|y|)^2$, so
- *  differences can be compared but not fed to angleDiff again above $\sim 4 \cdot 10^4$.
+ *  Comparison is exact for all long long coordinates (__int128 products);
+ *  +, - need the sums to fit. angleDiff needs |x|,|y| <= 2e9 and
+ *  returns an unreduced vector with coordinates up to 2 max(|x|,|y|)^2, so
+ *  differences can be compared but not fed to angleDiff again above ~4e4.
  * Usage:
  *  vector<Angle> v = {w[0], w[0].t360() ...}; // sorted
  *  int j = 0; rep(i,0,n) { while (v[j] < v[i].t180()) ++j; }

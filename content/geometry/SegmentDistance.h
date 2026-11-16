@@ -6,7 +6,7 @@
  * Description:\\
 \begin{minipage}{65mm}
 Returns the shortest distance between point p and the line segment from point s to e.
-Works for any Point<T>; with Point<ll> (coordinates up to $10^9$) everything but the final division is exact, which double input cannot give near the segment.
+Works for any Point<T>; with Point<ll> (coordinates up to 1e9) everything but the final division is exact, which double input cannot give near the segment.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-10mm}

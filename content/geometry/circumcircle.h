@@ -13,7 +13,7 @@ ccRadius = radius and ccCenter = center of circle through points A, B, C.
 \end{minipage}
  Collinear points give inf/nan. For Point<double>, differences and products
  are taken in long double with fma on cancellation, so thin triangles with
- integer coordinates up to $10^9$ are accurate. ccCenter on other point types
+ integer coordinates up to 1e9 are accurate. ccCenter on other point types
  (e.g. Point<Fraction>) uses the plain formula relative to A.
  * Status: tested
  */
