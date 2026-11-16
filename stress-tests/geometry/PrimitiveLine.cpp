@@ -198,6 +198,9 @@ void distTest() {
 	assert(abs(lineDist(PE(0, 0), PE(1, 1), PE(1, 0)) + sqrtl(0.5L)) <= eps);
 	assert(abs(segDist(PE(0, 0), PE(1, 1), PE(1, 0)) - sqrtl(0.5L)) <= eps);
 	assert(lineDist(PL(0, 0), PL(2, 0), PL(1, 1)) == 1);
+	assert(segDist(PL(0, 0), PL(2, 0), PL(1, 1)) == 1);
+	assert(segDist(PL(0, 0), PL(2, 0), PL(3, 0)) == 1); // beyond e
+	assert(segDist(PL(0, 0), PL(0, 0), PL(3, 4)) == 5); // s == e
 	assert(lineDist(PL(0, 0), PL(2, 0), PL(1, -1)) == -1);
 
 	{ // reviewed reproducer: relative error was 2.5e-4

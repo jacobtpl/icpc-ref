@@ -136,6 +136,11 @@ void testCenter() {
 		assert(isnan(c.x) && isnan(c.y));
 		DP d = polygonCenter(vector<DP>{DP(0,0), DP(1,1), DP(2,2)});
 		assert(isnan(d.x) && isnan(d.y));
+		// empty input: NaN as well, no UB
+		d = polygonCenter(vector<DP>{});
+		assert(isnan(d.x) && isnan(d.y));
+		c = polygonCenter(vector<IP>{});
+		assert(isnan(c.x) && isnan(c.y));
 	}
 	ll M = (1LL << 30) - 1;
 	rep(it,0,200000) {

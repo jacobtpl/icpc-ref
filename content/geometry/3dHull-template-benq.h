@@ -17,8 +17,6 @@ using vb = vector<bool>;
 mt19937 rng;
 P3 cross(const P3& a, const P3& b, const P3& c) {
 	return (b-a).cross(c-a); }
-P3::PF perp(const P3& a, const P3& b, const P3& c) {
-	return cross(a,b,c).unit(); }
 bool isMult(const P3& a, const P3& b) { // for long longs
 	P3 c = a.cross(b);
 	return (c.x== 0 && c.y==0 && c.z==0);

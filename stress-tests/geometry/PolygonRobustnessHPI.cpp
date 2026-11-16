@@ -229,6 +229,29 @@ double area(const vector<Point<double>>& v) { return polygonArea2(v) / 2; }
 int main() {
 	typedef Point<double> P;
 	// --- review reproducers ---
+	// lattice slivers of area 1/2 with coordinates up to 1e9, as integer-
+	// valued doubles: exact path, vertices returned exactly, reversed -> {}
+	{
+		mt19937_64 lr(89173);
+		vector<ll> sizes = {10, 1000, 100000, 10000000, 1000000000};
+		rep(it,0,500) sizes.push_back(10 + (ll)(lr() % 999999990));
+		for (ll n : sizes) for (int refl : {-1, 1}) {
+			vector<IP> tri = {IP(), IP(n-1, n-2) * refl, IP(n, n-1) * refl};
+			vector<Ray> rays; vector<P> want;
+			rep(i,0,3) {
+				IP p = tri[i], d = tri[(i+1)%3] - tri[i];
+				rays.push_back({P((double)p.x, (double)p.y), P((double)d.x, (double)d.y)});
+				want.emplace_back((double)p.x, (double)p.y);
+			}
+			if (refl < 0) reverse(all(rays)), reverse(all(want));
+			shuffle(all(rays), lr);
+			auto got = halfPlaneIsect(rays);
+			sort(all(got)); sort(all(want));
+			assert(got == want);
+			for (auto& r : rays) r.dp = r.dp * -1;
+			assert(halfPlaneIsect(rays).empty());
+		}
+	}
 	// A3: unit square, direction vectors of any length
 	for (double len : {1.0, 1e-4, 1e-5, 1e-9, 1e-100, 1e100}) {
 		vector<Ray> sq = {{P(0,0),P(len,0)}, {P(1,0),P(0,len)}, {P(1,1),P(-len,0)}, {P(0,1),P(0,-len)}};
