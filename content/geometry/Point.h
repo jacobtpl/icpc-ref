@@ -141,8 +141,8 @@ struct Point {
 	T cross(P a, P b) const { return (a-*this).cross(b-*this); }
 	T dist2() const { return x*x + y*y; }
 	F dist() const { // hypot only if dist2() over/underflows
-		F d = F(dist2());
-		if (!geoFloat<T> || (d > F(1e-290) && d < F(1e290)) ||
+		F d = F(dist2()), big = F(sizeof(F) < 8 ? 1e30 : 1e290);
+		if (!geoFloat<T> || (d > 1 / big && d < big) ||
 			(x == 0 && y == 0)) return gsqrt(d);
 		return ghypot(F(x), F(y));
 	}

@@ -45,8 +45,8 @@ template<class T> struct Point3D {
 	}
 	T dist2() const { return x*x + y*y + z*z; }
 	F dist() const { // hypot only if dist2() over/underflows F
-		F d = F(dist2());
-		if (!geoFloat<T> || (d > F(1e-290) && d < F(1e290)) ||
+		F d = F(dist2()), big = F(sizeof(F) < 8 ? 1e30 : 1e290);
+		if (!geoFloat<T> || (d > 1 / big && d < big) ||
 			(x == 0 && y == 0 && z == 0)) return gsqrt(d);
 		F a = gfabs(F(x)), b = gfabs(F(y)), c = gfabs(F(z)),
 		  m = max(a, max(b, c));
