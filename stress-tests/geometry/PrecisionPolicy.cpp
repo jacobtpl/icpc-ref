@@ -77,6 +77,15 @@ template<class T> void floats(ld u) {
 	assert(err(segDist(P(0, 0), P(2, 0), P(1, 1)), T(1)) == 0);
 	assert(lineInter(P(0, 0), P(2, 2), P(0, 2), P(2, 0)).second == P(1, 1));
 	assert(closest(sq).first == P(0, 0));
+	{ // fractional and duplicate coordinates
+		vector<P> v, dup = {P(0, T(1e16)), P(0, T(1e16))};
+		rep(i,0,300) v.push_back(P(T(i * 37 % 300) / 512, T(i * 91 % 300) / 512));
+		T best = 9;
+		rep(i,0,300) rep(k,0,i) best = min(best, (v[i] - v[k]).dist2());
+		auto c = closest(v);
+		assert((c.first - c.second).dist2() == best);
+		assert(closest(dup).first == dup[0]);
+	}
 	assert(sz(triangulate(sq)) == 6);
 	assert(sz(convexHull(sq)) == 4);
 	assert(KDTree<P>(sq).nearest(P(3, 3)).first == 2);
@@ -112,6 +121,15 @@ template<class T, class F, class W> void ints(T big) {
 	assert(sz(hp) == 4);
 	rep(i,0,4) assert(hp[i].x == F(i == 1 || i == 2 ? 2 : 0));
 	assert((halfPlaneIsect<T, ld>(rs)).size() == 4);
+	{ // the vertex is computed in the requested type, not in F
+		vector<RayT<T>> tr = {{P(0,0),P(3,1)}, {P(3,1),P(-3,6)}, {P(0,7),P(0,-7)}};
+		auto g = halfPlaneIsect<T, ld>(tr);
+		assert(sz(g) == 3 && g[1].y == 1 && g[1].x == 3);
+		vector<RayT<T>> th = {{P(0,0),P(1,0)}, {P(1,0),P(-1,3)}, {P(0,3),P(0,-1)},
+			{P(0,1),P(1,0)}};
+		for (auto p : halfPlaneIsect<T, ld>(th)) if (p.y == 1 && p.x > 0)
+			assert(fabsl(p.x - 2 / 3.0L) < 1e-18L);
+	}
 	assert(closest(s2).first == P(0, 0));
 	assert(sz(triangulate(s2)) == 6);
 	assert(KDTree<P>(s2).nearest(P(3, 3)).first == 2);
@@ -133,6 +151,12 @@ int main() {
 	ints<int, double, ll>(40000);
 	ints<ll, double, __int128>(3000000000LL);
 	ints<__int128, ld, __int128>(3000000000LL);
+
+	// float: lengths whose square is subnormal or overflows
+	assert(fabsf(Point<float>(3e-23f, 0).dist() / 3e-23f - 1) < 1e-6f);
+	assert(fabsf(Point3D<float>(0, 3e-23f, 0).dist() / 3e-23f - 1) < 1e-6f);
+	assert(fabsf(Point<float>(3e30f, 4e30f).dist() / 5e30f - 1) < 1e-6f);
+	assert(fabs(Point<double>(3e-160, 4e-160).dist() / 5e-160 - 1) < 1e-15);
 
 	// geoEps: off by default, then a tolerance for floating sgn only
 	typedef Point<double> P;
