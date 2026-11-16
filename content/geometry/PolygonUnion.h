@@ -5,14 +5,11 @@
  * Source: https://codeforces.com/gym/101673/submission/50481926
  * Description: Calculates the area of the union of $n$ polygons (not necessarily
  * convex). The points within each polygon must be given in CCW order.
- * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
- * T can be any type Point supports; the result is GeoR<T> (see Point.h):
- * double for int and ll, T itself for floating types and Fraction.
- * With integer T all side tests are exact (ll: |x|,|y| < 2^30,
- * __int128: < 2^62, int: < 2^14) and only the ratios and the sum
- * are floating point, so prefer it for integer input (in double the
- * tests are only exact for integers up to about 3e7). With Fraction
- * everything is exact. Side tests use sgn, so geoEps applies. The area is summed relative to a
+ * Returns double for int and ll input, else T. With integer T all side
+ * tests are exact (ll: |x|,|y| < 2^30, int: < 2^14), so prefer it for
+ * integer input (in double the tests are only exact up to about 3e7).
+ * Eps: side tests are cross products through sgn, so geoEps applies;
+ * it shouldn't be needed. The area is summed relative to a
  * polygon vertex, so far-away input does not cancel.
  * Usage:
  *  typedef Point<ll> P;

@@ -8,8 +8,7 @@
  * Duplicate points are merged. Fewer than three distinct points or
  * all points on a line give no triangles; cocircular points give
  * any valid triangulation.
- * Works on any Point<T>; exact for Point<ll> with coordinates of
- * absolute value up to 1e9 (see FastDelaunay.h for other types).
+ * Exact for Point<ll> up to 1e9 (see FastDelaunay.h for other types).
  * Usage:
  *  vector<Point<ll>> pts = ...;
  *  for (auto& t : triHull(pts)) use(t[0], t[1], t[2]);

@@ -4,10 +4,8 @@
  * License: CC0
  * Source: My geometric reasoning
  * Description: Returns the shortest distance on the sphere with radius radius between the points with azimuthal angles (longitude) f1 (phi1) and f2 (phi2) from x axis and zenith angles (latitude) t1 (theta1) and t2 (theta2) from z axis (0 = north pole). All angles measured in radians. The algorithm starts by converting the spherical coordinates to cartesian coordinates so if that is what you have you can use only the two last rows. d and s are the lengths of the difference and the sum of the two unit vectors; the angle between them is 2 atan2(d, s), which stays accurate (and never NaN) for nearby and antipodal points alike.
- * Everything is computed in the type T of the first argument (double,
- * long double or __float128; an integer first argument gives double),
- * which is also the result type. Name it to be explicit:
- * sphericalDistance<long double>(...).
+ * Computed and returned in the type of the first argument (an integer
+ * gives double); or name it: sphericalDistance<long double>(...).
  * Usage:
  *  double pi = acos(-1.0);
  *  // equator, a quarter turn apart, unit sphere: pi/2

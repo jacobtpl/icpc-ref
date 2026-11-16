@@ -7,15 +7,10 @@
  * Each circumcircle contains none of the input points.
  * There must be no duplicate points.
  * If all points are on a line, no triangles will be returned.
- * Works on any Point<T>. The in-circle test 'circ' is evaluated in
- * W = Geo<T>::W (see Point.h) and needs 4th powers of the coordinates:
- * exact for Point<ll> (W = __int128) up to 1e9 and for Point<int>
- * (W = ll) up to 2e4; cocircular points give any valid triangulation.
- * Orientation tests are evaluated in T.
- * Floating T works too, but circ is then not exact (by default it is
- * computed in T itself; a wider W helps).
+ * Exact for Point<ll> up to 1e9 and Point<int> up to 2e4; cocircular
+ * points give any valid triangulation. Floating T works but the
+ * in-circle test is then not exact, and no eps is used.
  * Returns triangles in order {t[0][0], t[0][1], t[0][2], t[1][0], ...}, all counter-clockwise.
- * All edge records are freed when triangulate returns.
  * Usage:
  *  typedef Point<ll> P;
  *  vector<P> pts = ...;                // distinct points

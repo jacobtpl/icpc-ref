@@ -5,13 +5,9 @@
  * Source: http://en.wikipedia.org/wiki/Circumcircle
  * Description: ccRadius = radius and ccCenter = center of the circle
  *  through points A, B, C (picture: circumcircle.pdf).
- *  Collinear points give inf/nan. Works on any floating Point
- *  (double, long double, __float128): differences and products are
- *  taken in W = Geo<T>::W (T itself by default, see Point.h) and the
- *  determinants use geoDet, which stays accurate when the products
- *  cancel, so thin triangles do not lose digits in any type.
- *  ccCenter also accepts Point<Fraction> (exact, plain formula);
- *  ccRadius needs a floating Point.
+ *  Collinear points give inf/nan. Works on any floating Point and
+ *  stays accurate for thin triangles; ccCenter also accepts
+ *  Point<Fraction>. No eps is used.
  * Usage:
  *  typedef Point<double> P;
  *  P o = ccCenter(P(0,0), P(2,0), P(0,2));     // (1,1)

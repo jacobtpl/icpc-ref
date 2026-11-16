@@ -5,15 +5,11 @@
  * Source: https://vlecomte.github.io/cp-geo.pdf
  * Description: Finds the intersection between a circle and a line.
  * Returns a vector of either 0, 1, or 2 intersection points
- * (empty if a = b). P must be a floating point Point; r has its
- * coordinate type. Everything is computed in W = Geo<T>::W (T itself by
- * default, see Point.h), so Point<long double> or Point<__float128>
- * give that precision throughout.
- * The sign of r^2|ab|^2 - s^2, which decides the count, is taken
- * with sgn (exact unless geoEps<W> is set) and is evaluated without
- * cancellation error. It is exact for integer-valued input while
- * r^2, |ab|^2 and s fit the mantissa of W: |x|,|y|,r <= 3e7 in
- * double, <= 1e9 in long double (as W or as T).
+ * (empty if a = b). P is a floating point Point; r has its
+ * coordinate type. The count is exact for integer-valued input up to
+ * 3e7 (double), 1e9 (long double).
+ * Eps: geoEps is compared to r^2|ab|^2 - s^2 with s = (b-a)x(c-a),
+ * a length^4, so scale it by |ab|^2 (or normalise b-a).
  * Usage:
  *  typedef Point<double> P;
  *  vector<P> v = circleLine(P(0,0), 5.0, P(-10,3), P(10,3));

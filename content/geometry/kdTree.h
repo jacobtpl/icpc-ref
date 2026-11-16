@@ -7,8 +7,7 @@
  * destruction and can be copied, moved and assigned freely.
  * KDTree<P> works on any P = Point<T>. Squared distances are
  * evaluated in T: with long long, tree points and queries need
- * |x|, |y| <= 2^30-1 (about 1.07e9), so that
- * dist2 <= 8 * (2^30-1)^2 < 2^63. Duplicate points are fine.
+ * |x|, |y| <= 2^30-1. Duplicate points are fine.
  * nearest on an empty tree returns {-1, P()}.
  * Usage:
  *  typedef Point<ll> P;

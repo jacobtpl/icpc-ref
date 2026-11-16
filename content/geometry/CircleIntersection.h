@@ -4,12 +4,9 @@
  * License: CC0
  * Description: Computes the pair of points at which two circles intersect. Returns false in case of no intersection.
  * Asserts on identical circles. Tangent circles give two equal points.
- * P must be a floating point Point; the radii have its coordinate type.
- * Everything is computed in W = Geo<T>::W (T itself by default, see
- * Point.h). The yes/no answer is decided with sgn (exact unless
- * geoEps<W> is set); it is exact for integer-valued input while squared
- * distances fit the mantissa of W: |x|,|y|,r <= 3e7 in double,
- * <= 1e9 in long double.
+ * P is a floating point Point; the radii have its coordinate type.
+ * Exact yes/no for integer-valued input up to 3e7 (double), 1e9 (long double).
+ * Eps: geoEps is compared to (r1+r2)^2 - d^2 and d^2 - (r1-r2)^2.
  * Usage:
  *  typedef Point<double> P;
  *  pair<P, P> out;

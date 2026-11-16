@@ -5,26 +5,13 @@
    * by a point p and a nonzero direction dp.
    * Returns {} unless the intersection is bounded with positive area
    * (so also when it is empty, a point, a segment or unbounded).
-   * T can be any type Point supports. Products are formed in
-   * W = Geo<T>::W and vertices are returned as Point<GeoR<T>>
-   * (see Point.h); pass F explicitly for another result type, e.g.
-   * halfPlaneIsect<ll, long double>(rays).
-   * Integer T: every decision is exact and only the returned vertices
-   * are rounded; use it for integer input. The largest intermediate is
-   * a product of four coordinate differences: RayT<ll> (W = __int128)
-   * needs |p| <= 1e9, |dp| <= 2e9; RayT<int> (W = ll) needs
-   * |p|,|dp| <= 1e4; RayT<__int128> needs |p|,|dp| <= 1e9.
-   * RayT<Fraction> is exact throughout and returns Fraction vertices.
-   * Floating T: a determinant within eps times the sum of the
-   * magnitudes of its terms counts as zero, i.e. the configuration as
-   * degenerate (parallel rays, or a vertex on a third line). eps is
-   * relative, so it does not depend on the size of the coordinates,
-   * only on the type the products are formed in (W): use about
-   * 500 ulp, i.e. 1e-13 for double, 1e-16 for long double, 1e-31 for
-   * __float128. Features smaller than eps times the distance
-   * between the origins p are lost. The tests are invariant under
-   * translation and under scaling of the input or of any dp.
-   * geoEps is not used here.
+   * Integer T: every decision is exact; only the returned vertices
+   * are rounded. Limits: RayT<ll> |p| <= 1e9, |dp| <= 2e9;
+   * RayT<int> |p|,|dp| <= 1e4. Vertices are Point<double>; for more
+   * use halfPlaneIsect<ll, long double>(rays).
+   * Eps (floating T only; geoEps is not used): the eps argument is
+   * relative, independent of coordinate size. Use ~500 ulp: 1e-13 for
+   * double, 1e-16 for long double, 1e-31 for __float128.
    * add_bounds clips to [0,bound]^2 (not to negative coordinates).
  * Usage:
    * typedef Point<double> P;

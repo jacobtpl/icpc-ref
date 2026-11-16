@@ -7,8 +7,7 @@
  *  far from the origin. signedPolyVolume6 returns six times the volume in the
  *  coordinate type: exact for integers while (number of faces) * 6D^3 fits,
  *  D being the largest coordinate difference. signedPolyVolume returns
- *  GeoR<T> (see Point.h): Geo<T>::F for integer coordinates (double for
- *  int and ll) and otherwise the coordinate type (Fraction is exact).
+ *  double for int and ll coordinates and otherwise the coordinate type.
  * Usage:
  *  vector<Point3D<double>> p = ...;
  *  double vol = signedPolyVolume(p, hull3d(p));

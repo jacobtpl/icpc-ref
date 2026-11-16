@@ -8,9 +8,8 @@
  * Computes $UV/D$, where $U=(c-a)\times(b-a)$,
  * $V=(c-a)\times(d-c)$ and $D=(b-a)\times(d-c)$.
  * Integer intermediates are exact; the result is approximate.
- * The result type defaults to Geo<I>::F (see Point.h; double for
- * int and long long); choose another with lineInterArea2<T>.
- * Use T = long double or __float128 when later area sums may cancel.
+ * The result is double for int and long long; choose another with
+ * lineInterArea2<T>, e.g. when later area sums may cancel.
  * Usage: auto area2 = lineInterArea2<__float128>(a,b,c,d);
  * Time: O(1)
  * Status: stress-tested against an independent rational oracle

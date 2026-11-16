@@ -4,10 +4,8 @@
  * License: CC0
  * Source: https://codeforces.com/blog/entry/58747
  * Description: Finds the closest pair of points (at least 2 points).
- * Works on any Point<T>. Squared distances are evaluated in T, so
- * 2 * (coordinate range)^2 must fit: |x|,|y| <= 1e9 for long long,
- * <= 1.6e4 for int. The strip width uses a square root in Geo<T>::F
- * (see Point.h), rounded up, so integer input stays exact.
+ * Works on any Point<T>. Squared distances are evaluated in T:
+ * |x|,|y| <= 1e9 for long long, <= 1.6e4 for int. No eps is used.
  * Usage:
  *  typedef Point<ll> P;
  *  vector<P> v = {P(0,0), P(5,5), P(1,1), P(9,0)};

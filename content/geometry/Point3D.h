@@ -5,12 +5,9 @@
  * Source:
  * Description: Class to handle points in 3D space.
  * 	T can be double, long double, __float128, int, long long, __int128
- * 	or Fraction. dot, cross and dist2 are evaluated in T (with long long
- * 	keep coordinates of the operands <= 1e9) and operator/ truncates
- * 	for integers. Lengths, angles, unit, normal and rotate use
- * 	F = Geo<T>::F from Point.h (T if floating, double for int, long long
- * 	and Fraction, long double for __int128) and never truncate.
- * 	To change precision change T; to change F edit Geo in Point.h.
+ * 	or Fraction; see Point.h. dot, cross and dist2 are evaluated in T
+ * 	(long long: keep coordinates <= 1e9). Lengths, angles, unit,
+ * 	normal and rotate return a floating type and never truncate.
  * Usage:
  * 	typedef Point3D<double> P3;
  * 	P3 a(1, 0, 0), b(0, 1, 0);

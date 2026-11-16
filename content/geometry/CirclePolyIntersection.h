@@ -7,9 +7,8 @@
  * ccw polygon. Chords are built from the foot of the perpendicular from
  * the centre to each edge line, so small circles far from the vertices
  * are fine (e.g. r=1, coordinates 1e9).
- * P must be a floating point Point; r and the result have its
- * coordinate type. Everything (also the angles) is computed in
- * W = Geo<T>::W, which is T itself by default (see Point.h).
+ * P is a floating point Point; r and the result have its coordinate
+ * type. No eps is used.
  * Usage:
  *  typedef Point<double> P;
  *  vector<P> sq = {P(0,0), P(2,0), P(2,2), P(0,2)};

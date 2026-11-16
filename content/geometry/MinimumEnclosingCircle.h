@@ -8,17 +8,12 @@
  * Works in coordinates relative to one of the points, so the tolerance is
  * relative to the spread of the points, not to their distance from the
  * origin. Duplicate and collinear points are fine; empty input gives radius 0.
- * Points up to eps * r outside the circle are accepted. eps is
- * relative (it does not depend on the size of the coordinates) and
- * only has to cover rounding in the circle through 3 points:
- * 1e-12 suits double, 1e-15 long double, 1e-28 __float128. Too small
- * costs time (extra rebuilds), not correctness; too large returns a
- * circle up to that much too small.
+ * Eps (geoEps is not used): points up to eps * r outside the circle
+ * are accepted. It is relative: 1e-12 for double, 1e-15 for
+ * long double, 1e-28 for __float128.
  * Usage:
  *  typedef Point<double> P;
- *  vector<P> v = {P(0,0), P(2,0), P(1,1)};
- *  auto [o, r] = mec(v);                  // o = (1,0), r = 1
- *  auto res = mec(vector<Point<long double>>{...}, 1e-15L);
+ *  auto [o, r] = mec(v);        // or mec(v, eps)
  * Time: expected O(n)
  * Status: stress-tested
  */

@@ -6,11 +6,9 @@
  * Description: A class for ordering angles (as represented by integer points and
  *  a number of rotations around the origin). Useful for rotational sweeping.
  *  Sometimes also represents points or vectors.
- *  AngleT<T> has coordinates of integer type T (int, long long,
- *  __int128); Angle is AngleT<long long>. Comparison forms its
- *  products in W = Geo<T>::W (see Point.h), so it is exact for all
- *  int and long long coordinates (for __int128 keep them below 2^63).
- *  +, - need the sums to fit. angleDiff (in T) needs |x|,|y| <= 2e9 for long long and
+ *  AngleT<T> takes int, long long or __int128; Angle is AngleT<ll>.
+ *  Comparison is exact for all int and long long coordinates.
+ *  +, - need the sums to fit. angleDiff needs |x|,|y| <= 2e9 for ll and
  *  returns an unreduced vector with coordinates up to 2 max(|x|,|y|)^2, so
  *  differences can be compared but not fed to angleDiff again above ~4e4.
  * Usage:

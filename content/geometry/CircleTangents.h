@@ -8,18 +8,14 @@
  * 1 if the circles are tangent to each other (in which case .first = .second and the tangent line is perpendicular to the line between the centers).
  * .first and .second give the tangency points at circle 1 and 2 respectively.
  * To find the tangents of a circle with a point set r2 to 0.
- * P must be a floating point Point; the radii have its coordinate type.
- * Everything is computed in W = Geo<T>::W (T itself by default, see
- * Point.h). The count is decided with sgn (exact unless geoEps<W> is
- * set); it is exact for integer-valued input while squared distances
- * fit the mantissa of W: |x|,|y|,r <= 3e7 in double, <= 1e9 in
- * long double.
+ * P is a floating point Point; the radii have its coordinate type.
+ * The count is exact for integer-valued input up to 3e7 (double),
+ * 1e9 (long double).
+ * Eps: geoEps is compared to d^2 - (r1-r2)^2 (tangent circles).
  * Usage:
  *  typedef Point<double> P;
  *  auto t = tangents(P(0,0), 1.0, P(4,0), 1.0);   // 2 external
  *  auto in = tangents(P(0,0), 1.0, P(4,0), -1.0); // 2 internal
- *  auto pt = tangents(P(0,0), 1.0, P(4,0), 0.0);  // from a point
- *  // t[i].first is on circle 1, t[i].second on circle 2
  * Status: tested
  */
 #pragma once

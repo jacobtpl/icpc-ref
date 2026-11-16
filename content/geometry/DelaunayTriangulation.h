@@ -7,11 +7,8 @@
  *  Calls trifun(i,j,k) with the indices of every triangle, counter-clockwise.
  *  If any three points are collinear or any four are on the same circle, behavior is undefined
  *  (use FastDelaunay for such input).
- *  Coordinates are centred and lifted in W = Geo<T>::W (see Point.h).
- *  Integer T is exact while 4th powers of the coordinate range fit in W:
- *  Point<ll> (W = __int128) is valid for absolute values up to 1e9,
- *  Point<int> (W = ll) up to 1e4.
- *  Floating T is not exact; by default it is lifted in T itself.
+ *  Exact for Point<ll> up to 1e9 and Point<int> up to 1e4.
+ *  Floating T is not exact and no eps is used.
  * Usage:
  *  vector<Point<ll>> ps = ...;
  *  delaunay(ps, [&](int i, int j, int k) { tris.push_back({i,j,k}); });

@@ -6,11 +6,8 @@
  * Description: Returns a vector with the vertices of a polygon with
  *  everything to the left of the line going from s to e cut away
  *  (picture: PolygonCut.pdf).
- *  T can be any type Point supports. Side tests are evaluated in T
- *  (exact for integers and Fraction; watch for overflow) and compared
- *  exactly. The result is vector<Point<GeoR<T>>> (see Point.h):
- *  Point<double> for int and ll input, so new vertices are never
- *  truncated; Point<T> for floating T and Fraction.
+ *  Returns Point<double> for int and ll input, else Point<T>.
+ *  Side tests are exact in T (watch for overflow); no eps is used.
  * Usage:
  * 	typedef Point<double> P;
  * 	vector<P> p = ...;

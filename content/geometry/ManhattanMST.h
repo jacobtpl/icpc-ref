@@ -7,12 +7,9 @@
  * to contain a minimum spanning tree for the graph with edge weights w(p, q) =
  * |p.x - q.x| + |p.y - q.y|. Edges are in the form (distance, src, dst). Use a
  * standard MST algorithm on the result to find the final MST.
- * Takes any Point<T>. All arithmetic and the returned weights use D,
- * which defaults to T but at least long long (int -> ll, ll -> ll,
- * __int128 -> __int128, double -> double, ...); override it with
- * manhattanMST<T, D>(pts). Vertex indices are stored as D too.
- * Weights are at most 4 max|coord|: exact for any int input, and for
- * ll input with |x|, |y| <= 2e18. The MST total is the caller's sum.
+ * Takes any Point<T>. Weights are T, but at least long long; they are
+ * at most 4 max|coord|: exact for any int input, and for ll input
+ * with |x|, |y| <= 2e18. The MST total is the caller's sum.
  * Usage:
  *  vector<Point<int>> pts = ...;
  *  for (auto [w, i, j] : manhattanMST(pts)) ...; // w, i, j are ll
