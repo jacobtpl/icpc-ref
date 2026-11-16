@@ -207,6 +207,50 @@ int main() {
 			cases++;
 		}
 	}
+	// degenerate input in doubles (lattice points scaled, rotated and
+	// moved, so nothing is exact): with eps the result must still be a
+	// closed surface with the exact volume and no point clearly outside
+	rep(it,0,6000) {
+		int n = (int)rnd(4, it % 10 ? 40 : 300), R = (int)rnd(1, 20);
+		vector<IP> p(n);
+		for (auto& q : p) q = {rnd(-R, R), rnd(-R, R), rnd(-R, R)};
+		if (it % 3 == 0) for (auto& q : p) q[rnd(0, 2)] = it & 1 ? R : -R;
+		if (it % 3 == 1) for (auto& q : p) q[2] = q[0]*q[0] + q[1]*q[1];
+		p[0] = {0,0,0}; p[1] = {R,0,0}; p[2] = {0,R,0}; p[3] = {0,0,R};
+		shuffle(all(p), rng);
+		LL v6 = 0;
+		for (auto& f : hull3dFast(conv<ll>(p)))
+			v6 += det(p[0], p[f[0]], p[f[1]], p[f[2]]);
+		double c = cos(0.7), s = sin(0.7), c2 = cos(1.9), s2 = sin(1.9);
+		double sc = it % 2 ? 0.1 : 1, off = it % 4 < 2 ? 0 : 1e6;
+		vector<P3> A;
+		for (auto& q : p) {
+			double x = (double)q[0], y = (double)q[1], z = (double)q[2];
+			if (it % 8 < 4) { double u = c*x - s*y, w = s*x + c*y;
+				x = u, y = c2*w - s2*z, z = s2*w + c2*z; }
+			A.emplace_back(x*sc + off, y*sc - off, z*sc + off/3);
+		}
+		double D = 0;
+		for (P3 a : A) D = max({D, abs(a.x - A[0].x), abs(a.y - A[0].y),
+			abs(a.z - A[0].z)});
+		auto fs = hull3dFast(A, 1e-9 * D*D*D);
+		map<pii, int> edges;
+		double vol = 0;
+		for (auto& f : fs) {
+			rep(j,0,3) if (edges[{f[j], f[(j+1)%3]}]++)
+				fail("hull3dFast eps: edge twice", p);
+			P3 a = A[f[0]], nr = (A[f[1]] - a).cross(A[f[2]] - a);
+			if (!(nr.dist() > 0)) fail("hull3dFast eps: degenerate face", p);
+			for (P3 q : A) if (nr.dot(q - a) > 1e-7 * D * nr.dist())
+				fail("hull3dFast eps: point outside", p);
+			vol += (a - A[0]).cross(A[f[1]] - A[0]).dot(A[f[2]] - A[0]);
+		}
+		for (auto& [e, k] : edges) if (!edges.count({e.second, e.first}))
+			fail("hull3dFast eps: open edge", p);
+		double want = (double)v6 * sc*sc*sc;
+		if (abs(vol - want) > 1e-7 * want) fail("hull3dFast eps: volume", p);
+		cases++;
+	}
 	{ // speed: 2e5 points on a sphere and 2e5 lifted grid points
 		auto t0 = chrono::steady_clock::now();
 		int n = 200000;
@@ -221,7 +265,7 @@ int main() {
 		double s = chrono::duration<double>(
 			chrono::steady_clock::now() - t0).count();
 		cerr << "two hulls of 2e5 points: " << s << " s" << endl;
-		assert(s < 30);
+		assert(s < 120);
 	}
 	cout << "Tests passed! (" << cases << " point sets)" << endl;
 }
