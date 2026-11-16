@@ -27,6 +27,15 @@ def ulp(v):
     return F(2) ** max(e - 112, -16494)
 
 
+def bits_of(v):
+    """Bits of the binary128 value nearest to a positive rational v."""
+    e = v.numerator.bit_length() - v.denominator.bit_length()
+    if F(2) ** e > v: e -= 1
+    m = round(v / F(2) ** (e - 112))
+    if m >> 113: m >>= 1; e += 1
+    return e + 16383 << 112 | m - (1 << 112)
+
+
 def dec(v, digits):
     """Decimal string of rational v with the given number of significant digits."""
     s, v = ('-' if v < 0 else ''), abs(v)
@@ -68,6 +77,13 @@ def main():
             if abs(v) < 10 ** 60:
                 p = rng.choice([0, 1, 6, 9, 15, 20, 30, 36, 45, 60, 80])
                 lines.append(f'w {bits >> 64} {bits & (1 << 64) - 1} {p}'); checks.append(('w', v, p))
+        for k in range(-50, 50):  # powers of ten and their neighbours
+            for d in (-1, 0, 1):
+                for sign in (0, 1):
+                    bits = bits_of(F(10) ** k) + d | sign << 127
+                    for p in (0, 3, max(0, -k), max(0, -k) + 1, max(0, -k) + 20, 45):
+                        lines.append(f'w {bits >> 64} {bits & (1 << 64) - 1} {p}')
+                        checks.append(('w', value(bits), p))
         for bits, want in [(0x7fff << 112, 'inf'), (0xffff << 112, '-inf'), (0x7fff8 << 108, 'nan')]:
             lines.append(f'w {bits >> 64} {bits & (1 << 64) - 1} 3'); checks.append((want,))
         out = subprocess.run([str(exe)], input='\n'.join(lines) + '\n', text=True,

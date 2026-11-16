@@ -99,8 +99,9 @@ ostream& operator<<(ostream& o, f128 x) {
 	string d;
 	size_t n = 0, z = 0; // digits before the point, zeros right after it
 	for (; x >= f128(1e37) && n < 5000; x /= f128(1e10)) p += 10, n += 10;
-	for (; x > 0 && x < f128(1e-10) && p >= 10; x *= f128(1e10)) p -= 10, z += 10;
-	for (; x > 0 && x < f128(.1) && p > 0; x *= 10) p--, z++;
+	// scale small x up, staying below 1 so the shifted digits follow the zeros
+	for (; x > 0 && x < f128(1e-11) && p >= 10; x *= f128(1e10)) p -= 10, z += 10;
+	for (; x > 0 && x < f128(.09) && p > 0; x *= 10) p--, z++;
 	u128 ip = u128(x), one = u128(1) << 124;
 	u128 f = u128((x - f128(ip)) * f128(one));
 	d = u128str(ip), n += d.size(), d += string(z, '0');
