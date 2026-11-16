@@ -53,7 +53,8 @@ vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
 	type_identity_t<T> bound = 1000000000) {
 	typedef Point<T> P; typedef RayT<T> R;
 	const bool I = !geoFloat<T>; // exact arithmetic
-	typedef typename Geo<T>::W W; typedef GeoC<T> C;
+	typedef typename Geo<T>::W W;
+	typedef conditional_t<geoInt<T>, F, W> C; // vertex arithmetic
 	W E = 0;
 	if constexpr (!I) E = W(eps);
 	if (add_bounds) { // bound input by rectangle [0,D] x [0,D]
