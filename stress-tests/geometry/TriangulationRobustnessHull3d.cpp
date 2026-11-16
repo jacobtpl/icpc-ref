@@ -6,6 +6,8 @@
 #include "../../content/geometry/Point3D.h"
 #include "../../content/geometry/3dHull.h"
 #include "../../content/geometry/PolyhedronVolume.h"
+typedef Point3D<double> P3;
+typedef Face<P3> F;
 
 typedef __int128 LL;
 typedef array<LL,3> IP;

@@ -1,6 +1,7 @@
 #include "../utilities/template.h"
 
 #include "../../content/geometry/CirclePolyIntersection.h"
+typedef Point<double> P;
 #include "../utilities/genPolygon.h"
 
 namespace orig{

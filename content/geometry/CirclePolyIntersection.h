@@ -7,34 +7,44 @@
  * ccw polygon. Chords are built from the foot of the perpendicular from
  * the centre to each edge line, so small circles far from the vertices
  * are fine (e.g. r=1, coordinates 1e9).
+ * P must be a floating point Point; r and the result have its
+ * coordinate type. Everything (also the angles) is computed in
+ * W = Geo<T>::W, which is T itself by default (see Point.h).
+ * Usage:
+ *  typedef Point<double> P;
+ *  vector<P> sq = {P(0,0), P(2,0), P(2,2), P(0,2)};
+ *  double a = circlePoly(P(0,0), 1.0, sq); // quarter disc: pi/4
  * Time: O(n)
  * Status: Tested on GNYR 2019 Gerrymandering, stress-tested
  */
 #pragma once
 
-#include "../../content/geometry/Point.h"
+#include "Point.h"
 
-typedef Point<double> P;
-double circlePoly(P c, double r, vector<P> ps) {
-	typedef long double ld;
-	auto ang = [](P p, P q) {
-		return atan2(p.cross(q), p.dot(q)); };
-	auto tri = [&](P p, P q) {
-		auto r2 = r * r / 2;
-		P d = q - p, u = p, v = q;
-		ld d2 = (ld)d.x*d.x + (ld)d.y*d.y,
-		   cr = (ld)p.x*d.y - (ld)p.y*d.x, h = fabsl(cr) / sqrtl(d2),
-		   det = (r - h) * (r + h) / d2; // nan if p == q
+template<class P>
+auto circlePoly(P c, decltype(P().x) r, const vector<P>& ps) {
+	typedef decltype(c.x) T; typedef typename Geo<T>::W W;
+	typedef Point<W> Q;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	W R = r, r2 = R * R / 2;
+	auto ang = [](Q p, Q q) {
+		return gatan2(p.cross(q), p.dot(q)); };
+	auto tri = [&](Q p, Q q) {
+		Q d = q - p, u = p, v = q;
+		W d2 = d.dist2(), cr = p.cross(d), h = gfabs(cr) / gsqrt(d2),
+		  det = (R - h) * (R + h) / d2; // nan if p == q
 		if (!(det > 0)) return ang(p, q) * r2;
-		ld a = ((ld)d.x*p.x + (ld)d.y*p.y) / d2, e = sqrtl(det),
-		   s = -a - e, t = -a + e, k = -cr / d2;
+		W a = d.dot(p) / d2, e = gsqrt(det),
+		  s = -a - e, t = -a + e, k = -cr / d2;
 		if (t < 0 || 1 <= s) return ang(p, q) * r2;
 		// crossings = foot of the perpendicular d.perp()*k -+ d*e
-		if (s > 0) u = P(double(-d.y*k-d.x*e), double(d.x*k-d.y*e));
-		if (t < 1) v = P(double(-d.y*k+d.x*e), double(d.x*k+d.y*e));
+		if (s > 0) u = Q(-d.y*k - d.x*e, d.x*k - d.y*e);
+		if (t < 1) v = Q(-d.y*k + d.x*e, d.x*k + d.y*e);
 		return ang(p,u) * r2 + u.cross(v)/2 + ang(v,q) * r2;
 	};
-	auto sum = 0.0;
+	auto rel = [&](P p) { // p - c, formed in W
+		return Q(W(p.x) - W(c.x), W(p.y) - W(c.y)); };
+	W sum = 0;
 	rep(i,0,sz(ps))
-		sum += tri(ps[i] - c, ps[(i + 1) % sz(ps)] - c);
-	return sum; }
+		sum += tri(rel(ps[i]), rel(ps[(i + 1) % sz(ps)]));
+	return T(sum); }

@@ -1,6 +1,7 @@
 #include "../utilities/template.h"
 
 #include "../../content/geometry/ClosestPair.h"
+typedef Point<ll> P;
 
 namespace old {
 template<class It>

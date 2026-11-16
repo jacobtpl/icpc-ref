@@ -1,6 +1,9 @@
 #include "../utilities/template.h"
 
 #include "../../content/geometry/Point.h"
+// This file tests the documented opt-in of Point.h: double input with
+// products formed in long double.
+template<> struct Geo<double> { typedef double F; typedef long double W; };
 #include "../../content/geometry/PolygonArea.h"
 #include "../../content/geometry/HalfPlaneIntersection.h"
 
@@ -145,7 +148,7 @@ ll cntPoly = 0, cntEmpty = 0, cntSliver = 0;
 void checkSmall(const vector<IR>& rs) {
 	auto want = toLd(brute(rs));
 	(sz(want) ? cntPoly : cntEmpty)++;
-	auto gi = halfPlaneIsect(rs);
+	auto gi = halfPlaneIsect<ll, ld>(rs);
 	auto gd = halfPlaneIsect(toDouble(rs));
 	if (!finite(gi) || !finite(gd) || !same(gi, want, 1e-12L) || !same(gd, want, 1e-9L)) {
 		cerr << "small case mismatch: want " << sz(want) << " got " << sz(gi) << " / " << sz(gd) << endl;
@@ -217,7 +220,7 @@ void sliver() {
 	for (IP p : tri) want.push_back(Point<ld>((ld)p.x, (ld)p.y));
 	rep(it,0,3) {
 		shuffle(all(ccw), rng); shuffle(all(cw), rng);
-		auto g = halfPlaneIsect(ccw);
+		auto g = halfPlaneIsect<ll, ld>(ccw);
 		assert(same(g, want, 1e-6L));
 		assert(fabsl(polygonArea2(g) - 1) < 1e-6L);
 		assert(halfPlaneIsect(cw).empty());

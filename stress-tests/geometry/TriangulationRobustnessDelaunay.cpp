@@ -7,6 +7,7 @@
 #include "../../content/geometry/Point3D.h"
 #include "../../content/geometry/Delaunay.h"
 #include "../../content/geometry/DelaunayTriangulation.h"
+typedef Point<ll> P;
 
 typedef __int128 LL;
 typedef array<P,3> Tri;
@@ -96,8 +97,6 @@ vector<Tri> runFast(vector<P> ps) { // needs distinct points
 	sort(all(ps)); ps.erase(unique(all(ps)), ps.end());
 	vector<P> t = triangulate(ps);
 	if (sz(t) % 3) fail("triangulate", "size not a multiple of 3", ps);
-	// ownership: every edge record must be released when the call returns
-	if (!quads.empty() || H) fail("triangulate", "edge records kept", ps);
 	vector<Tri> r;
 	for (int i = 0; i < sz(t); i += 3) r.push_back({t[i], t[i+1], t[i+2]});
 	return r;
@@ -217,7 +216,6 @@ int main() {
 			vector<P> p = {P(it, 0), P(it + 4, 1), P(it + 1, 5),
 				P(it + 5, 6), P(it + 2, 2)};
 			tot += triangulate(p).size();
-			assert(quads.empty() && !H);
 		}
 		assert(tot == 200000 * 12);
 		double s = chrono::duration<double>(

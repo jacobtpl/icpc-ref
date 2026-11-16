@@ -6,13 +6,20 @@
  * Description: Calculates the area of the union of $n$ polygons (not necessarily
  * convex). The points within each polygon must be given in CCW order.
  * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
- * T can be double, ll or Fraction. With ll all side tests are exact for
- * |x|,|y| < 2^30 and only the ratios and the sum are floating point,
- * so prefer it for integer input (in double the tests are only exact
- * for integers up to about 3e7). With Fraction everything is exact
- * and a Fraction is returned. The area is summed relative to a
+ * T can be any type Point supports; the result is GeoR<T> (see Point.h):
+ * double for int and ll, T itself for floating types and Fraction.
+ * With integer T all side tests are exact (ll: |x|,|y| < 2^30,
+ * __int128: < 2^62, int: < 2^14) and only the ratios and the sum
+ * are floating point, so prefer it for integer input (in double the
+ * tests are only exact for integers up to about 3e7). With Fraction
+ * everything is exact. Side tests use sgn, so geoEps applies. The area is summed relative to a
  * polygon vertex, so far-away input does not cancel.
- * Time: $O(N^2)$, where $N$ is the total number of points
+ * Usage:
+ *  typedef Point<ll> P;
+ *  vector<vector<P>> polys = {{P(0,0),P(2,0),P(2,2),P(0,2)},
+ *                             {P(1,1),P(3,1),P(3,3),P(1,3)}};
+ *  double area = polyUnion(polys); // 7
+ * Time: O(N^2), where N is the total number of points
  * Status: stress-tested, Submitted on ECNA 2017 Problem A
  */
 #pragma once
@@ -20,9 +27,7 @@
 #include "Point.h"
 #include "sideOf.h"
 
-typedef Point<double> P;
-template<class P> using PolyUnionT = conditional_t<
-	is_integral<decltype(P().x)>::value, double, decltype(P().x)>;
+template<class P> using PolyUnionT = GeoR<decltype(P().x)>;
 template<class P> PolyUnionT<P> rat(P a, P b) {
 	typedef PolyUnionT<P> R;
 	return sgn(b.x) ? R(a.x) / R(b.x) : R(a.y) / R(b.y);

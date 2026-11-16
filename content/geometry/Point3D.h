@@ -4,20 +4,29 @@
  * License: CC0
  * Source:
  * Description: Class to handle points in 3D space.
- * 	T can be e.g. double, long double, long long or Fraction.
- * 	Integer T: dot, cross and dist2 are evaluated in T (with long long
- * 	keep coordinates of the operands <= 1e9) and operator/ truncates.
- * 	Lengths, angles, unit, normal and rotate use F = T if T is
- * 	floating, else double (also for Fraction), and never truncate.
+ * 	T can be double, long double, __float128, int, long long, __int128
+ * 	or Fraction. dot, cross and dist2 are evaluated in T (with long long
+ * 	keep coordinates of the operands <= 1e9) and operator/ truncates
+ * 	for integers. Lengths, angles, unit, normal and rotate use
+ * 	F = Geo<T>::F from Point.h (T if floating, double for int, long long
+ * 	and Fraction, long double for __int128) and never truncate.
+ * 	To change precision change T; to change F edit Geo in Point.h.
  * Usage:
+ * 	typedef Point3D<double> P3;
+ * 	P3 a(1, 0, 0), b(0, 1, 0);
+ * 	P3 n = a.cross(b);            // (0,0,1)
+ * 	double len = (a - b).dist();  // sqrt(2)
+ * 	auto r = a.rotate(acos(-1) / 2, n); // (0,1,0), type Point3D<F>
  * Status: tested, except for phi and theta
  */
 #pragma once
 
+#include "Point.h"
+
 template<class T> struct Point3D {
 	typedef Point3D P;
 	typedef const P& R;
-	typedef conditional_t<is_floating_point_v<T>,T,double> F;
+	typedef typename Geo<T>::F F;
 	typedef Point3D<F> PF;
 	T x, y, z;
 	explicit Point3D(T x=0, T y=0, T z=0) : x(x), y(y), z(z) {}
@@ -36,22 +45,25 @@ template<class T> struct Point3D {
 	}
 	T dist2() const { return x*x + y*y + z*z; }
 	F dist() const { // hypot only if dist2() over/underflows F
-		F d = F(dist2()), e = numeric_limits<F>::epsilon();
-		if (!is_floating_point_v<T> || isnormal(d*e) ||
-			(x == 0 && y == 0 && z == 0)) return sqrt(d);
-		return hypot(F(x), F(y), F(z));
+		F d = F(dist2());
+		if (!geoFloat<T> || (d > F(1e-290) && d < F(1e290)) ||
+			(x == 0 && y == 0 && z == 0)) return gsqrt(d);
+		F a = gfabs(F(x)), b = gfabs(F(y)), c = gfabs(F(z)),
+		  m = max(a, max(b, c));
+		a /= m, b /= m, c /= m;
+		return m * gsqrt(a*a + b*b + c*c);
 	}
 	//Azimuthal angle (longitude) to x-axis in interval [-pi, pi]
-	F phi() const { return atan2(F(y), F(x)); }
+	F phi() const { return gatan2(F(y), F(x)); }
 	//Zenith angle (latitude) to the z-axis in interval [0, pi]
-	F theta() const { return atan2(hypot(F(x), F(y)), F(z)); }
+	F theta() const { return gatan2(ghypot(F(x), F(y)), F(z)); }
 	PF unit() const { //makes dist()=1
 		F d = dist(); return PF(F(x)/d, F(y)/d, F(z)/d); }
 	//returns unit vector normal to *this and p
 	PF normal(P p) const { return cross(p).unit(); }
 	//returns point rotated 'angle' radians ccw around axis
 	PF rotate(F angle, P axis) const {
-		F s = sin(angle), c = cos(angle);
+		F s = gsin(angle), c = gcos(angle);
 		PF u = axis.unit(), v = PF(F(x), F(y), F(z));
 		return u*v.dot(u)*(1-c) + v*c - v.cross(u)*s;
 	}

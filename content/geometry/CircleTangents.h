@@ -8,8 +8,18 @@
  * 1 if the circles are tangent to each other (in which case .first = .second and the tangent line is perpendicular to the line between the centers).
  * .first and .second give the tangency points at circle 1 and 2 respectively.
  * To find the tangents of a circle with a point set r2 to 0.
- * P must be a floating point Point. No epsilon is used; the count is exact for
- * integer-valued input with |x|,|y|,r <= 1e9 (x86 long double).
+ * P must be a floating point Point; the radii have its coordinate type.
+ * Everything is computed in W = Geo<T>::W (T itself by default, see
+ * Point.h). The count is decided with sgn (exact unless geoEps<W> is
+ * set); it is exact for integer-valued input while squared distances
+ * fit the mantissa of W: |x|,|y|,r <= 3e7 in double, <= 1e9 in
+ * long double.
+ * Usage:
+ *  typedef Point<double> P;
+ *  auto t = tangents(P(0,0), 1.0, P(4,0), 1.0);   // 2 external
+ *  auto in = tangents(P(0,0), 1.0, P(4,0), -1.0); // 2 internal
+ *  auto pt = tangents(P(0,0), 1.0, P(4,0), 0.0);  // from a point
+ *  // t[i].first is on circle 1, t[i].second on circle 2
  * Status: tested
  */
 #pragma once
@@ -17,18 +27,19 @@
 #include "Point.h"
 
 template<class P>
-vector<pair<P, P>> tangents(P c1, double r1, P c2, double r2) {
-	typedef long double ld; typedef decltype(c1.x) T;
-	static_assert(is_floating_point<T>::value, "use doubles");
-	ld x = (ld)c2.x - c1.x, y = (ld)c2.y - c1.y, dr = (ld)r1 - r2,
-	   d2 = x*x + y*y, h2 = d2 - dr*dr;
-	if (d2 == 0 || h2 < 0)  return {};
-	ld h = sqrtl(h2);
+vector<pair<P, P>> tangents(P c1, decltype(P().x) r1,
+		P c2, decltype(P().x) r2) {
+	typedef decltype(c1.x) T; typedef typename Geo<T>::W W;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	W x = W(c2.x) - W(c1.x), y = W(c2.y) - W(c1.y), R1 = r1, R2 = r2,
+	  dr = R1 - R2, d2 = x*x + y*y, h2 = d2 - dr*dr;
+	if (d2 == 0 || sgn(h2) < 0) return {};
+	W h = h2 > 0 ? gsqrt(h2) : W(0);
 	vector<pair<P, P>> out;
-	for (ld sign : {-1, 1}) {
-		ld vx = (x*dr - y*h*sign)/d2, vy = (y*dr + x*h*sign)/d2;
-		out.push_back({P(T(c1.x + vx*r1), T(c1.y + vy*r1)),
-		               P(T(c2.x + vx*r2), T(c2.y + vy*r2))});
+	for (int sign : {-1, 1}) {
+		W vx = (x*dr - y*h*W(sign))/d2, vy = (y*dr + x*h*W(sign))/d2;
+		out.push_back({P(T(c1.x + vx*R1), T(c1.y + vy*R1)),
+		               P(T(c2.x + vx*R2), T(c2.y + vy*R2))});
 	}
-	if (h2 == 0) out.pop_back();
+	if (sgn(h2) == 0) out.pop_back();
 	return out; }

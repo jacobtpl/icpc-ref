@@ -6,11 +6,16 @@
 
 #include "../../content/geometry/Point.h"
 #include "../../content/geometry/kdTree.h"
+typedef long long T;
+typedef Point<T> P;
+typedef KDTree<P> Tree;
+typedef Tree::Node Node;
+const T INF = -1; // returned by nearest() on an empty tree
 
-static_assert(is_copy_constructible<KDTree>::value && is_copy_assignable<KDTree>::value);
-static_assert(is_nothrow_move_constructible<KDTree>::value &&
-	is_nothrow_move_assignable<KDTree>::value);
-static_assert(is_default_constructible<KDTree>::value);
+static_assert(is_copy_constructible<Tree>::value && is_copy_assignable<Tree>::value);
+static_assert(is_nothrow_move_constructible<Tree>::value &&
+	is_nothrow_move_assignable<Tree>::value);
+static_assert(is_default_constructible<Tree>::value);
 
 typedef __int128 lll;
 mt19937_64 rng(20261012);
@@ -22,7 +27,7 @@ lll d2(P a, P b) {
 	return dx * dx + dy * dy;
 }
 
-void checkQuery(const KDTree& tree, const vector<P>& ps, P q) {
+void checkQuery(const Tree& tree, const vector<P>& ps, P q) {
 	pair<T, P> r = tree.nearest(q);
 	if (ps.empty()) {
 		assert(r.first == INF && r.second == P());
@@ -64,29 +69,29 @@ P genQuery(const vector<P>& ps, ll lo, ll hi) {
 int main() {
 	{ // the review reproducer (leaked 960 bytes in 15 allocations)
 		for (int i = 0; i < 3; ++i) {
-			KDTree tree({P(0,0), P(2,2), P(4,0)});
+			Tree tree({P(0,0), P(2,2), P(4,0)});
 			assert(tree.nearest(P(0,0)).first == 0);
 			assert(tree.nearest(P(3,3)) == make_pair(2LL, P(2,2)));
 		}
 	}
 	{ // maximal squared distance in the documented range: 8 * (2^30-1)^2
-		KDTree tree({P(-LIM, -LIM)});
+		Tree tree({P(-LIM, -LIM)});
 		auto r = tree.nearest(P(LIM, LIM));
 		assert(r.first == 8 * LIM * LIM && r.second == P(-LIM, -LIM));
-		KDTree two({P(-LIM, -LIM), P(-LIM, LIM)});
+		Tree two({P(-LIM, -LIM), P(-LIM, LIM)});
 		assert(two.nearest(P(LIM, -LIM)).first == 4 * LIM * LIM);
 		assert(two.nearest(P(LIM, 1)).second == P(-LIM, LIM));
 	}
 	{ // empty trees
-		KDTree a, b((vector<P>()));
+		Tree a, b((vector<P>()));
 		assert(a.nearest(P(1, 2)) == make_pair(INF, P()));
 		assert(b.nearest(P(-1, -2)).first == INF);
-		KDTree c = a; c = b; b = move(c);
+		Tree c = a; c = b; b = move(c);
 		assert(b.nearest(P()).first == INF);
 	}
 	{ // all points equal
 		vector<P> ps(9, P(-7, 3));
-		KDTree tree(ps);
+		Tree tree(ps);
 		assert(tree.nearest(P(-7, 3)) == make_pair(0LL, P(-7, 3)));
 		assert(tree.nearest(P(-4, 7)) == make_pair(25LL, P(-7, 3)));
 	}
@@ -97,14 +102,14 @@ int main() {
 		ll hi = rnd(0, 2) == 0 ? LIM : rnd(0, 1) ? 3 : 1000, lo = -hi;
 		if (rnd(0, 9) == 0) lo = hi - 5; // far from origin
 		vector<P> ps = gen(n, lo, hi, mode);
-		KDTree tree(ps);
+		Tree tree(ps);
 		assert(sz(tree.t) == max(2 * n - 1, 0));
 		rep(q,0,20) checkQuery(tree, ps, genQuery(ps, -hi, hi));
 	}
 	rep(t,0,30) {
 		ll hi = t % 2 ? LIM : 100;
 		vector<P> ps = gen(2000, -hi, hi, t % 6);
-		KDTree tree(ps);
+		Tree tree(ps);
 		rep(q,0,200) checkQuery(tree, ps, genQuery(ps, -hi, hi));
 	}
 
@@ -113,29 +118,29 @@ int main() {
 	rep(t,0,2000) {
 		vector<P> pa = gen((int)rnd(0, 20), -LIM, LIM, (int)rnd(0, 5));
 		vector<P> pb = gen((int)rnd(0, 20), -50, 50, (int)rnd(0, 5));
-		auto ok = [&](const KDTree& tr, const vector<P>& ps) {
+		auto ok = [&](const Tree& tr, const vector<P>& ps) {
 			rep(q,0,5) checkQuery(tr, ps, genQuery(ps, -LIM, LIM));
 		};
-		auto* a = new KDTree(pa);
-		KDTree copy(*a);          // copy construct
-		KDTree b(pb);
-		KDTree assigned(pb);
+		auto* a = new Tree(pa);
+		Tree copy(*a);          // copy construct
+		Tree b(pb);
+		Tree assigned(pb);
 		assigned = *a;            // copy assign over a live tree
 		delete a;                 // copies must survive the original
 		ok(copy, pa); ok(assigned, pa);
-		KDTree moved(std::move(copy)); // move construct
+		Tree moved(std::move(copy)); // move construct
 		ok(moved, pa);
 		copy = b;                 // moved-from tree can be reassigned
 		ok(copy, pb);
 		b = std::move(moved);     // move assign over a live tree
 		ok(b, pa);
-		KDTree& self = b;
+		Tree& self = b;
 		b = self;                 // self assignment
 		ok(b, pa);
 		swap(b, copy);
 		ok(b, pb); ok(copy, pa);
-		vector<KDTree> v;         // reallocation moves/copies trees
-		rep(i,0,9) v.push_back(i % 2 ? KDTree(pa) : KDTree(pb));
+		vector<Tree> v;         // reallocation moves/copies trees
+		rep(i,0,9) v.push_back(i % 2 ? Tree(pa) : Tree(pb));
 		v.erase(v.begin() + 3);
 		rep(i,0,sz(v)) ok(v[i], (i < 3 ? i : i + 1) % 2 ? pa : pb);
 	}
@@ -144,7 +149,7 @@ int main() {
 		auto start = chrono::steady_clock::now();
 		ll sum = 0;
 		rep(t,0,200000) {
-			KDTree tree({P(t, -t), P(-t, 3), P(7, t)});
+			Tree tree({P(t, -t), P(-t, 3), P(7, t)});
 			sum += tree.nearest(P(1, 1)).first;
 		}
 		double s = chrono::duration<double>(chrono::steady_clock::now() - start).count();

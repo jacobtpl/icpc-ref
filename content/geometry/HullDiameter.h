@@ -11,7 +11,6 @@
 #pragma once
 #include "Point.h"
 
-typedef Point<ll> P;
 template<class P>
 array<P, 2> hullDiameter(vector<P> S) {
 	using T = decltype(P().x);

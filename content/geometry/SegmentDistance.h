@@ -21,11 +21,10 @@ Works for any Point<T>; with Point<ll> (coordinates up to 1e9) everything but th
 
 #include "Point.h"
 
-typedef Point<double> P; // default only; segDist is generic
 template<class P> auto segDist(P s, P e, P p) {
 	P v = e - s, w = p - s, u = p - e;
 	typedef decltype(v.dist()) F;
 	if (w.dot(v) <= 0) return w.dist(); // also s == e
 	if (u.dot(v) >= 0) return u.dist();
-	return abs((F)v.cross(w)) / v.dist();
+	return gfabs((F)v.cross(w)) / v.dist();
 }

@@ -33,6 +33,7 @@ struct Point<double> {
 };
 
 #include "../../content/geometry/ConvexHull.h"
+typedef Point<ll> P;
 #include "../../content/geometry/LineHullIntersection.h"
 
 int segmentIntersection(const P& s1, const P& e1,

@@ -19,8 +19,6 @@
 #include "Point3D.h"
 
 template<class P3> struct Face { P3 q; int a, b, c; };
-typedef Point3D<double> P3;
-typedef Face<P3> F;
 struct PR {
 	void ins(int x) { (a == -1 ? a : b) = x; }
 	void rem(int x) { (a == x ? a : b) = -1; }

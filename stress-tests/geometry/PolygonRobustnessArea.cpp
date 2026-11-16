@@ -147,13 +147,13 @@ void testCenter() {
 		IP o = it % 4 < 2 ? IP() : IP(rnd(-M + R, M - R), rnd(-M + R, M - R));
 		vector<IP> w = shift(v, o);
 		rotate(w.begin(), w.begin() + rnd(0, n - 1), w.end());
-		auto c = polygonCenter(w);
+		auto c = polygonCenter<ll, ld>(w);
 		assert(fabsl(c.x - (ld)o.x - cx) < 1e-8L && fabsl(c.y - (ld)o.y - cy) < 1e-8L);
 		// double path: error relative to the polygon plus one rounding of the sum
 		DP d = polygonCenter(toD(w));
 		assert(fabsl(d.x - (ld)o.x - cx) < 1e-6L && fabsl(d.y - (ld)o.y - cy) < 1e-6L);
 		reverse(all(w));
-		c = polygonCenter(w);
+		c = polygonCenter<ll, ld>(w);
 		assert(fabsl(c.x - (ld)o.x - cx) < 1e-8L && fabsl(c.y - (ld)o.y - cy) < 1e-8L);
 	}
 }

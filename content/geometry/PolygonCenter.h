@@ -4,10 +4,19 @@
  * License: CC0
  * Source:
  * Description: Returns the center of mass for a polygon of nonzero area
- *  (zero area gives NaN, or throws for Fraction). Moments are taken
- *  relative to v[0], so the error is relative to the size of the polygon,
- *  not to its distance from the origin; Fraction input is exact. The ll
- *  overload sums exactly in __int128 for |x|,|y| < 2^30 and divides once.
+ *  (zero area or no points gives NaN, or throws for Fraction).
+ *  Moments are taken relative to v[0], so the error is relative to the
+ *  size of the polygon, not to its distance from the origin.
+ *  T can be any type Point supports. The result is Point<GeoR<T>>
+ *  (see Point.h): Point<double> for int and ll input, Point<T> for
+ *  floating T and Fraction (exact). For another result type name it:
+ *  polygonCenter<ll, long double>(v).
+ *  Integer T: the sums are exact in W = Geo<T>::W and divided once at
+ *  the end, valid while 4*D^3 fits in W for coordinate range D:
+ *  ll: |x|,|y| < 2^30, int: < 5e5, __int128: < 1e12.
+ * Usage:
+ *  vector<Point<ll>> v = {Point<ll>(0,0), Point<ll>(4,0), Point<ll>(0,4)};
+ *  Point<double> c = polygonCenter(v); // (4/3, 4/3)
  * Time: O(n)
  * Status: Tested
  */
@@ -15,29 +24,18 @@
 
 #include "Point.h"
 
-typedef Point<double> P;
-template<class P>
-P polygonCenter(const vector<P>& v) {
-	typedef decltype(P().x) T;
-	T A = 0;
-	if (v.empty()) return P(A / A, A / A);
-	P res(0, 0);
+template<class T, class R = GeoR<T>>
+Point<R> polygonCenter(const vector<Point<T>>& v) {
+	typedef typename Geo<T>::W W;
+	typedef conditional_t<geoInt<T>, R, W> C;
+	W A = 0, X = 0, Y = 0;
+	if (v.empty()) return Point<R>(R(C(A) / C(A)), R(C(A) / C(A)));
 	rep(i,1,sz(v)-1) {
-		P a = v[i] - v[0], b = v[i+1] - v[0];
-		T c = a.cross(b);
-		res = res + (a + b) * c; A += c;
+		W ax = W(v[i].x) - W(v[0].x), ay = W(v[i].y) - W(v[0].y),
+		  bx = W(v[i+1].x) - W(v[0].x), by = W(v[i+1].y) - W(v[0].y),
+		  c = ax * by - ay * bx;
+		A += c; X += c * (ax + bx); Y += c * (ay + by);
 	}
-	return v[0] + res / A / 3;
-}
-Point<long double> polygonCenter(const vector<Point<ll>>& v) {
-	typedef long double ld;
-	if (v.empty()) return Point<ld>(NAN, NAN);
-	__int128 A = 0, X = 0, Y = 0;
-	rep(i,1,sz(v)-1) {
-		Point<ll> a = v[i] - v[0], b = v[i+1] - v[0];
-		__int128 c = a.cross(b);
-		A += c; X += c * (a.x + b.x); Y += c * (a.y + b.y);
-	}
-	return Point<ld>((ld)v[0].x + (ld)X / (ld)(3 * A),
-		(ld)v[0].y + (ld)Y / (ld)(3 * A));
+	C d = C(A * 3);
+	return Point<R>(R(C(v[0].x) + C(X) / d), R(C(v[0].y) + C(Y) / d));
 }
