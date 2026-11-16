@@ -17,16 +17,18 @@ int main() {
 	check(str(~u128(0)) == "340282366920938463463374607431768211455");
 	check(str(u128(0)) == "0" && str(i128(0)) == "0");
 	i128 x = 42; u128 u = 42;
-	for (string s : {"", "+", "-", "1.0", "--1", "1a", "a", "0x1"})
-		check(!rd(s, x) && x == 42 && !rd(s, u) && u == 42);
+	const char* bad[] = {"", "+", "-", "1.0", "--1", "1a", "a", "0x1"};
+	rep(j,0,8) check(!rd(bad[j], x) && x == 42 && !rd(bad[j], u) && u == 42);
 	check(rd("  -00012 7", x) && x == -12 && rd("+5", u) && u == 5);
 	check(rd(str(lo), x) && x == lo && rd(str(hi), x) && x == hi);
 	check(rd(str(~u128(0)), u) && u == ~u128(0));
 	for (ll n = -20000; n <= 20000; ++n)
 		check(str(i128(n)) == to_string(n) && rd(to_string(n), x) && x == n);
-	mt19937_64 rng(128);
+	unsigned long long seed = 128;
 	rep(it,0,100000) {
-		u128 b = (u128(rng()) << 64 | rng()) >> (rng() % 128);
+		unsigned long long r[3];
+		rep(j,0,3) r[j] = seed = seed * 6364136223846793005ULL + 1442695040888963407ULL;
+		u128 b = (u128(r[0]) << 64 | r[1]) >> ((r[2] >> 33) % 128);
 		check(rd(str(b), u) && u == b);
 		check(rd(str(i128(b)), x) && x == i128(b));
 	}
@@ -53,7 +55,7 @@ int main() {
 	}
 	cout << "f128\n";
 #else
-	f128 v = 0; istringstream("1.5") >> v; check(str(v) == "1.5");
-	cout << "nof128\n";
+	f128 v = 0; check(rd("1.5", v) && str(v) == "1.5");
+	cout << "nof128 " << numeric_limits<f128>::digits << "\n";
 #endif
 }
