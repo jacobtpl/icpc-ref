@@ -3,61 +3,17 @@
  * Date: 2009-02-26
  * License: CC0
  * Source: My head with inspiration from tinyKACTL
- * Description: Class to handle points in the plane, plus the one
- *  block that decides which number types all geometry headers use.
- *  T can be double, long double, __float128, int, long long, __int128
- *  or Fraction. The other geometry headers take their number types
- *  from here (the *-benq.h hull variants have their own `using T`).
- *
- *  Geo<T> (customize below) gives, for coordinate type T:
- *   F: floating type of lengths, angles, ratios and non-integer results.
- *   W: type of intermediates that need more room than T. It must hold
- *      the product of any two values that fit in T.
- *  Defaults: floating T and Fraction compute everything in T itself
- *  (no hidden long double); int -> F=double, W=long long;
- *  long long -> F=double, W=__int128; __int128 -> F=long double, W=__int128
- *  (nothing is wider, so keep values below 2^63 there).
- *
- *  To change precision, change the type you declare your points with:
- *   typedef Point<double> P;       // fast default
- *   typedef Point<long double> P;  // ~19 digits, somewhat slower
- *   typedef Point<__float128> P;   // ~34 digits, much slower
- *  To keep double points but compute circle/half-plane intermediates
- *  in long double (results exact for integer-valued doubles up to 1e9
- *  in the headers that say so), set W in the double row below to
- *  long double (or #define GEO_DOUBLE_W long double before including).
- *  For long double lengths from integer points, edit F in the ll row.
- *
- *  Functions returning non-integer values (intersection points,
- *  centers, areas of unions) return GeoR<T>: F for integer T, else T.
- *
- *  dot, cross and dist2 are evaluated in T: with long long keep
- *  |x|,|y| <= 1e9, with int <= 1.6e4 (prefer long long), with
- *  __int128 <= 4e18. operator/ truncates for integer T.
- *  dist, angle, unit, normal and rotate return F and never truncate.
- *  mulDiv(a,b,c) is a*b/c with the product formed in W (truncates
- *  toward zero for integers).
- *
- *  Epsilon: sgn(x) is the sign test used by the predicates of the
- *  geometry headers. For floating x it treats |x| <= geoEps<type of x>
- *  as zero; the default 0 means exact comparisons. Integers and
- *  Fraction are always exact. Set it once, e.g. in main:
- *   geoEps<double> = 1e-9;
- *  (and geoEps<long double> too if W is long double).
- *  How to choose it: most tested values are cross or dot products of
- *  coordinate differences. With differences up to M their rounding
- *  error is a few u*M*M, where u = 2.2e-16 (double), 1.1e-19
- *  (long double), 1.9e-34 (__float128). eps must be well above that
- *  and below the smallest value that is truly nonzero (for input
- *  with k decimals: 10^(-2k)).
- *   double, M=1e3, 2 decimals: noise 2e-10, smallest 1e-4: use 1e-7.
- *   double, M=1e6, 2 decimals: noise 2e-4 > 1e-4: no eps works;
- *    use long double (noise 1e-7, eps 1e-5) or scale to integers.
- *  If the input is integer-valued, use an integer T and no eps.
- *
- *  __float128 needs no -lquadmath: gsqrt, gsin, gcos, gfabs, gatan2,
- *  ghypot and gfma call glibc's sqrtf128 etc. Read it as long double or
- *  string and print with (long double)x; there is no iostream support.
+ * Description: Class to handle points in the plane. Pick precision
+ *  by the point type; all geometry headers follow:
+ *   typedef Point<double> P; // or long double, __float128 (no
+ *                            // -lquadmath needed), int, ll, __int128
+ *  dot, cross, dist2 are computed in T (ll: keep |x|,|y| <= 1e9).
+ *  dist, angle, unit, rotate return a floating type and never truncate.
+ *  Epsilon: exact by default. For a tolerance on floats set, in main,
+ *   geoEps<double> = 1e-7;
+ *  It is compared to cross/dot products: use ~1000 * u * M^2 for
+ *  coordinates up to M (u = 2e-16 double, 1e-19 long double).
+ *  Integer input: use an integer T and no eps.
  * Usage:
  *  typedef Point<double> P;
  *  P a(1, 2), b(4, 6);
@@ -68,23 +24,9 @@
  */
 #pragma once
 
-// ---- Customize below: the only place geometry picks number types ----
-// How to use: you normally do NOT edit this block. Pick the precision
-// in your own code by the type you declare points with:
-//   typedef Point<double> P;  (or long double, __float128, int, ll,
-//                              __int128)
-// and every geometry header follows. To upgrade, change that typedef.
-//
-// The table below is a lookup, not a menu: keep all rows. The row for
-// T applies only to Point<T> and says what such points compute with:
-//   F = type of lengths, angles and non-integer results (dist, ...)
-//   W = type of products (cross/dot/determinant intermediates)
-// Edit a row only to keep the point type but change F or W, e.g.
-// W of double -> long double (wider products for double points), or
-// F of ll -> long double (long double lengths from integer points).
-//
-// For a tolerance in comparisons set geoEps, e.g. in main:
-//   geoEps<double> = 1e-9;   (see "Epsilon" above for the value)
+// Number types per coordinate type T. Keep all rows; edit one only to
+// change what Point<T> computes with:
+//  F = type of lengths and non-integer results, W = type of products
 #define GEO(T, FT, WT) \
 	template<> struct Geo<T> { typedef FT F; typedef WT W; };
 template<class T> struct Geo { // any other type, e.g. Fraction
@@ -101,7 +43,6 @@ GEO(ll,          double,      __int128)
 GEO(__int128,    long double, __int128) // nothing wider: stay < 2^63
 #undef GEO
 template<class T> T geoEps = T(0); // tolerance of sgn(); 0 = exact
-// ---- End of customization ----
 
 template<class T> constexpr bool geoFloat =
 	is_floating_point_v<T> || is_same_v<T, __float128>;
