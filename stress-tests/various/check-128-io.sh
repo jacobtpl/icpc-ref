@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 # Checks the 128-bit cin/cout operators in content/contest/template.cpp with
 # every C++ compiler found on this machine, under several flag sets.
-# Run from anywhere:  bash stress-tests/various/check-128-io.sh
+# Run from inside the repo:  bash stress-tests/various/check-128-io.sh
 # Paste the whole output back if anything says FAIL.
-cd "$(dirname "$0")/../.." || exit 1
+# Works from the repo (any directory in it) or as a downloaded copy run there.
+root=""
+for d in "$(git rev-parse --show-toplevel 2>/dev/null)" "$(cd "$(dirname "$0")/../.." && pwd)"; do
+	if [ -n "$d" ] && [ -f "$d/stress-tests/various/Template128IO.py" ] &&
+		grep -q u128 "$d/content/contest/template.cpp" 2>/dev/null; then root=$d; break; fi
+done
+if [ -z "$root" ]; then
+	echo "Cannot find the 128-bit I/O files. cd into your icpc-ref checkout, run"
+	echo "  git fetch origin && git checkout devin/1794861157-template-128-io && git pull"
+	echo "and run this script again from there."
+	exit 1
+fi
+cd "$root" || exit 1
+echo "repo: $root ($(git rev-parse --short HEAD 2>/dev/null))"
 command -v python3 >/dev/null || { echo "python3 is required"; exit 1; }
+echo "python: $(python3 --version 2>&1)"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/shim/bits"
 printf '#include <%s>\n' algorithm cctype cstdlib cstring iomanip iostream \
@@ -38,7 +52,8 @@ for c in "${compilers[@]}"; do
 			printf '   PASS [%s] %s\n' "${f:-no flags}" "$out"
 		else
 			fail=1; printf '   FAIL [%s]\n' "${f:-no flags}"
-			grep -E 'error|Error|assert|Abort' "$tmp/err" | head -8 | sed 's/^/      /'
+			{ grep -E 'error|Error|assert|Abort|Errno|ld:|Undefined' "$tmp/err" | head -8
+				echo "...last lines:"; tail -5 "$tmp/err"; } | cut -c1-300 | sed 's/^/      /'
 		fi
 	done
 done
