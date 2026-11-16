@@ -85,6 +85,16 @@ template<class T> void floats(ld u) {
 		auto c = closest(v);
 		assert((c.first - c.second).dist2() == best);
 		assert(closest(dup).first == dup[0]);
+		// large offset: p - d rounds, brute force must still agree
+		rep(it,0,200) {
+			vector<P> w;
+			rep(i,0,40) w.push_back(P(T(1e15) + T((i * 7919 + it * 31) % 97) / 4,
+				T(-3e15) + T((i * 104729 + it * 17) % 89) / 4));
+			best = T(1e30);
+			rep(i,0,40) rep(k,0,i) best = min(best, (w[i] - w[k]).dist2());
+			c = closest(w);
+			assert((c.first - c.second).dist2() == best);
+		}
 	}
 	assert(sz(triangulate(sq)) == 6);
 	assert(sz(convexHull(sq)) == 4);

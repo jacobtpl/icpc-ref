@@ -29,9 +29,14 @@ pair<P, P> closest(vector<P> v) {
 	int j = 0, i = 0;
 	for (P p : v) {
 		P d{T(gsqrt(F(ret.first))) + !geoFloat<T>, 0};
-		while (j < i && v[j].y <= p.y - d.x) S.erase(v[j++]);
+		// too far: tested on the differences dist2 uses, so rounding
+		// of p.y - d or p.x - d can not drop a closer point
+		auto far = [&](T a, T b) { return (a-b)*(a-b) > ret.first; };
+		while (j < i && far(p.y, v[j].y)) S.erase(v[j++]);
 		i++;
 		auto lo = S.lower_bound(p - d), hi = S.upper_bound(p + d);
+		while (lo != S.begin() && !far(p.x, prev(lo)->x)) --lo;
+		while (hi != S.end() && !far(p.x, hi->x)) ++hi;
 		for (; lo != hi; ++lo)
 			ret = min(ret, {(*lo - p).dist2(), {*lo, p}});
 		S.insert(p);
