@@ -1,9 +1,9 @@
 #include "../utilities/template.h"
 
+#define GEO_DOUBLE_W long double
 #include "../../content/geometry/Point.h"
 // This file tests the documented opt-in of Point.h: double input with
 // products formed in long double.
-template<> struct Geo<double> { typedef double F; typedef long double W; };
 #include "../../content/geometry/PolygonArea.h"
 #include "../../content/geometry/HalfPlaneIntersection.h"
 

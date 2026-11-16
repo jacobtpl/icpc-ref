@@ -1,9 +1,9 @@
 #include "../utilities/template.h"
 
+#define GEO_DOUBLE_W long double
 #include "../../content/geometry/Point.h"
 // This file tests the documented opt-in of Point.h: double input with
 // intermediates in long double (exact counts for integers up to 1e9).
-template<> struct Geo<double> { typedef double F; typedef long double W; };
 #include "../../content/geometry/CircleIntersection.h"
 #include "../../content/geometry/CircleLine.h"
 #include "../../content/geometry/CircleTangents.h"

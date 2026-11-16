@@ -24,8 +24,9 @@
  *   typedef Point<__float128> P;   // ~34 digits, much slower
  *  To keep double points but compute circle/half-plane intermediates
  *  in long double (results exact for integer-valued doubles up to 1e9
- *  in the headers that say so), uncomment the Geo<double> line below.
- *  For long double lengths from integer points, edit F in Geo<ll>.
+ *  in the headers that say so), set W in the double row below to
+ *  long double (or #define GEO_DOUBLE_W long double before including).
+ *  For long double lengths from integer points, edit F in the ll row.
  *
  *  Functions returning non-integer values (intersection points,
  *  centers, areas of unions) return GeoR<T>: F for integer T, else T.
@@ -68,14 +69,31 @@
 #pragma once
 
 // ---- Customize below: the only place geometry picks number types ----
-template<class T> struct Geo { // floating types and Fraction
+// How to use: declare your points with the coordinate type you want,
+//   typedef Point<double> P;   (or long double, __float128, ll, ...)
+// and every geometry header follows. Each row below says, for points
+// with coordinates of type T:
+//   F = type of lengths, angles and non-integer results (dist, ...)
+//   W = type of products (cross/dot/determinant intermediates)
+// For more precision, switch the point type, or edit a row: e.g. make
+// W of double `long double`, or F of ll `long double`.
+// For a tolerance in comparisons set geoEps, e.g. in main:
+//   geoEps<double> = 1e-9;   (see "Epsilon" above for the value)
+#define GEO(T, FT, WT) \
+	template<> struct Geo<T> { typedef FT F; typedef WT W; };
+template<class T> struct Geo { // any other type, e.g. Fraction
 	typedef conditional_t<is_class_v<T>, double, T> F; typedef T W; };
-template<> struct Geo<int> { typedef double F; typedef ll W; };
-template<> struct Geo<ll> { typedef double F; typedef __int128 W; };
-template<> struct Geo<__int128> {
-	typedef long double F; typedef __int128 W; };
-// template<> struct Geo<double> { // wider intermediates for doubles
-//	typedef double F; typedef long double W; };
+#ifndef GEO_DOUBLE_W // long double: wider products for double points
+#define GEO_DOUBLE_W double
+#endif
+//  T            F            W
+GEO(double,      double,      GEO_DOUBLE_W)
+GEO(long double, long double, long double)
+GEO(__float128,  __float128,  __float128)
+GEO(int,         double,      ll)
+GEO(ll,          double,      __int128)
+GEO(__int128,    long double, __int128) // nothing wider: stay < 2^63
+#undef GEO
 template<class T> T geoEps = T(0); // tolerance of sgn(); 0 = exact
 // ---- End of customization ----
 
