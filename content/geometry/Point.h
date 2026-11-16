@@ -69,14 +69,20 @@
 #pragma once
 
 // ---- Customize below: the only place geometry picks number types ----
-// How to use: declare your points with the coordinate type you want,
-//   typedef Point<double> P;   (or long double, __float128, ll, ...)
-// and every geometry header follows. Each row below says, for points
-// with coordinates of type T:
+// How to use: you normally do NOT edit this block. Pick the precision
+// in your own code by the type you declare points with:
+//   typedef Point<double> P;  (or long double, __float128, int, ll,
+//                              __int128)
+// and every geometry header follows. To upgrade, change that typedef.
+//
+// The table below is a lookup, not a menu: keep all rows. The row for
+// T applies only to Point<T> and says what such points compute with:
 //   F = type of lengths, angles and non-integer results (dist, ...)
 //   W = type of products (cross/dot/determinant intermediates)
-// For more precision, switch the point type, or edit a row: e.g. make
-// W of double `long double`, or F of ll `long double`.
+// Edit a row only to keep the point type but change F or W, e.g.
+// W of double -> long double (wider products for double points), or
+// F of ll -> long double (long double lengths from integer points).
+//
 // For a tolerance in comparisons set geoEps, e.g. in main:
 //   geoEps<double> = 1e-9;   (see "Epsilon" above for the value)
 #define GEO(T, FT, WT) \
