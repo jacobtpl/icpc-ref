@@ -21,10 +21,10 @@ template<typename T> bool ckmin(T &a, T const& b) {return b<a?a=b,1:0;}
 // f128 reads [+-]digits[.digits][e[+-]digits], uses the first 36
 // significant digits, and always prints fixed with precision() decimals
 // (default 6), about 33 significant digits correct.
-// __float128 exists on x86 Linux gcc/clang but not with clang on macOS;
-// there f128 falls back to long double with the standard stream operators,
-// so code still compiles and runs, just with less precision (64-bit on
-// Apple Silicon). Don't trust local precision tests on a Mac.
+// __float128 exists on x86 Linux gcc/clang and Homebrew g++ on macOS, but
+// not with Apple clang; there f128 falls back to long double with the
+// standard stream operators, so code still compiles and runs, just with
+// less precision (64-bit on Apple Silicon): use g++-NN locally on a Mac.
 #ifdef __SIZEOF_INT128__
 using i128 = __int128_t;
 using u128 = __uint128_t;
@@ -55,7 +55,9 @@ template<class T> istream& read128(istream& in, T& x) {
 istream& operator>>(istream& in, i128& x) { return read128(in, x); }
 istream& operator>>(istream& in, u128& x) { return read128(in, x); }
 #endif
-#if defined(__SIZEOF_INT128__) && defined(__SIZEOF_FLOAT128__)
+#if defined(__SIZEOF_INT128__) && (defined(__SIZEOF_FLOAT128__) || \
+	(defined(__APPLE__) && !defined(__clang__) && defined(__FLT128_MANT_DIG__)))
+#define HAS_F128 1
 using f128 = __float128;
 istream& operator>>(istream& in, f128& x) {
 	string s;

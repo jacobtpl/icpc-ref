@@ -35,7 +35,7 @@ int main() {
 	{ ostringstream o; o << setw(5) << i128(-7) << setw(4) << u128(3); check(o.str() == "   -7   3"); }
 	{ istringstream i("1 2 3"); int c = 0; while (i >> x) c++; check(c == 3); }
 #endif
-#if defined(__SIZEOF_INT128__) && defined(__SIZEOF_FLOAT128__)
+#ifdef HAS_F128
 	// "r token" -> bits of the parsed value (or "fail");
 	// "w hi lo prec" -> the value with those bits, printed.
 	string op;

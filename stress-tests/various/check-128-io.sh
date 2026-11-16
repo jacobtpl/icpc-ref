@@ -41,7 +41,13 @@ fail=0
 for c in "${compilers[@]}"; do
 	echo; echo "== $c: $("$c" --version | head -1)"
 	echo "   128-bit macros:$("$c" -x c++ -dM -E - </dev/null |
-		grep -E 'SIZEOF_(INT128|FLOAT128)|LDBL_MANT_DIG' | sed 's/#define//' | tr '\n' ';')"
+		grep -E 'SIZEOF_(INT128|FLOAT128)|(LDBL|FLT128)_MANT_DIG' | sed 's/#define//' | tr '\n' ';')"
+	# Ask the compiler directly, not a macro: is __float128 a real 113-bit type?
+	has=no
+	echo 'int main(){__float128 a=1,e=1;for(int i=0;i<100;i++)e/=2;return !(sizeof a==16&&a+e!=a);}' \
+		>"$tmp/q.cpp"
+	"$c" "$tmp/q.cpp" -o "$tmp/q" 2>/dev/null && "$tmp/q" && has=yes
+	echo "   compiler has real __float128: $has"
 	shim=""
 	if ! echo '#include <bits/stdc++.h>' | "$c" -x c++ -fsyntax-only - 2>/dev/null; then
 		shim="-I$tmp/shim"
@@ -49,7 +55,12 @@ for c in "${compilers[@]}"; do
 	fi
 	for f in "${flagsets[@]}"; do
 		if out=$(CXX="$c" python3 stress-tests/various/Template128IO.py $shim $f 2>"$tmp/err"); then
-			printf '   PASS [%s] %s\n' "${f:-no flags}" "$out"
+			case "$has:$out" in
+				yes:integers*) fail=1; r="FAIL (template fell back to long double)";;
+				no:Template128IO*) fail=1; r="FAIL (unexpected __float128 path)";;
+				*) r=PASS;;
+			esac
+			printf '   %s [%s] %s\n' "$r" "${f:-no flags}" "$out"
 		else
 			fail=1; printf '   FAIL [%s]\n' "${f:-no flags}"
 			{ grep -E 'error|Error|assert|Abort|Errno|ld:|Undefined' "$tmp/err" | head -8
