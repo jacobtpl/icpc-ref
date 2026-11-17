@@ -1,4 +1,11 @@
-#include <cstdio>
+/**
+ * Author: jacobtpl
+ * Description: Full solution to a sequence problem with an array-based implicit
+ *  treap: insert, delete, range add, range min, range reverse and range rotate.
+ *  A whole program, not a header: adapt work().
+ * Time: O(log N) expected per operation
+ */
+#include <bits/stdc++.h>
 #include <cstdlib>
 #include <utility>
 #include <algorithm>

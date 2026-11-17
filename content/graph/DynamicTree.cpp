@@ -1,4 +1,17 @@
-
+/**
+ * Author: Benq
+ * Description: Full solution to "Dynamic Tree Test": link-cut tree that also
+ *  keeps virtual subtrees (c[2], c[3] and c[4]), so it supports path and subtree
+ *  set/add and min/max/sum queries, reroot and change-parent.
+ *  INFO[0] is the path aggregate, INFO[1] the aggregate of everything hanging
+ *  off the path. A whole program, not a header: adapt main().
+ * Time: O(log N) amortized per operation, large constant
+ * Status: checked against a brute force on small random cases (test not in repo)
+ */
+#include <bits/stdc++.h>
+using namespace std;
+typedef vector<int> vi;
+typedef pair<int,int> pi;
 
 #define FOR(i, a, b) for (int i = (a); i < (b); i++)
 #define F0R(i, a) for (int i = 0; i < (a); i++)
@@ -29,7 +42,7 @@ struct info {
     info (int v) {
         if (v == INT_MAX) {
             sz = sum = 0;
-            mn = INT_MAX, mx = INT_MAX+1;
+            mn = INT_MAX, mx = INT_MIN;
         } else {
             sz = 1; sum = mn = mx = v;
         }
@@ -37,20 +50,11 @@ struct info {
     info() : info(INT_MAX) {}
 };
 
-void pr(const info& a) {
-    vi t = {a.sz,a.sum,a.mn,a.mx};
-    pr(t);
-}
-
 info& operator+=(info& a, const info& b) {
     a.sz += b.sz, a.sum += b.sum;
     ckmin(a.mn,b.mn); ckmax(a.mx,b.mx);
     return a;
 }
-
-bool COOL = 0, FLAG = 0;
-
-void dump(string label = "");
 
 struct snode {
     //////// VARIABLES
@@ -178,21 +182,9 @@ struct snode {
     //////// LINK CUT TREE BASE OPERATIONS
     void access() { // bring this to top of tree, left subtree of this is now path to root
         int it = 0;
-        // if (FLAG) ps("WAT",LCT[1]->nextNum[1],LCT[1]->nextNum[0]);
         for (sn v = this, pre = NULL; v; v = v->p) {
-            /*if (FLAG && v->id != 8) {
-                ps("HA",v->id,v->dir()); exit(0);
-            }
-            if (FLAG && v->id == 7) {
-                ps("WAT",v->nextNum[1]); exit(0);
-            }*/
             it ++;
             v->splay(); auto c = v->c[1]; 
-            /*if (c->c[2]) {
-                ps("??");
-                //dump();
-                exit(0);
-            }*/
             if (c) assert(!c->c[2] && !c->c[3]);
             if (pre) pre->prop();
             if (pre) {
@@ -210,7 +202,6 @@ struct snode {
             }
             v->c[1] = pre; v->calc(); pre = v;
         }
-        // if (COOL) ps("HA",id,mn,mx,sum,sz,lazy);
         splay(); assert(!c[1]);
     }
     void makeRoot() { access(); flip ^= 1; }
@@ -219,14 +210,6 @@ struct snode {
     friend sn lca(sn x, sn y) {
         if (x == y) return x;
         x->access(); y->access(); 
-        /*if (FLAG) {
-            dump(); exit(0);
-        }
-        if (FLAG) {
-            ps(x->id,y->id);
-            ps(x->dir());
-            dump();
-        }*/
         if (!x->p) return NULL;
         x->splay(); return x->p ? x->p : x;
     }
@@ -235,10 +218,6 @@ struct snode {
     //////// LINK CUT TREE MODIFICATIONS
     friend bool link(sn x, sn y) { // make y parent of x
         if (connected(x,y)) exit(2);
-        /*if (FLAG) {
-            ps("??",x->id,y->id);
-            exit(0);
-        }*/
         x->makeRoot(); setLink(y,join(x,y->c[4]),4); y->calc();
         return 1;
     }
@@ -266,28 +245,8 @@ sn getPar(sn x) {
 }
 
 int N,M,root;
+const int MX = 100005;
 sn LCT[MX];
-
-void printInfo(int a) {
-    ps("LABEL",a,"PARENT",LCT[a]->p?LCT[a]->p->id:-1,"FLIP",LCT[a]->flip,LCT[a]->INFO[0],LCT[a]->INFO[1]);
-    F0R(b,5) if (LCT[a]->c[b]) ps("CHILD","DIR",b,"LABEL",LCT[a]->c[b]->id);
-    ps("-----");
-}
-
-void dump(string label) {
-    ps("DUMP",label);
-    //FOR(i,1,N+1) ps("WAT",i,LCT[i]->nextNum[0],LCT[i]->val,LCT[i]->INFO[0].sz,LCT[i]->INFO[1].mx,LCT[i]->INFO[0].mn,LCT[i]->INFO[1].mn);
-    FOR(a,1,N+1) {
-        F0R(b,5) if (LCT[a]->c[b]) {
-            ps(a,LCT[a]->c[b]->id,b);
-            // ps("CHILD","DIR",b,"LABEL",LCT[a]->c[b]->id);
-        }
-        //printInfo(a);
-    }
-    FOR(a,1,N+1) ps(a,LCT[a]->flip);
-    ps("----");
-    // exit(0);
-}
 
 void pathInc(int y, int z) {
     LCT[y]->access(); LCT[y]->lazy[0] = z;
@@ -295,44 +254,32 @@ void pathInc(int y, int z) {
 
 void pathMod(int y, int z) {
     LCT[y]->access(); LCT[y]->nextNum[0] = z;
-    /*if (y == 4) {
-        ps("??",y,z);
-        dump();
-        LCT[5]->access();
-        dump();
-        exit(0);
-    }*/
 }
 
 void init() {
-    setIO(); re(N,M);
-    vpi ed(N-1); re(ed);
+    cin.tie(0)->sync_with_stdio(0);
+    cin >> N >> M;
+    vector<pi> ed(N-1);
+    for (auto& e : ed) cin >> e.f >> e.s;
     FOR(i,1,N+1) {
-        int x; re(x);
+        int x; cin >> x;
         LCT[i] = new snode(i,x);
     }
     F0R(i,N-1) {
         int x = ed[i].f, y = ed[i].s;
-        // if (i == 3) FLAG = 1;
         link(LCT[x],LCT[y]);
-        // if (i == 3) dump();
-        // dump();
     }
-    re(root); 
+    cin >> root; 
 }
 
-int co = 0;
-
-void PS(int x) { cout << x << "\n"; co ++; }
+void PS(int x) { cout << x << "\n"; }
 
 int main() {
     init();
-    // FLAG = 1;
-    int co = 0;
     F0R(i,M) {
-        int K; re(K);
+        int K; cin >> K;
         if (K == 0 || K == 5) {
-            int x,y; re(x,y); LCT[root]->makeRoot(); LCT[x]->access();
+            int x,y; cin >> x >> y; LCT[root]->makeRoot(); LCT[x]->access();
             auto c = LCT[x]->c[4];
             if (K == 0) {
                 if (c) c->prop(), c->nextNum[0] = c->nextNum[1] = y;
@@ -344,44 +291,28 @@ int main() {
             }
             LCT[x]->calc();
         } else if (K == 1) {
-            int x; re(x); root = x;
+            int x; cin >> x; root = x;
         } else if (K == 2 || K == 6) {
-            int x,y,z; re(x,y,z); LCT[x]->makeRoot(); 
+            int x,y,z; cin >> x >> y >> z; LCT[x]->makeRoot(); 
             if (K == 2) pathMod(y,z);
             else pathInc(y,z);
         } else if (K == 3 || K == 4 || K == 11) {
-            int x; re(x); LCT[root]->makeRoot(); LCT[x]->access();
+            int x; cin >> x; LCT[root]->makeRoot(); LCT[x]->access();
             auto ans = info(LCT[x]->val); sn c = LCT[x]->c[4];
             if (c) c->prop(), ans += c->INFO[0], ans += c->INFO[1];
-            co ++;
-            /*if (co == 1068) {
-                ps("AA",K,ans,12+i);
-                LCT[x]->propAll();
-                dump();
-                exit(0);
-            }*/
             if (K == 3) PS(ans.mn);
             else if (K == 4) PS(ans.mx);
             else if (K == 11) PS(ans.sum);
         } else if (K == 7 || K == 8 || K == 10) {
-            int x,y; re(x,y); LCT[x]->makeRoot(); LCT[y]->access();
+            int x,y; cin >> x >> y; LCT[x]->makeRoot(); LCT[y]->access();
             auto ans = LCT[y]->INFO[0];
-            co ++;
-            /*if (co == 1067) {
-                ps("BB",K,ans);
-                LCT[y]->propAll();
-                dump();
-                exit(0);
-            }*/
             if (K == 7) PS(ans.mn);
             else if (K == 8) PS(ans.mx);
             else PS(ans.sum);
         } else if (K == 9) {
-            int x,y; re(x,y);
+            int x,y; cin >> x >> y;
             LCT[root]->makeRoot();
             if (lca(LCT[x],LCT[y]) == LCT[x]) {
-                // ps("OOPSNO",root,x,y);
-                // if (i == 20) ps("HI");
                 continue;
             }
             cut(getPar(LCT[x]),LCT[x]);
@@ -389,9 +320,3 @@ int main() {
         } else exit(5);
     }
 }
-
-/* stuff you should look for
-    * int overflow, array bounds
-    * special cases (n=1?), set tle
-    * do smth instead of nothing and stay organized
-*/

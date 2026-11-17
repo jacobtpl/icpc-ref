@@ -19,7 +19,8 @@
 
 struct SuffixArray {
 	vi sa, lcp; // sa[0] is empty str, size is n+1, lcp[i] is of sa[i] and sa[i-1]
-	SuffixArray(string& s, int lim=256) { // or basic_string<int>
+	string s; // or basic_string<int>, here and in search()
+	SuffixArray(const string& _s, int lim=256) : s(_s) {
 		int n = sz(s) + 1, k = 0, a, b;
 		vi x(all(s)+1), y(n), ws(max(n, lim)), rank(n);
 		sa = lcp = y, iota(all(sa), 0);
@@ -41,14 +42,14 @@ struct SuffixArray {
 	}
 	// total unique substrings = (n+1 C 2) - sum(lcp)
 	// string search in O(m log n). returns [l,r] of matches in sa.
-	pair<int,int> search(string &t) {
+	pair<int,int> search(const string &t) {
 		int b=1,e=sz(sa)-1;
 		while (b<e) {
 			int m=(b+e)/2;
 			if (s.compare(sa[m], sz(t), t) >= 0) e = m; // not strict
 			else b = m+1;
 		}
-		if (s.compare(sa[b], sz(t), t) != 0) return mp(-1,-1);
+		if (s.compare(sa[b], sz(t), t) != 0) return {-1,-1};
 		pair<int,int> ans{b,-1};
 		b=1,e=sz(sa)-1;
 		while (b<e) {

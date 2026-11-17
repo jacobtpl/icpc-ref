@@ -8,7 +8,7 @@
  * Status: tested
  */
 struct PalTree {
-    static const int ASZ = 26;
+    static const int ASZ = 26, INF = 1e9;
     struct node {
         array<int,ASZ> to = array<int,ASZ>();
         int len, link, oc = 0; // # occurrences of pal

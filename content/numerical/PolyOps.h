@@ -3,6 +3,10 @@
  * Date: 2024
  * Description: Operations on formal power series
  */
+#pragma once
+
+#include "../number-theory/ModInt.h"
+
 int const RT = 5;
 using T = mint;
 using poly = vector<mint>;

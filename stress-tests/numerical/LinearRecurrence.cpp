@@ -17,6 +17,7 @@ void gen(vector<ll>& v, int at, F f) {
 }
 
 int main() {
+	mod = 5;
 	rep(n,1,5) {
 		vector<ll> start(n);
 		vector<ll> coef(n);
