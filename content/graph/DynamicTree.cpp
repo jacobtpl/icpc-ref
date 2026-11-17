@@ -38,10 +38,10 @@ template<class T> void ckmax(T &a, T b) { a = max(a, b); }
 typedef struct snode* sn;
 
 struct info {
-    int sz, sum, mn, mx;
+    int sz, mn, mx; long long sum;
     info (int v) {
         if (v == INT_MAX) {
-            sz = sum = 0;
+            sz = 0; sum = 0;
             mn = INT_MAX, mx = INT_MIN;
         } else {
             sz = 1; sum = mn = mx = v;
@@ -80,7 +80,7 @@ struct snode {
         }
         if (nextNum[1] != INT_MAX) { // modify everything in subtree EXCEPT 01 paths 
             if (INFO[1].sz) {
-                INFO[1].sum = nextNum[1]*INFO[1].sz; 
+                INFO[1].sum = (long long)nextNum[1]*INFO[1].sz; 
                 INFO[1].mn = INFO[1].mx = nextNum[1];
             }
             F0R(i,5) if (c[i]) {
@@ -91,7 +91,7 @@ struct snode {
         }
         if (lazy[1] != 0) {
             if (INFO[1].sz) {
-                INFO[1].sum += lazy[1]*INFO[1].sz;
+                INFO[1].sum += (long long)lazy[1]*INFO[1].sz;
                 INFO[1].mn += lazy[1], INFO[1].mx += lazy[1];
             }
             F0R(i,5) if (c[i]) {
@@ -102,14 +102,14 @@ struct snode {
         }
         if (nextNum[0] != INT_MAX) { // modify ONLY 01 paths 
             val = nextNum[0];
-            INFO[0].sum = nextNum[0]*INFO[0].sz;
+            INFO[0].sum = (long long)nextNum[0]*INFO[0].sz;
             INFO[0].mn = INFO[0].mx = nextNum[0];
             F0R(i,2) if (c[i]) c[i]->nextNum[0] = nextNum[0], c[i]->lazy[0] = 0;
             nextNum[0] = INT_MAX;
         }
         if (lazy[0] != 0) {
             val += lazy[0];
-            INFO[0].sum += lazy[0]*INFO[0].sz;
+            INFO[0].sum += (long long)lazy[0]*INFO[0].sz;
             INFO[0].mn += lazy[0], INFO[0].mx += lazy[0];
             F0R(i,2) if (c[i]) c[i]->lazy[0] += lazy[0];
             lazy[0] = 0;
@@ -272,7 +272,7 @@ void init() {
     cin >> root; 
 }
 
-void PS(int x) { cout << x << "\n"; }
+void PS(long long x) { cout << x << "\n"; }
 
 int main() {
     init();
