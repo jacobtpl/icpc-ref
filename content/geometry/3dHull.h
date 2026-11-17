@@ -64,8 +64,10 @@ vector<Face<P3>> hull3d(const vector<P3>& A) {
 			C(a, b, c); C(a, c, b); C(b, c, a);
 		}
 	}
-	// orient outwards: no dot of two normals (overflows integers)
-	for (F& it : FS) rep(l,0,4) if ((A[it.b] - A[it.a]).cross(
+	// orient outwards: no dot of two normals (overflows integers).
+	// Face vertices are skipped: they only give rounding noise.
+	for (F& it : FS) rep(l,0,4) if (l != it.a && l != it.b &&
+		l != it.c && (A[it.b] - A[it.a]).cross(
 		A[it.c] - A[it.a]).dot(A[l] - A[it.a]) > 0) {
 		swap(it.c, it.b); break; }
 	return FS;
