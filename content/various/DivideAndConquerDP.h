@@ -26,5 +26,8 @@ struct DP { // Modify at will:
 		rec(L, mid, LO, best.second+1);
 		rec(mid+1, R, best.second, HI);
 	}
-	void solve(int L, int R) { rec(L, R, INT_MIN, INT_MAX); }
+	void solve(int L, int R) {
+		res.resize(max(sz(res), R));
+		rec(L, R, INT_MIN, INT_MAX);
+	}
 };
