@@ -22,7 +22,7 @@ vector<T> maxPlusCC(const vector<T>& a, const vector<T>& b) {
 	vector<T> c(n + m - 1);
 	c[0] = a[0] + b[0];
 	while (i + j < n + m - 2) {
-		if (j == m-1 || (i < n-1 && a[i+1] - a[i] >= b[j+1] - b[j])) i++;
+		if (j == m-1 || (i < n-1 && a[i+1] + b[j] >= a[i] + b[j+1])) i++;
 		else j++;
 		c[i + j] = a[i] + b[j];
 	}
