@@ -6,18 +6,23 @@
  *  (de Berg et al., Computational Geometry, chapter 11)
  * Description: Computes all faces of the 3-dimensional hull of a point set
  *  as index triples into A, counter-clockwise seen from outside.
- *  Works on any Point3D<T>. A point sees a face if vol() > eps, where
- *  vol is 6 times the volume of the tetrahedron they span; points within
- *  eps of a face plane are treated as lying in it.
+ *  Works on any Point3D<T>. Point d sees face abc if
+ *  (b-a) x (c-a) . (d-a) > eps (six times a tetrahedron volume).
  *  Integer T (eps = 0) is exact: coplanar, collinear and duplicate points
  *  are fine, coplanar facets come out triangulated, and points that are
  *  not corners of the hull may or may not be used.
- *  Floating T: eps = 0 only works in general position. If four points
- *  can be (nearly) coplanar pass eps around 1e-9 * D^3 for double, where
+ *  Floating T, general position: eps = 0.
+ *  Floating T, exactly degenerate up to rounding (four coplanar points,
+ *  e.g. a grid scaled by 0.1): eps around 1e-9 * D^3 for double, where
  *  D is the largest coordinate difference.
- *  The error of the input must be well below that eps (100 times
- *  is enough): points at about eps from a face plane can break it.
- *  Only fails (assert) if all points are within eps of one plane.
+ *  Floating T, nearly degenerate (points between about eps / 10 and
+ *  1e4 * eps off a plane through three others): NOT reliable for any
+ *  eps, a point can end up far outside the result. Scale the input to
+ *  integers instead (__int128 if needed), or if an error of 1e-6 * D is
+ *  acceptable move every point randomly by that much and use eps = 0.
+ *  The result is always a closed surface (every edge in exactly two
+ *  faces, once in each direction), also in that last case.
+ *  Fails (assert) if all points are coplanar.
  *  Every test uses coordinate differences, so only D matters, not the
  *  offset from the origin: exact while 6D^3 fits in T (long long:
  *  D <= 1e6, __int128: D <= 2e12, double with integer coordinates:
@@ -55,7 +60,7 @@ vector<array<int,3>> hull3dFast(const vector<P3>& A,
 	vector<array<int,3>> fs, nb, res; // faces ever made; face across edge j,j+1
 	vector<bool> dead;
 	vector<vi> pts, vis(n); // points seeing face, faces seen by point
-	vi seen(n, -1), at(n);
+	vi seen(n, -1), at(n), in(n, -1);
 	auto add = [&](int a, int b, int c, const vi& cand) {
 		int id = sz(fs);
 		fs.push_back({a, b, c}); dead.push_back(0);
@@ -73,12 +78,28 @@ vector<array<int,3>> hull3dFast(const vector<P3>& A,
 	nb = {{1, 2, 3}, {3, 2, 0}, {1, 3, 0}, {2, 1, 0}};
 	for (int i : rest) {
 		vi rem; // faces seen from i: replace them by a cone from i.
-		// Flood from one of them, so that rounding cannot tear the hull
-		for (int f : vis[i]) if (!dead[f]) {
-			dead[f] = 1, rem.push_back(f); break; }
-		rep(q,0,sz(rem)) for (int g : nb[rem[q]]) if (!dead[g] &&
-			vol(fs[g][0], fs[g][1], fs[g][2], i) > eps)
-				dead[g] = 1, rem.push_back(g);
+		// Grow them from one face, only in steps that keep them a disc
+		// (two shared edges, or one and a new corner), so the horizon
+		// is one simple cycle whatever the tests say
+		auto kill = [&](int f) {
+			dead[f] = 1, rem.push_back(f);
+			for (int v : fs[f]) in[v] = i;
+		};
+		for (int f : vis[i]) if (!dead[f]) { kill(f); break; }
+		// second pass: a face i clearly sees is stuck, so also take
+		// faces i is within eps of, to fill the pocket that blocks it
+		rep(pass,0,2) {
+			bool stuck = 0;
+			rep(q,0,sz(rem)) for (int g : nb[rem[q]]) if (!dead[g]) {
+				auto v = vol(fs[g][0], fs[g][1], fs[g][2], i);
+				if (!(v > (pass ? -eps : eps))) continue;
+				int c = 0, w = 0;
+				rep(k,0,3) if (dead[nb[g][k]]) c++, w = fs[g][(k+2)%3];
+				if (c == 2 || (c == 1 && in[w] != i)) kill(g);
+				else if (v > eps) stuck = 1;
+			}
+			if (!stuck) break;
+		}
 		int st = sz(fs);
 		for (int f : rem) rep(j,0,3) {
 			int a = fs[f][j], b = fs[f][(j+1)%3], g = nb[f][j];

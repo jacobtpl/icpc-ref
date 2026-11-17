@@ -251,6 +251,24 @@ int main() {
 		if (abs(vol - want) > 1e-7 * want) fail("hull3dFast eps: volume", p);
 		cases++;
 	}
+	{ // points 10 eps off a plane: flooding over every face seen gave a
+		// horizon through vertex 1 twice, an open surface, point 6 outside
+		vector<array<double,3>> p{{.6,.3,1e-8}, {1,.9,1e-8}, {.8,.7,1e-8}, {0,0,0},
+			{1,0,0}, {0,1,0}, {0,0,1}};
+		vector<P3> A;
+		for (auto& q : p) A.emplace_back(q[0], q[1], q[2]);
+		set<pii> edges;
+		for (auto& f : hull3dFast(A, 1e-9)) {
+			rep(j,0,3) if (!edges.insert({f[j], f[(j+1)%3]}).second)
+				fail("hull3dFast branching horizon: edge twice", p);
+			for (P3 q : A) if ((A[f[1]] - A[f[0]]).cross(A[f[2]] - A[f[0]])
+					.dot(q - A[f[0]]) > 1e-7)
+				fail("hull3dFast branching horizon: point outside", p);
+		}
+		for (auto e : edges) if (!edges.count({e.second, e.first}))
+			fail("hull3dFast branching horizon: open edge", p);
+		cases++;
+	}
 	{ // an int eps must not make the tests run in int
 		vector<P3> A{P3(0,0,0), P3(.5,0,0), P3(0,.5,0), P3(0,0,.5)};
 		assert(sz(hull3dFast(A, 0)) == 4);
