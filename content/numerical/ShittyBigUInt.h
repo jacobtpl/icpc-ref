@@ -81,10 +81,10 @@ public:
 		return 0;
 	}
 
-	BigUInt operator<< (uint shift)
+	BigUInt operator<< (unsigned shift)
 	{
-		uint full = shift / B;
-		uint partial = shift - full * B;
+		unsigned full = shift / B;
+		unsigned partial = shift - full * B;
 		BigUInt o;
 		o.assign(full + 1, 0);
 		for(int i=0;i<size();++i)
@@ -96,10 +96,10 @@ public:
 		o.check();
 		return o;
 	}
-	BigUInt operator>> (uint shift)
+	BigUInt operator>> (unsigned shift)
 	{
-		uint full = shift / B;
-		uint partial = shift - full * B;
+		unsigned full = shift / B;
+		unsigned partial = shift - full * B;
 		BigUInt o;
 		for(int i=full;i<size();++i)
 		{
@@ -112,6 +112,6 @@ public:
 		return o;
 	}
 
-	BigUInt& operator>>= (uint shift) { return *this = *this >> shift; }
-	BigUInt& operator<<= (uint shift) { return *this = *this << shift; }
+	BigUInt& operator>>= (unsigned shift) { return *this = *this >> shift; }
+	BigUInt& operator<<= (unsigned shift) { return *this = *this << shift; }
 };
