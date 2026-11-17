@@ -37,7 +37,7 @@ typedef RayT<double> Ray;
 template<class T, class F = GeoR<T>>
 vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
 	bool add_bounds = false, typename Geo<T>::F eps = 1e-13,
-	type_identity_t<T> bound = 1000000000) {
+	common_type_t<T> bound = 1000000000) {
 	typedef Point<T> P; typedef RayT<T> R;
 	const bool I = !geoFloat<T>; // exact arithmetic
 	typedef typename Geo<T>::W W;

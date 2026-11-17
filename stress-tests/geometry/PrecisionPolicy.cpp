@@ -151,7 +151,7 @@ template<class T, class F, class W> void ints(T big) {
 int main() {
 	static_assert(geoFloat<Q> && geoInt<__int128>); // also in strict mode
 	floats<double>(0x1p-53L);
-	floats<ld>(0x1p-64L);
+	floats<ld>(LDBL_EPSILON / 2);
 	floats<Q>(0x1p-113L);
 	// __float128 really carries ~34 digits
 	Q s = gsqrt(Q(2));
