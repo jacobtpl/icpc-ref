@@ -36,7 +36,7 @@ done
 [ ${#compilers[@]} -gt 0 ] || { echo "no C++ compiler found"; exit 1; }
 
 flagsets=("" "-O2" "-std=c++11" "-std=c++17 -O2" "-std=gnu++17 -O2"
-	"-std=c++20 -O2 -Wall -Wextra -Wconversion" "-std=gnu++20 -O0" "-Ofast")
+	"-std=c++20 -O2 -Wall -Wextra -Wconversion" "-std=gnu++20 -O0" "-std=c++23 -O2" "-std=gnu++23" "-Ofast")
 fail=0
 for c in "${compilers[@]}"; do
 	echo; echo "== $c: $("$c" --version | head -1)"
@@ -54,6 +54,11 @@ for c in "${compilers[@]}"; do
 		echo "   no <bits/stdc++.h> here: using a temporary stand-in for this test"
 	fi
 	for f in "${flagsets[@]}"; do
+		# older compilers spell C++23 as c++2b
+		echo 'int main(){}' | "$c" $f -x c++ -fsyntax-only - 2>/dev/null || f=${f/++23/++2b}
+		if ! echo 'int main(){}' | "$c" $f -x c++ -fsyntax-only - 2>/dev/null; then
+			printf '   SKIP [%s] this compiler does not accept these flags\n' "$f"; continue
+		fi
 		if out=$(CXX="$c" python3 stress-tests/various/Template128IO.py $shim $f 2>"$tmp/err"); then
 			case "$has:$out" in
 				yes:integers*) fail=1; r="FAIL (template fell back to long double)";;
