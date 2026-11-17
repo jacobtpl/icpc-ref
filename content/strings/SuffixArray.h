@@ -43,6 +43,7 @@ struct SuffixArray {
 	// total unique substrings = (n+1 C 2) - sum(lcp)
 	// string search in O(m log n). returns [l,r] of matches in sa.
 	pair<int,int> search(const string &t) {
+		if (s.empty()) return {-1,-1};
 		int b=1,e=sz(sa)-1;
 		while (b<e) {
 			int m=(b+e)/2;
