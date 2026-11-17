@@ -61,19 +61,61 @@ template<class T> int sgn(T x) {
 		return (x > geoEps<T>) - (x < -geoEps<T>);
 	else return (x > 0) - (x < 0);
 }
+// __float128 math in plain C++: needs no libquadmath and no glibc, so
+// it also works on macOS. Accurate to a few ulp; angles |x| < 1e12.
+namespace q128 {
+typedef __float128 Q;
+inline Q fabs(Q x) { return x < 0 ? -x : x; }
+inline Q sqrt(Q x) {
+	if (!(x > 0) || x == x + x) return x < 0 ? (x - x) / (x - x) : x;
+	Q s = 1; // scale into double range, then Newton from a double
+	for (; x > 0x1p1000; x *= 0x1p-200) s *= 0x1p100;
+	for (; x < 0x1p-1000; x *= 0x1p200) s *= 0x1p-100;
+	Q r = std::sqrt((double)x);
+	r = (r + x / r) / 2; r = (r + x / r) / 2;
+	return r * s; }
+inline Q hypot(Q x, Q y) {
+	x = fabs(x), y = fabs(y); if (x < y) swap(x, y);
+	if (x == 0 || x == x + x) return x;
+	y /= x; return x * sqrt(1 + y * y); }
+inline void sincos(Q x, Q& s, Q& c) {
+	static const array<Q, 34> inv = [] { // 1/i!
+		array<Q, 34> a; a[0] = 1;
+		rep(i,1,34) a[i] = a[i-1] / i;
+		return a; }();
+	ll k = (ll)(x / 0x1.921fb54442d18p+0 + (x < 0 ? -.5 : .5));
+	Q n = k, r = x - n * 0x1.921fb54442d18p+0 // x - k*pi/2
+		- n * 0x1.1a62633145cp-54 - n * 0x1.b839a252049c1p-104,
+		r2 = -r * r, S = 0, C = 0;
+	for (int i = 32; i >= 0; i -= 2) // Taylor series, |r| <= pi/4
+		C = C * r2 + inv[i], S = S * r2 + inv[i+1];
+	S *= r; s = k & 1 ? C : S, c = k & 1 ? -S : C;
+	if (k & 2) s = -s, c = -c; }
+inline Q sin(Q x) { Q s, c; sincos(x, s, c); return s; }
+inline Q cos(Q x) { Q s, c; sincos(x, s, c); return c; }
+inline Q atan2(Q y, Q x) { // double atan2 plus one Newton step
+	Q h = hypot(x, y), s, c;
+	if (!(h > 0) || h == h + h) return std::atan2((double)y, (double)x);
+	x /= h, y /= h; Q t = std::atan2((double)y, (double)x);
+	sincos(t, s, c); Q d = y * c - x * s;
+	return t + (d + d * d * d / 6); }
+inline Q fma(Q a, Q b, Q c) { // exact when a*b + c cancels (geoDet)
+	auto hi = [](Q v) { Q t = v * 0x1p57 + v; return t - (t - v); };
+	Q p = a * b, A = hi(a), B = hi(b), a2 = a - A, b2 = b - B;
+	return (p + c) + (((A * B - p) + A * b2 + a2 * B) + a2 * b2); }
+}
 #define GEO_FN(f) template<class F> F g##f(F x) { \
-	if constexpr (is_same_v<F, __float128>) return f##f128(x); \
+	if constexpr (is_same_v<F, __float128>) return q128::f(x); \
 	else return f(x); }
 GEO_FN(sqrt) GEO_FN(sin) GEO_FN(cos) GEO_FN(fabs)
 #undef GEO_FN
-template<class F> F gatan2(F y, F x) {
-	if constexpr (is_same_v<F, __float128>) return atan2f128(y, x);
-	else return atan2(y, x); }
-template<class F> F ghypot(F x, F y) {
-	if constexpr (is_same_v<F, __float128>) return hypotf128(x, y);
-	else return hypot(x, y); }
+#define GEO_FN(f) template<class F> F g##f(F x, F y) { \
+	if constexpr (is_same_v<F, __float128>) return q128::f(x, y); \
+	else return f(x, y); }
+GEO_FN(atan2) GEO_FN(hypot)
+#undef GEO_FN
 template<class F> F gfma(F a, F b, F c) { // a*b+c, rounded once
-	if constexpr (is_same_v<F, __float128>) return fmaf128(a, b, c);
+	if constexpr (is_same_v<F, __float128>) return q128::fma(a, b, c);
 	else return fma(a, b, c); }
 // a*b - c*d; when the products cancel the rounding errors of both
 // are recovered with fma (Kahan), so the sign and digits survive
