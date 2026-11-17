@@ -61,10 +61,19 @@ template<class T> int sgn(T x) {
 		return (x > geoEps<T>) - (x < -geoEps<T>);
 	else return (x > 0) - (x < 0);
 }
-// __float128 math in plain C++: needs no libquadmath and no glibc, so
-// it also works on macOS. Accurate to a few ulp; angles |x| < 1e12.
+// __float128 math without libquadmath: glibc's functions on Linux,
+// else (macOS; or define GEO_OWN_F128) plain C++, accurate to a few
+// ulp for angles |x| < 1e12.
 namespace q128 {
 typedef __float128 Q;
+#if defined(__GLIBC__) && !defined(GEO_OWN_F128)
+#define GEO_Q(f) inline Q f(Q x) { return f##f128(x); }
+GEO_Q(sqrt) GEO_Q(sin) GEO_Q(cos) GEO_Q(fabs)
+#undef GEO_Q
+inline Q atan2(Q y, Q x) { return atan2f128(y, x); }
+inline Q hypot(Q x, Q y) { return hypotf128(x, y); }
+inline Q fma(Q a, Q b, Q c) { return fmaf128(a, b, c); }
+#else
 inline Q fabs(Q x) { return x < 0 ? -x : x; }
 inline Q sqrt(Q x) {
 	if (!(x > 0) || x == x + x) return x < 0 ? (x - x) / (x - x) : x;
@@ -103,6 +112,7 @@ inline Q fma(Q a, Q b, Q c) { // exact when a*b + c cancels (geoDet)
 	auto hi = [](Q v) { Q t = v * 0x1p57 + v; return t - (t - v); };
 	Q p = a * b, A = hi(a), B = hi(b), a2 = a - A, b2 = b - B;
 	return (p + c) + (((A * B - p) + A * b2 + a2 * B) + a2 * b2); }
+#endif
 }
 #define GEO_FN(f) template<class F> F g##f(F x) { \
 	if constexpr (is_same_v<F, __float128>) return q128::f(x); \
