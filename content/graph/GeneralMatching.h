@@ -4,7 +4,7 @@
  * License: CC0
  * Source: http://www.mimuw.edu.pl/~mucha/pub/mucha_sankowski_focs04.pdf
  * Description: Matching for general graphs.
- * Fails with probability $N / mod$.
+ * Fails with probability N / mod.
  * Time: O(N^3)
  * Status: not very well tested
  */

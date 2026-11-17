@@ -1,7 +1,7 @@
 /**
  * Author: Benq
  * Description: Computes all faces of the 3-dimension hull of a point set.
- * Time: O(n \log n)
+ * Time: O(n log n)
  * Status: tested on SPOJ CH3D
  */
 

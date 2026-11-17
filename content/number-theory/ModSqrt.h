@@ -3,9 +3,9 @@
  * Date: 2016-08-31
  * License: CC0
  * Source: http://eli.thegreenplace.net/2009/03/07/computing-modular-square-roots-in-python/
- * Description: Tonelli-Shanks algorithm for modular square roots. Finds $x$ s.t. $x^2 = a \pmod p$ ($-x$ gives the other solution).
- * Requires $p$ prime, $p < 3 \cdot 10^9$ (use modmul for the products if $p$ is larger).
- * Time: O(\log^2 p) worst case, O(\log p) for most $p$
+ * Description: Tonelli-Shanks algorithm for modular square roots. Finds x s.t. x^2 = a (mod p) (-x gives the other solution).
+ * Requires p prime, p < 3 * 10^9 (use modmul for the products if p is larger).
+ * Time: O(log^2 p) worst case, O(log p) for most p
  * Status: Tested for all a,p <= 10000
  */
 #pragma once

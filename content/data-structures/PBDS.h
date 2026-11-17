@@ -4,7 +4,7 @@
  * License: CC0
  * Source: me
  * Description: examples for PBDS BBST, mergeable heaps and rope.
- * Time: O(\log N)
+ * Time: O(log N)
  * Status: tested
  */
 #include <ext/pb_ds/assoc_container.hpp>

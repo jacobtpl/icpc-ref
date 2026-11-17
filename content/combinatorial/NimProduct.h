@@ -1,19 +1,19 @@
 /**
  * Author: Benq
  * Description: Product of nimbers is associative, commutative, and distributive 
- 	* over addition (xor). Forms finite field of size $2^{2^k}.$ 
- 	* Defined by $ab=\text{mex}(\{a'b+ab'+a'b':a'<a,b'<b\}).$ Application: 
- 	* Given 1D coin turning games $G_1,G_2$ $G_1\times G_2$ is the 2D coin turning 
- 	* game defined as follows. If turning coins at $x_1,x_2,\ldots,x_m$ is legal 
- 	* in $G_1$ and $y_1,y_2,\ldots,y_n$ is legal in $G_2$, then turning coins at 
- 	* all positions $(x_i,y_j)$ is legal assuming that the coin at $(x_m,y_n)$ 
- 	* goes from heads to tails. Then the grundy function $g(x,y)$ of $G_1\times G_2$ 
- 	* is $g_1(x)\times g_2(y).$ 
+ 	* over addition (xor). Forms finite field of size 2^(2^k). 
+ 	* Defined by ab=mex({a'b+ab'+a'b':a'<a,b'<b}). Application: 
+ 	* Given 1D coin turning games G_1,G_2 G_1x G_2 is the 2D coin turning 
+ 	* game defined as follows. If turning coins at x_1,x_2,...,x_m is legal 
+ 	* in G_1 and y_1,y_2,...,y_n is legal in G_2, then turning coins at 
+ 	* all positions (x_i,y_j) is legal assuming that the coin at (x_m,y_n) 
+ 	* goes from heads to tails. Then the grundy function g(x,y) of G_1x G_2 
+ 	* is g_1(x)x g_2(y). 
  * Source: Andrew He
  	* also see pg 35 of https://www.fmf.uni-lj.si/~juvan/Seminar1/ferguson.pdf
  	* https://en.wikipedia.org/wiki/Nimber
  	* https://judge.yosupo.jp/submission/6485
- * Time: $64^2$ xors per multiplication, memorize to speed up.
+ * Time: 64^2 xors per multiplication, memorize to speed up.
  * Status: tested on https://codeforces.com/gym/102341/problem/L
  	* https://projecteuler.net/problem=459
  	* https://judge.yosupo.jp/problem/nim_product_64

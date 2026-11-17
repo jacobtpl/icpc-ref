@@ -4,9 +4,9 @@
  * License: CC0
  * Source: Czech graph algorithms book, by Demel. (Tarjan's algorithm)
  * Description: Finds strongly connected components in a
- * directed graph. If vertices $u, v$ belong to the same component,
- * we can reach $u$ from $v$ and vice versa.
- * Usage: scc(graph, [\&](vi\& v) { ... }) visits all components
+ * directed graph. If vertices u, v belong to the same component,
+ * we can reach u from v and vice versa.
+ * Usage: scc(graph, [&](vi& v) { ... }) visits all components
  * in reverse topological order. comp[i] holds the component
  * index of a node (a component only has edges to components with
  * lower index). ncomps will contain the number of components.

@@ -1,22 +1,13 @@
 \chapter{Various}
 
 \section{Intervals}
-	\kactlimport{IntervalContainer.h}
-	\kactlimport{IntervalCover.h}
-	\kactlimport{ConstantIntervals.h}
 
 \section{Misc. algorithms}
-	\kactlimport{Dates.h}
-	\kactlimport{TernarySearch.h}
-	\kactlimport{LIS.h}
-	\kactlimport{FastKnapsack.h}
 
 \section{128-bit numbers and I/O}
 	\import{Numbers128.tex}
 
 \section{Dynamic programming}
-	\kactlimport{KnuthDP.h}
-	\kactlimport{DivideAndConquerDP.h}
 
 \section{Debugging tricks}
 	\begin{itemize}
@@ -41,10 +32,3 @@
 			\item \lstinline{#pragma GCC target ("avx2")} can double performance of vectorized code, but causes crashes on old machines.
 			\item \lstinline{#pragma GCC optimize ("trapv")} kills the program on integer overflows (but is really slow).
 		\end{itemize}
-	\kactlimport{FastMod.h}
-	\kactlimport{FastInput.h}
-	\kactlimport{BumpAllocator.h}
-	\kactlimport{SmallPtr.h}
-	% \kactlimport{BumpAllocatorSTL.h}
-	% \kactlimport{Unrolling.h}
-	% \kactlimport{SIMD.h}

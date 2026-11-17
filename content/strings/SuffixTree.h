@@ -8,7 +8,7 @@
  *  The root is 0 (has l = -1, r = 0), non-existent children are -1.
  *  To get a complete tree, append a dummy symbol -- otherwise it may contain
  *  an incomplete path (still useful for substring matching, though).
- * Time: $O(26N)$
+ * Time: O(26N)
  * Status: stress-tested a bit
  */
 #pragma once

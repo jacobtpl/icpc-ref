@@ -3,8 +3,8 @@
  * Date: back in the day
  * License: CC0
  * Source: me
- * Description: 2D point-update range-query segtree supporting $10^9$ coordinates (IOI 2013 game)
- * Time: $O(\log^2 N)$
+ * Description: 2D point-update range-query segtree supporting 10^9 coordinates (IOI 2013 game)
+ * Time: O(log^2 N)
  * Status: tested on IOI
  */
 

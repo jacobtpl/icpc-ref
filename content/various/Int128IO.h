@@ -5,7 +5,7 @@
  *  parse128 accepts an optional sign followed by digits. It returns false
  *  on invalid input or overflow, leaving out unchanged. str128 handles
  *  the minimum value without signed negation overflow.
- * Time: O(|s|) parsing, O(\log |x|) formatting.
+ * Time: O(|s|) parsing, O(log |x|) formatting.
  * Status: Stress-tested against Python integers.
  */
 #pragma once

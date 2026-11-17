@@ -4,10 +4,10 @@
  * License: CC0
  * Description: Chinese Remainder Theorem.
  *
- * \texttt{crt(a, m, b, n)} computes $x$ such that $x\equiv a \pmod m$, $x\equiv b \pmod n$.
- * If $|a| < m$ and $|b| < n$, $x$ will obey $0 \le x < \text{lcm}(m, n)$.
- * Assumes $mn < 2^{62}$.
- * Time: $\log(n)$
+ * crt(a, m, b, n) computes x such that x == a (mod m), x == b (mod n).
+ * If |a| < m and |b| < n, x will obey 0 <= x < lcm(m, n).
+ * Assumes mn < 2^62.
+ * Time: log(n)
  * Status: Works
  */
 #pragma once

@@ -4,7 +4,7 @@
  * License: CC0
  * Source: idk
  * Description: FFT but with complex numbers
- * Time: O(N \log N) with $N = |A|+|B|$ ($\tilde 1s$ for $N=2^{22}$)
+ * Time: O(N log N) with N = |A|+|B| (~1s for N=2^22)
  * Status: somewhat tested
  */
 vector<C> conv_complex(const vector<C>& a, const vector<C>& b) {

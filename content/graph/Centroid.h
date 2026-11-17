@@ -3,7 +3,7 @@
  * Date: April 6, 2024
  * Description: Boilerplate centroid decomp code
  * Status: Tested by Jacob on Xenia and Tree
- * Time: O(N\log N)
+ * Time: O(Nlog N)
  */
 
 struct Centroid {

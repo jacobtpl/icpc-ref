@@ -3,15 +3,9 @@
  * Date: 2009-03-21
  * License: CC0
  * Source:
- * Description:\\
-\begin{minipage}{65mm}
+ * Description:
 Returns the shortest distance between point p and the line segment from point s to e.
 Works for any Point<T>; with Point<ll> (coordinates up to 1e9) everything but the final division is exact, which double input cannot give near the segment.
-\end{minipage}
-\begin{minipage}{15mm}
-\vspace{-10mm}
-\includegraphics[width=\textwidth]{content/geometry/SegmentDistance}
-\end{minipage}
  * Usage: 
  * 	Point<double> a, b(2,2), p(1,1);
  * 	bool onSegment = segDist(a,b,p) < 1e-10;

@@ -11,7 +11,7 @@
  * ll. Exact for any int input, and for ll input with |x|, |y| <= 2e18
  * (weights are at most 4 max|coord|). The MST total is the caller's sum:
  * it fits in ll while (N-1) * 4 max|coord| < 2^63.
- * Time: O(N \log N)
+ * Time: O(N log N)
  * Status: Stress-tested
  */
 #pragma once

@@ -4,10 +4,10 @@
  * License: CC0
  * Source: folklore
  * Description: Builds the block cut tree.
- * 	BCTree node $n >= cut$ is the single node who[n][0] of the original graph: an AP,
+ * 	BCTree node n >= cut is the single node who[n][0] of the original graph: an AP,
  * 	an endpoint of a bridge (bridges join two such nodes directly) or an isolated node.
- * 	Node $v$ of the original graph is such a node iff $vmap[v] >= cut$. No self-loops.
- * 	$emap[i] = -1$ if edge $i$ is a bridge. Otherwise, $emap[i]$ is the BCC containing it.
+ * 	Node v of the original graph is such a node iff vmap[v] >= cut. No self-loops.
+ * 	emap[i] = -1 if edge i is a bridge. Otherwise, emap[i] is the BCC containing it.
  * Usage:
  *  see BiconnectedComponents.h
  *  edges[i] = the edge i (pair of two nodes)

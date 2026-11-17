@@ -3,7 +3,7 @@
  * Date: 2019-10-29
  * License: Unknown
  * Source: https://codeforces.com/gym/101673/submission/50481926
- * Description: Calculates the area of the union of $n$ polygons (not necessarily
+ * Description: Calculates the area of the union of n polygons (not necessarily
  * convex). The points within each polygon must be given in CCW order.
  * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
  * T can be double, ll or Fraction. With ll all side tests are exact for
@@ -12,7 +12,7 @@
  * for integers up to about 3e7). With Fraction everything is exact
  * and a Fraction is returned. The area is summed relative to a
  * polygon vertex, so far-away input does not cancel.
- * Time: $O(N^2)$, where $N$ is the total number of points
+ * Time: O(N^2), where N is the total number of points
  * Status: stress-tested, Submitted on ECNA 2017 Problem A
  */
 #pragma once

@@ -4,7 +4,7 @@
  * License: CC0
  * Source: me
  * Description: AVL tree with split (maintaining a sequence)
- * Time: O(\log N)
+ * Time: O(log N)
  */
 struct AVL {
 public:

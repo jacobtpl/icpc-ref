@@ -3,16 +3,16 @@
  * Date: 2020-06-03
  * License: CC0
  * Source: own work
- * Description: Returns the smallest $x > 0$ s.t. $a^x = b \pmod m$, or
- * $-1$ if no such $x$ exists. modLog(a,1,m) can be used to
- * calculate the order of $a$.
- * Time: $O(\sqrt m)$
+ * Description: Returns the smallest x > 0 s.t. a^x = b (mod m), or
+ * -1 if no such x exists. modLog(a,1,m) can be used to
+ * calculate the order of a.
+ * Time: O(sqrt(m))
  * Status: tested for all 0 <= a,x < 500 and 0 < m < 500.
  *
  * Details: This algorithm uses the baby-step giant-step method to
  * find (i,j) such that a^(n * i) = b * a^j (mod m), where n > sqrt(m)
  * and 0 < i, j <= n. If a and m are coprime then a^j has a modular
- * inverse, which means that a^(i * n - j) = b (mod m$).
+ * inverse, which means that a^(i * n - j) = b (mod m).
  *
  * However this particular implementation of baby-step giant-step works even
  * without assuming a and m are coprime, using the following idea:

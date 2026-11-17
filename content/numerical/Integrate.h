@@ -4,7 +4,7 @@
  * License: CC0
  * Source: Wikipedia
  * Description: Simple integration of a function over an interval using
- *  Simpson's rule. The error should be proportional to $h^4$, although in
+ *  Simpson's rule. The error should be proportional to h^4, although in
  *  practice you will want to verify that the result is stable to desired
  *  precision when epsilon changes.
  * Status: mostly untested

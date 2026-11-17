@@ -4,7 +4,7 @@
  * Description: A short self-balancing tree. It acts as a
  *  sequential container with log-time splits/joins, and
  *  is easy to augment with additional data. 0-index.
- * Time: $O(\log N)$
+ * Time: O(log N)
  * Status: stress-tested
  */
 using pt = struct Node*;

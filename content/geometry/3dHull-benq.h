@@ -6,7 +6,7 @@
  *  Predicates are evaluated in T on coordinate differences and are
  *  exact for integer coordinates of absolute value up to 5e4 with
  *  T = double, 5e5 with long long, 1e12 with __int128.
- * Time: O(n^2, n \log n)
+ * Time: O(n^2, n log n)
  * Status: tested on SPOJ CH3D
  */
 #pragma once

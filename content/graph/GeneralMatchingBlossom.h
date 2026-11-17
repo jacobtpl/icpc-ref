@@ -2,7 +2,7 @@
  * Author: Benq
  * Description: Variant on Gabow's Impl of Edmond's Blossom Algorithm. 
     * General unweighted max matching with 1-based indexing. If 
-    * \texttt{white[v] = 0} after \texttt{solve()} returns, \texttt{v} is part
+    * white[v] = 0 after solve() returns, v is part
     * of every max matching. 1-INDEXED NODES
  * Time: O(NM), faster in practice
  * Source: 

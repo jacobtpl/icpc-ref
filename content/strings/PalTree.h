@@ -4,7 +4,7 @@
  * link points to longest suffix-palindrome of node
  * oc stores num occurences after resolveOc()
  * ans[i][b] is min factorization of prefix i (1-indexed) with parity b
- * Time: O(n\log n)
+ * Time: O(nlog n)
  * Status: tested
  */
 struct PalTree {

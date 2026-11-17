@@ -2,14 +2,14 @@
  * Author: Devin
  * Date: 2026-10-08
  * License: CC0
- * Source: own work; folklore (linear basis over $\mathbb F_2$)
- * Description: Basis of a set of 64-bit vectors over $\mathbb F_2$.
- *  $b[i]$ is 0 or a basis vector with highest set bit $i$; $r$ is the rank,
- *  so $2^r$ distinct values are representable as xors of subsets (0 always is).
- *  add returns true iff $x$ was not representable before.
- *  maxXor/minXor give the max/min of $x \oplus v$ over representable $v$.
- *  kth returns the $k$-th smallest representable value, 0-indexed
- *  ($\texttt{kth(0)} = 0$), and requires $k < 2^r$.
+ * Source: own work; folklore (linear basis over GF(2))
+ * Description: Basis of a set of 64-bit vectors over GF(2).
+ *  b[i] is 0 or a basis vector with highest set bit i; r is the rank,
+ *  so 2^r distinct values are representable as xors of subsets (0 always is).
+ *  add returns true iff x was not representable before.
+ *  maxXor/minXor give the max/min of x xor v over representable v.
+ *  kth returns the k-th smallest representable value, 0-indexed
+ *  (kth(0) = 0), and requires k < 2^r.
  *  Values are compared as unsigned; cast negative numbers to ull.
  * Time: O(64) per operation, O(64^2) for merge.
  * Usage:

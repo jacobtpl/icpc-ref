@@ -6,7 +6,7 @@
  * Description: Disjoint-set data structure with undo.
  * If undo is not needed, skip st, time() and rollback().
  * Usage: int t = uf.time(); ...; uf.rollback(t);
- * Time: $O(\log(N))$
+ * Time: O(log(N))
  * Status: tested as part of DirectedMST.h
  */
 #pragma once

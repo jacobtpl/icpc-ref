@@ -5,15 +5,15 @@
  * Source: https://software.intel.com/sites/landingpage/IntrinsicsGuide/
  * Description: Cheat sheet of SSE/AVX intrinsics, for doing arithmetic on several numbers at once.
  * Can provide a constant factor improvement of about 4, orthogonal to loop unrolling.
- * Operations follow the pattern \texttt{"\_mm(256)?\_name\_(si(128|256)|epi(8|16|32|64)|pd|ps)"}. Not all are described here;
- * grep for \texttt{\_mm\_} in \texttt{/usr/lib/gcc/{*}/4.9/include/} for more.
- * If AVX is unsupported, try 128-bit operations, "emmintrin.h" and \#define \texttt{\_\_SSE\_\_} and \texttt{\_\_MMX\_\_} before including it.
- * For aligned memory use \texttt{\_mm\_malloc(size, 32)} or \texttt{int buf[N] alignas(32)}, but prefer loadu/storeu.
+ * Operations follow the pattern "_mm(256)?_name_(si(128|256)|epi(8|16|32|64)|pd|ps)". Not all are described here;
+ * grep for _mm_ in /usr/lib/gcc/{*}/4.9/include/ for more.
+ * If AVX is unsupported, try 128-bit operations, "emmintrin.h" and #define __SSE__ and __MMX__ before including it.
+ * For aligned memory use _mm_malloc(size, 32) or int buf[N] alignas(32), but prefer loadu/storeu.
  */
 #pragma once
 
 #pragma GCC target ("avx2") // or sse4.1
-#include "immintrin.h" /** keep-include */
+#include "immintrin.h"
 
 typedef __m256i mi;
 #define L(x) _mm256_loadu_si256((mi*)&(x))

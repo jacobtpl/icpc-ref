@@ -4,14 +4,14 @@
  * License: CC0
  * Source: me
  * Description: Persistent AVL tree with split. Nodes made since the last
- * \texttt{step()} are modified in place, so \texttt{split} and \texttt{+} destroy
- * their operands unless those are older. \texttt{step()} freezes all existing
+ * step() are modified in place, so split and + destroy
+ * their operands unless those are older. step() freezes all existing
  * trees and returns a fresh modifiable copy. Nodes are never freed: call
- * \texttt{PAVL::reset()} between testcases (invalidates every existing tree).
+ * PAVL::reset() between testcases (invalidates every existing tree).
  * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
  *  PAVL b = a.step(); // a is now immutable
  *  auto [l, r] = b.split(1); // consumes b, not a
- * Time: O(\log N)
+ * Time: O(log N)
  */
 struct PAVL {
 	struct Node {

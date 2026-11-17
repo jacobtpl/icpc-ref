@@ -4,8 +4,8 @@
  * License: CC0
  * Description: Exact finite fractions, stored as coprime p/q with q > 0.
  *  Uses long long storage and signed 128-bit intermediates. Throws
- *  overflow\_error if the reduced numerator or positive denominator
- *  does not fit, and domain\_error on division by zero. Do not modify
+ *  overflow_error if the reduced numerator or positive denominator
+ *  does not fit, and domain_error on division by zero. Do not modify
  *  p or q directly. Floating conversions are explicit; no epsilon is needed.
  *  Input accepts integer or p/q tokens; output is always p/q.
  *  fromWide(p,q) reduces a signed 128-bit ratio before checking storage.

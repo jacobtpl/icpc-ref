@@ -5,12 +5,12 @@
  * Source: hacKIT, NWERC 2015
  * Description: A set (not multiset!) with support for finding the n'th
  * element, and finding the index of an element.
- * To get a map, change \texttt{null\_type}.
- * Time: O(\log N)
+ * To get a map, change null_type.
+ * Time: O(log N)
  */
 #pragma once
 
-#include <bits/extc++.h> /** keep-include */
+#include <bits/extc++.h>
 using namespace __gnu_pbds;
 
 template<class T>

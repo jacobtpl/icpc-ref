@@ -4,7 +4,7 @@
  * License: CC0
  * Source: https://codeforces.com/blog/entry/58747
  * Description: Finds the closest pair of points.
- * Time: O(n \log n)
+ * Time: O(n log n)
  * Status: stress-tested
  */
 #pragma once

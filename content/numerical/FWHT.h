@@ -2,7 +2,7 @@
  * Author: Siyong
  * Date: 2023
  * Description: FWHT
- * Time: O(N \log N)
+ * Time: O(N log N)
  * For inverse fwht: call fwht and divide all elements by (2 ** L) (size of array)
  */
 template<typename T>

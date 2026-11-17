@@ -3,31 +3,18 @@
  * Date: 2009-08-15
  * License: CC0
  * Source: https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
- * Description: $x=\textrm{tridiagonal}(d,p,q,b)$ solves the equation system
-\[
-\left(\begin{array}{c}b_0\\b_1\\b_2\\b_3\\\vdots\\b_{n-1}\end{array}\right) =
-\left(\begin{array}{cccccc}
-d_0 & p_0 & 0 & 0 & \cdots & 0\\
-q_0 & d_1 & p_1 & 0 & \cdots & 0\\
-0 & q_1 & d_2 & p_2 & \cdots & 0\\
-\vdots & \vdots & \ddots & \ddots & \ddots & \vdots\\
-0 & 0 & \cdots & q_{n-3} & d_{n-2} & p_{n-2}\\
-0 & 0 & \cdots & 0 & q_{n-2} & d_{n-1}\\
-\end{array}\right)
-\left(\begin{array}{c}x_0\\x_1\\x_2\\x_3\\\vdots\\x_{n-1}\end{array}\right).
-\]
-
-This is useful for solving problems on the type
-\[ a_i=b_ia_{i-1}+c_ia_{i+1}+d_i,\,1\leq i\leq n, \]
-where $a_0$, $a_{n+1}$, $b_i$, $c_i$ and $d_i$ are known. $a$ can then be obtained from
-\begin{align*}
-\{a_i\}=\textrm{tridiagonal}(&\{1,-1,-1,...,-1,1\}, \{0,c_1,c_2,\dots,c_n\},\\
-&\{b_1,b_2,\dots,b_n,0\}, \{a_0,-d_1,-d_2,\dots,-d_n,a_{n+1}\}).
-\end{align*}
-Fails if the solution is not unique.
-
-If $|d_i| > |p_i| + |q_{i-1}|$ for all $i$, or $|d_i| > |p_{i-1}| + |q_i|$, or the matrix is positive definite,
-the algorithm is numerically stable and neither \texttt{tr} nor the check for \texttt{diag[i] == 0} is needed.
+ * Description: x = tridiagonal(d, p, q, b) solves the n x n system
+ *   d[0] x[0] + p[0] x[1] = b[0]
+ *   q[i-1] x[i-1] + d[i] x[i] + p[i] x[i+1] = b[i]   (0 < i < n-1)
+ *   q[n-2] x[n-2] + d[n-1] x[n-1] = b[n-1]
+ * i.e. d is the diagonal, p the superdiagonal and q the subdiagonal.
+ * To solve a_i = b_i a_(i-1) + c_i a_(i+1) + d_i for 1 <= i <= n with
+ * a_0 and a_(n+1) known, use
+ *   a = tridiagonal({1,-1,...,-1,1}, {0,c_1,...,c_n},
+ *                   {b_1,...,b_n,0}, {a_0,-d_1,...,-d_n,a_(n+1)}).
+ * Fails if the solution is not unique.
+ * If |d_i| > |p_i| + |q_(i-1)| for all i, or |d_i| > |p_(i-1)| + |q_i|, or the matrix is positive definite,
+ * the algorithm is numerically stable and neither tr nor the check for diag[i] == 0 is needed.
  * Time: O(N)
  * Status: Brute-force tested mod 5 and 7 and stress-tested for real matrices obeying the criteria above.
  */

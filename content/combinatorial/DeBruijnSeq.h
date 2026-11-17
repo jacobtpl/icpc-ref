@@ -1,7 +1,7 @@
 /**
  * Author: Benq
- * Description: Given alphabet $[0,k)$ constructs a cyclic string 
- * of length $k^n$ that contains every length $n$ string as substr. 
+ * Description: Given alphabet [0,k) constructs a cyclic string 
+ * of length k^n that contains every length n string as substr. 
  * Source: https://github.com/koosaga/DeobureoMinkyuParty/blob/master/teamnote.tex
  * https://en.wikipedia.org/wiki/De_Bruijn_sequence
  * pg 241 of http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.93.5967&rep=rep1&type=pdf 

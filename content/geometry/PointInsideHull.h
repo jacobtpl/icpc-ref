@@ -8,7 +8,7 @@
  * the hull. If strict is true, points on the boundary aren't included.
  * Usage:
  * Status: stress-tested
- * Time: O(\log N)
+ * Time: O(log N)
  */
 #pragma once
 

@@ -5,7 +5,7 @@
  * Description: Represents a forest of unrooted trees. You can add and remove
  * edges (as long as the result is still a forest), and check whether
  * two nodes are in the same tree.
- * Time: All operations take amortized O(\log N).
+ * Time: All operations take amortized O(log N).
  * Status: Stress-tested a bit for N <= 20
  */
 #pragma once

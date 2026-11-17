@@ -2,7 +2,7 @@
  * Author: Jacob Teo
  * Date: 2024
  * Description: Link-cut tree with evert, node update and path sum.
- * Time: All operations take amortized O(\log N).
+ * Time: All operations take amortized O(log N).
  */
 #pragma once
 

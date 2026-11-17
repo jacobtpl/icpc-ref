@@ -3,7 +3,7 @@
  * Date: 2023
  * License: CC0
  * Description: Prime sieve but slow, for generating all primes smaller than LIM.
- * Time: LIM=1e7 $\approx$ 0.15s, LIM=1e8 $\approx$ 2s. Uses $\approx 12$ bytes per number (1.2GB for LIM=1e8).
+ * Time: LIM=1e7 ~ 0.15s, LIM=1e8 ~ 2s. Uses ~12 bytes per number (1.2GB for LIM=1e8).
  * Status: kinda tested
  */
 int const LIM = 1e7+5;

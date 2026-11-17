@@ -1,6 +1,9 @@
 #include "../utilities/template.h"
 
+// Drop const so that the test can use a small modulus.
+#define const
 #include "../../content/numerical/LinearRecurrence.h"
+#undef const
 
 template<class F>
 void gen(vector<ll>& v, int at, F f) {

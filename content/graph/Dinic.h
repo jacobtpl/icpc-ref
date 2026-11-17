@@ -3,8 +3,8 @@
  * Date: idk
  * License: CC0
  * Source: stanford-notebook
- * Description: Dinic's without scaling. Self-loops are ignored; requires $S \ne T$.
- * The $i$-th added non-loop edge is E[2*i], with its flow in E[2*i].flow.
+ * Description: Dinic's without scaling. Self-loops are ignored; requires S != T.
+ * The i-th added non-loop edge is E[2*i], with its flow in E[2*i].flow.
  * Usage: Dinic d(n); d.AddEdge(u, v, cap); ll f = d.MaxFlow(s, t);
  */
 

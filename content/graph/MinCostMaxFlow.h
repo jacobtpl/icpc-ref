@@ -5,10 +5,10 @@
  *  so the flow sent over an added edge e (not a self-loop) is -ed[e.n][e.rev].flow.
  *  If costs can be negative, call setpi before maxflow; negative cost cycles are not supported.
  *  With C = F = int, every shortest path cost and every difference of two such costs
- *  (these are the reduced distances) must stay below INFC ($\approx 2^{29}$), and the total flow
- *  below $2^{31}$; otherwise change the typedefs to ll.
+ *  (these are the reduced distances) must stay below INFC (~2^29), and the total flow
+ *  below 2^31; otherwise change the typedefs to ll.
  * Status: Tested on kattis:mincostmaxflow, stress-tested
- * Time: $O(F E \log(V))$ where F is max flow. $O(VE)$ for setpi.
+ * Time: O(F E log(V)) where F is max flow. O(VE) for setpi.
  */
 
 // #include <bits/extc++.h>

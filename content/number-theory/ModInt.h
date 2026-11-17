@@ -1,12 +1,12 @@
 /**
  * Author: Siyong
  * Date: April 6, 2024
- * Description: Modular integers for $1 \le M \le 2^{30}$.
+ * Description: Modular integers for 1 <= M <= 2^30.
  *   Keep v in [0,M). Division requires a divisor coprime to M;
  *   pow requires a nonnegative integer exponent. Stream input uses ll.
  * Usage: using mint = ModInt<998244353>;
  * Status: Stress-tested
- * Time: O(1), except O(\log M) division and O(\log b) power.
+ * Time: O(1), except O(log M) division and O(log b) power.
  */
 int const MOD = 998244353;
 ll euclid(ll a, ll b, ll &x, ll &y) {

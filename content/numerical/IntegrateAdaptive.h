@@ -6,8 +6,8 @@
  * Description: Fast integration using an adaptive Simpson's rule.
  * Usage:
 	double sphereVolume = quad(-1, 1, [](double x) {
-	return quad(-1, 1, [\&](double y) {
-	return quad(-1, 1, [\&](double z) {
+	return quad(-1, 1, [&](double y) {
+	return quad(-1, 1, [&](double z) {
 	return x*x + y*y + z*z < 1; });});});
  * Status: mostly untested
  */

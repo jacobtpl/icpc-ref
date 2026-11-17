@@ -4,7 +4,7 @@
  * Source: Pisinger 1999, "Linear Time Algorithms for Knapsack Problems with Bounded Weights"
  * Description: Given N non-negative integer weights w and a non-negative target t,
  * computes the maximum S <= t such that S is the sum of some subset of the weights.
- * Time: O(N \max(w_i))
+ * Time: O(N max(w_i))
  * Status: Tested on kattis:eavesdropperevasion, stress-tested
  */
 #pragma once

@@ -6,7 +6,7 @@
  * Description: Runs a callback for all maximal cliques in a graph (given as a
  * symmetric bitset matrix; self-edges not allowed). Callback is given a bitset
  * representing the maximal clique.
- * Time: O(3^{n/3}), much faster for sparse graphs
+ * Time: O(3^(n/3)), much faster for sparse graphs
  * Status: stress-tested
  */
 #pragma once

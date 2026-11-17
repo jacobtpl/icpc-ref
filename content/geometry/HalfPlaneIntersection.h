@@ -19,7 +19,7 @@
    * between the origins p are lost. The tests are invariant under
    * translation and under scaling of the input or of any dp.
    * add_bounds clips to [0,1e9]^2 (not to negative coordinates).
- * Time: O(N\log N)
+ * Time: O(Nlog N)
  * Source: Own
  * Status: stress-tested against exact brute force; older version tested on
 	* https://open.kattis.com/problems/bigbrother 

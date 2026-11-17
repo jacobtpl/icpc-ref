@@ -3,16 +3,11 @@
  * Date: 2019-04-27
  * License: CC0
  * Source: https://vlecomte.github.io/cp-geo.pdf
- * Description:\\
-\begin{minipage}{65mm}
+ * Description:
 If a unique intersection point between the line segments going from s1 to e1 and from s2 to e2 exists then it is returned.
 If no intersection point exists an empty vector is returned. If infinitely many exist a vector with 2 elements is returned, containing the endpoints of the common line segment.
-For integer coordinates with absolute value at most $10^9$, classification is exact using 128-bit intermediates. The output defaults to Point<long double>; choose segInter<T> for another floating type or Fraction. Fraction output throws if a reduced coordinate does not fit. Rounding never changes the vector size, even if overlap endpoints round to equal points.
+For integer coordinates with absolute value at most 10^9, classification is exact using 128-bit intermediates. The output defaults to Point<long double>; choose segInter<T> for another floating type or Fraction. Fraction output throws if a reduced coordinate does not fit. Rounding never changes the vector size, even if overlap endpoints round to equal points.
 Floating-point input can misclassify nearly collinear segments. Fraction input is exact only while every intermediate fits. These inputs retain their scalar type. Requires C++17.
-\end{minipage}
-\begin{minipage}{15mm}
-\includegraphics[width=\textwidth]{content/geometry/SegmentIntersection}
-\end{minipage}
  * Usage:
  * auto inter = segInter(s1,e1,s2,e2);
  * if (sz(inter)==1)

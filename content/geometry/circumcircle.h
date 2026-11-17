@@ -3,14 +3,8 @@
  * Date: 2009-04-11
  * License: CC0
  * Source: http://en.wikipedia.org/wiki/Circumcircle
- * Description:\\
-\begin{minipage}{65mm}
+ * Description:
 ccRadius = radius and ccCenter = center of circle through points A, B, C.
-\end{minipage}
-\begin{minipage}{15mm}
-\vspace{-2mm}
-\includegraphics[width=\textwidth]{content/geometry/circumcircle}
-\end{minipage}
  Collinear points give inf/nan. For Point<double>, differences and products
  are taken in long double with fma on cancellation, so thin triangles with
  integer coordinates up to 1e9 are accurate. ccCenter on other point types

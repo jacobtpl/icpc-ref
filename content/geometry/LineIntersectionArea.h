@@ -2,13 +2,13 @@
  * Author: Jacob, Devin
  * Date: 2026-10-12
  * License: CC0
- * Description: Signed doubled area of $(a,c,X)$, where $X$
- * is the intersection of the nonparallel lines $ab$ and $cd$.
- * Integer coordinates must have absolute value at most $10^9$.
- * Computes $UV/D$, where $U=(c-a)\times(b-a)$,
- * $V=(c-a)\times(d-c)$ and $D=(b-a)\times(d-c)$.
+ * Description: Signed doubled area of (a,c,X), where X
+ * is the intersection of the nonparallel lines ab and cd.
+ * Integer coordinates must have absolute value at most 10^9.
+ * Computes UV/D, where U=(c-a)x(b-a),
+ * V=(c-a)x(d-c) and D=(b-a)x(d-c).
  * Integer intermediates are exact; the result is approximate.
- * Use T=\texttt{\_\_float128} when later area sums may cancel.
+ * Use T=__float128 when later area sums may cancel.
  * Usage: auto area2 = lineInterArea2<__float128>(a,b,c,d);
  * Time: O(1)
  * Status: stress-tested against an independent rational oracle

@@ -13,7 +13,7 @@
  *  for each edge (a,b) {
  *    ed[a].emplace_back(b, eid);
  *    ed[b].emplace_back(a, eid++); }
- *  bicomps([\&](const vi\& edgelist) {...});
+ *  bicomps([&](const vi& edgelist) {...});
  * Time: O(E + V)
  * Status: tested during MIPT ICPC Workshop 2017
  */

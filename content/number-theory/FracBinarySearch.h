@@ -2,12 +2,12 @@
  * Author: Lucian Bicsi, Simon Lindholm
  * Date: 2017-10-31
  * License: CC0
- * Description: Given $f$ and $N$, finds the smallest fraction $p/q \in [0, 1]$
- * such that $f(p/q)$ is true, and $p, q \le N \le 3\cdot 10^{18}$.
- * You may want to throw an exception from $f$ if it finds an exact solution,
- * in which case $N$ can be removed.
+ * Description: Given f and N, finds the smallest fraction p/q in [0, 1]
+ * such that f(p/q) is true, and p, q <= N <= 3* 10^18.
+ * You may want to throw an exception from f if it finds an exact solution,
+ * in which case N can be removed.
  * Usage: fracBS([](Frac f) { return 3*f.p>=f.q; }, 10); // {1,3}
- * Time: O(\log(N))
+ * Time: O(log(N))
  * Status: stress-tested for n <= 300
  */
 

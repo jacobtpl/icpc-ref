@@ -4,7 +4,7 @@
  * Source: somewhere on github
  * Description: Calculates determinant using modular arithmetics.
  * Modulos can also be removed to get a pure-integer version.
- * Time: $O(N^3)$
+ * Time: O(N^3)
  * Status: bruteforce-tested for N <= 3, mod <= 7
  */
 #pragma once
