@@ -16,6 +16,7 @@
  	* https://www.codechef.com/problems/HAMILG
  	* https://judge.yosupo.jp/problem/general_matching
  */
+#pragma once
 
 using vb = vector<bool>;
 using pi = pair<int,int>;

@@ -11,9 +11,10 @@
  */
 #pragma once
 
-void add(int ind, int end) { ... } // add a[ind] (end = 0 or 1)
-void del(int ind, int end) { ... } // remove a[ind]
-int calc() { ... } // compute current answer
+// Fill in these three:
+void add(int ind, int end) { (void)ind; (void)end; } // add a[ind] (end = 0 or 1)
+void del(int ind, int end) { (void)ind; (void)end; } // remove a[ind]
+int calc() { return 0; } // compute current answer
 
 vi mo(vector<pii> Q) {
 	int L = 0, R = 0, blk = 350; // ~N/sqrt(Q)

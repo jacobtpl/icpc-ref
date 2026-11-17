@@ -4,6 +4,7 @@
  * Status: Minimum Cost b-flow yosupo
  * Time: empircally fast
  */
+#pragma once
 
 using i128 = __int128_t;
 struct NetworkSimplex {

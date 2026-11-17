@@ -41,7 +41,7 @@ int matInv(vector<vector<T>>& A) {
 		rep(j,0,n) tmp[i][j] /= v;
 		A[i][i] = 1;
 	}
-	/// forget A at this point, just eliminate tmp backward
+	// forget A at this point, just eliminate tmp backward
 	for (int i = n-1; i > 0; --i) rep(j,0,i) {
 		T v = A[j][i];
 		rep(k,0,n) tmp[j][k] -= v*tmp[i][k];

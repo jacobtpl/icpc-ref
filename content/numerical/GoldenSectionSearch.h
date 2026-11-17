@@ -12,7 +12,7 @@
  */
 #pragma once
 
-/// It is important for r to be precise, otherwise we don't necessarily maintain the inequality a < x1 < x2 < b.
+// It is important for r to be precise, otherwise we don't necessarily maintain the inequality a < x1 < x2 < b.
 double gss(double a, double b, double (*f)(double)) {
 	double r = (sqrt(5)-1)/2, eps = 1e-7;
 	double x1 = b - r*(b-a), x2 = a + r*(b-a);

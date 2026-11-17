@@ -7,6 +7,7 @@
  * The i-th added non-loop edge is E[2*i], with its flow in E[2*i].flow.
  * Usage: Dinic d(n); d.AddEdge(u, v, cap); ll f = d.MaxFlow(s, t);
  */
+#pragma once
 
 struct Dinic {
   struct Edge {
@@ -47,7 +48,7 @@ struct Dinic {
   }
   ll DFS(int u, int T, ll flow = -1) {
     if (u == T || flow == 0) return flow;
-    for (int &i = pt[u]; i < g[u].size(); ++i) {
+    for (int &i = pt[u]; i < sz(g[u]); ++i) {
       Edge &e = E[g[u][i]];
       Edge &oe = E[g[u][i]^1];
       if (d[e.v] == d[e.u] + 1) {

@@ -5,6 +5,7 @@
  * Status: Tested by Jacob on Xenia and Tree
  * Time: O(Nlog N)
  */
+#pragma once
 
 struct Centroid {
 	vector<vi> const& adj;

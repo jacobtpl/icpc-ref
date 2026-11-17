@@ -6,6 +6,8 @@
  * Time: LIM=1e7 ~ 0.15s, LIM=1e8 ~ 2s. Uses ~12 bytes per number (1.2GB for LIM=1e8).
  * Status: kinda tested
  */
+#pragma once
+
 int const LIM = 1e7+5;
 vector<bool> cp;
 vi pr, nx, lp, cnt;

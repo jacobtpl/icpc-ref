@@ -50,7 +50,9 @@ void dela(A& v, F f) {
 
 int main1() {
 	srand(2);
+#ifdef __GLIBC__
 	feenableexcept(29);
+#endif
 	rep(it,0,3000000) {{
 		bumpalloc.reset();
 		// if (it % 200 == 0) cerr << endl;

@@ -28,3 +28,8 @@ jobs:
         CXX=$(ls /opt/homebrew/bin/g++-[0-9]* | sort -V | tail -1)
         $CXX --version
         CXX=$CXX make test-compiles
+        echo "CXX=$CXX" >> $GITHUB_ENV
+    # Known to fail on main: some geometry tests assume an 80-bit long double.
+    - name: Run stress tests
+      continue-on-error: true
+      run: make test

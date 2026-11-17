@@ -43,7 +43,8 @@ The `chapter.tex` files are left over from the KACTL PDF; they still hold the ma
   naive implementations on random cases.
 - Set `CXX` to choose the compiler, e.g. `CXX=g++-15 make test-compiles` with Homebrew g++ on macOS.
 
-CI runs both on Linux, and the compile check on an Apple Silicon macOS runner.
+CI runs both on Linux and on an Apple Silicon macOS runner. The macOS stress-test step is
+informational for now: some geometry tests still assume an 80-bit long double.
 
 ## License
 

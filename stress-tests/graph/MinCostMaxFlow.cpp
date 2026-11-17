@@ -5,13 +5,7 @@
 // #include "mcmfold.h"
 // #include "mcmfnew.h"
 #include <bits/extc++.h>
-#define setpi dummy(){} bool setpi
-#undef assert
-#define assert(x) return x
 #include "../../content/graph/MinCostMaxFlow.h"
-#undef assert
-#undef setpi
-#include <cassert>
 #include "MinCostMaxFlow2.h"
 
 struct MCMF2 {
@@ -187,7 +181,7 @@ void testNeg() {
 			continue;
 		auto pa = mcmf.maxflow(S, T);
 		auto pa2 = mcmf2.maxflow(S, T);
-		assert(pa == pa2);
+		assert(pa.first == pa2.first && pa.second == pa2.second);
 		::i = lasti;
 	}
 	cout<<"Tests passed!"<<endl;

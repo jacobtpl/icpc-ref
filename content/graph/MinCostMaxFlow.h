@@ -10,8 +10,10 @@
  * Status: Tested on kattis:mincostmaxflow, stress-tested
  * Time: O(F E log(V)) where F is max flow. O(VE) for setpi.
  */
+#pragma once
 
-// #include <bits/extc++.h>
+#include <bits/extc++.h>
+
 struct MCMF {
 	typedef int C; typedef int F; typedef ll R;
 	C const INFC = numeric_limits<C>::max() / 4;
@@ -66,14 +68,15 @@ struct MCMF {
 		return {totflow, totcost};
 	}
 
-	// If some costs can be negative, call this before maxflow:
-	void setpi(int s) { // (otherwise, leave this out)
+	// If some costs can be negative, call this before maxflow.
+	// Returns false if there is a negative cost cycle (unsupported).
+	bool setpi(int s) {
 		fill(all(pi), INFC); pi[s] = 0;
 		int it = N, ch = 1;
 		while (ch-- && it--)
 			rep(i,0,N) if (pi[i] != INFC)
 				for (auto [to, f, c, _]: ed[i])
 					if (f < 0 && ckmin(pi[to], pi[i] + c)) ch = 1;
-		assert(it >= 0); // negative cost cycle
+		return it >= 0;
 	}
-}; // 1c3c23 without setpi; 4f8c64 with setpi
+};

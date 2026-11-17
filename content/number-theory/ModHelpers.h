@@ -6,6 +6,8 @@
  * Status: Tested many many times
  * Time: O(N)
  */
+#pragma once
+
 #include "ModInt.h"
 
 int const MV = 2e6 + 10;

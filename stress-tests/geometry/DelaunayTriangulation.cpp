@@ -9,7 +9,9 @@
 
 typedef Point<double> P;
 int main() {
+#ifdef __GLIBC__
 	feenableexcept(29);
+#endif
 	rep(it,0,100000) {{
 		vector<P> ps;
 		int N = rand() % 20 + 1;

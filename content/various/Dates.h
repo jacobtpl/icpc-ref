@@ -6,6 +6,8 @@
  * Description: Dates
  * Status: tested
  */
+#pragma once
+
 // Routines for performing computations on dates.  In these routines,
 // months are expressed as integers from 1 to 12, days are expressed
 // as integers from 1 to 31, and years are expressed as 4-digit

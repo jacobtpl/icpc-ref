@@ -106,9 +106,9 @@ poly exp(poly A, int n) { assert(A[0].v == 0);
 	for (int x = 1; x < n; x *= 2) {
 		IB = 2*IB-RSZ(conv(B,conv(IB,IB)),x);
 		poly Q = dif(RSZ(A,x)); Q += RSZ(conv(IB,dif(B)-conv(B,Q)),2*x-1); 
-		/// first x-1 terms of dif(B)-conv(B,Q) are zero
+		// first x-1 terms of dif(B)-conv(B,Q) are zero
 		B = B+RSZ(conv(B,RSZ(A,2*x)-integ(Q)),2*x); 
-	} /// We know that Q=A' is B'/B to x-1 places, we want to find B'/B to 2x-1 places
+	} // We know that Q=A' is B'/B to x-1 places, we want to find B'/B to 2x-1 places
 	return RSZ(B,n);
 } // 203953
 poly pow(poly A, ll b, int n) { // A^b mod x^n

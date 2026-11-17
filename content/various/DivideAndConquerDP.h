@@ -9,10 +9,12 @@
 #pragma once
 
 struct DP { // Modify at will:
+	vector<vector<ll>> dp; // cost table read by f
+	vector<pair<int, ll>> res; // (best k, value) written by store
 	int lo(int ind) { return 0; }
 	int hi(int ind) { return ind; }
 	ll f(int ind, int k) { return dp[ind][k]; }
-	void store(int ind, int k, ll v) { res[ind] = pii(k, v); }
+	void store(int ind, int k, ll v) { res[ind] = {k, v}; }
 
 	void rec(int L, int R, int LO, int HI) {
 		if (L >= R) return;

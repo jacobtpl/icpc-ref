@@ -18,6 +18,7 @@
  	* https://projecteuler.net/problem=459
  	* https://judge.yosupo.jp/problem/nim_product_64
  */
+#pragma once
 
 using ul = uint64_t; 
 struct Precalc {

@@ -40,7 +40,7 @@ struct Node { // Splay tree. Root's pp contains tree's parent.
 		if (p) p->fix();
 		swap(pp, y->pp);
 	}
-	void splay() { /// Splay this up to the root. Always finishes without flip set.
+	void splay() { // Splay this up to the root. Always finishes without flip set.
 		for (pushFlip(); p; ) {
 			if (p->p) p->p->pushFlip();
 			p->pushFlip(); pushFlip();
@@ -49,7 +49,7 @@ struct Node { // Splay tree. Root's pp contains tree's parent.
 			else p->p->rot(c2, c1 != c2);
 		}
 	}
-	Node* first() { /// Return the min element of the subtree rooted at this, splayed to the top.
+	Node* first() { // Return the min element of the subtree rooted at this, splayed to the top.
 		pushFlip();
 		return c[0] ? c[0]->first() : (splay(), this);
 	}
@@ -78,7 +78,7 @@ struct LinkCut {
 		Node* nu = access(&node[u])->first();
 		return nu == access(&node[v])->first();
 	}
-	void makeRoot(Node* u) { /// Move u to root of represented tree.
+	void makeRoot(Node* u) { // Move u to root of represented tree.
 		access(u);
 		u->splay();
 		if(u->c[0]) {
@@ -89,7 +89,7 @@ struct LinkCut {
 			u->fix();
 		}
 	}
-	Node* access(Node* u) { /// Move u to root aux tree. Return the root of the root aux tree.
+	Node* access(Node* u) { // Move u to root aux tree. Return the root of the root aux tree.
 		u->splay();
 		while (Node* pp = u->pp) {
 			pp->splay(); u->pp = 0;

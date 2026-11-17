@@ -10,10 +10,10 @@
  * Status: stress-tested
  */
 #pragma once
-/// Possible optimization: on the top-most
-/// recursion level, ignore 'cands', and go through nodes in order of increasing
-/// degree, where degrees go down as nodes are removed.
-/// (mostly irrelevant given MaximumClique)
+// Possible optimization: on the top-most
+// recursion level, ignore 'cands', and go through nodes in order of increasing
+// degree, where degrees go down as nodes are removed.
+// (mostly irrelevant given MaximumClique)
 
 typedef bitset<128> B;
 template<class F>

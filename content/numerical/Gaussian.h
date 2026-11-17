@@ -3,6 +3,8 @@
  * Description: Converts A to rref using Gaussian elim.
  * Time: O(N^3)
  */
+#pragma once
+
 using T = double; // or mint
 const double EPS = 1e-9; // adjust?
 template<class T>

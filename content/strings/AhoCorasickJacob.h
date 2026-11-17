@@ -7,6 +7,8 @@
  * Only works after adding all strings and calling build().
  * Status: tested
  */
+#pragma once
+
 struct AhoCorasick {
     struct node {
         unordered_map<char,int> next; // can use array

@@ -6,6 +6,7 @@
  * Time: O(M)
  * Status: https://codeforces.com/contest/1916/submission/245524057
  */
+#pragma once
 
 // `a` is taken by value: the caller's graph is not modified
 vector<int> bipolarOrient(vector<vector<int> > a, int s, int t) {

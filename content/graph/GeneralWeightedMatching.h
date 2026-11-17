@@ -15,6 +15,7 @@
  * Status: tested on
  	* https://codeforces.com/gym/102156/problem/F
  */
+#pragma once
 
 template<int SZ> struct WeightedMatch { 
 	struct edge { int u,v,w; }; edge g[SZ*2][SZ*2];

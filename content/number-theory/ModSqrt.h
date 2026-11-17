@@ -22,7 +22,7 @@ ll sqrt(ll a, ll p) {
 	int r = 0, m;
 	while (s % 2 == 0)
 		++r, s /= 2;
-	/// find a non-square mod p
+	// find a non-square mod p
 	while (modpow(n, (p - 1) / 2, p) != ull(p - 1)) ++n;
 	ll x = modpow(a, (s + 1) / 2, p);
 	ll b = modpow(a, s, p), g = modpow(n, s, p);

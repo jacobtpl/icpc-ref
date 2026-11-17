@@ -3,12 +3,12 @@
  * Date: 2019-04-24
  * License: CC0
  * Source: folklore
- * Description:
+ * Description: b^e mod the global constant mod. Files that include this one use the same mod.
  * Status: tested
  */
 #pragma once
 
-const ll mod = 1000000007; // faster if const
+const ll mod = 998244353; // faster if const
 
 ll modpow(ll b, ll e) {
 	ll ans = 1;

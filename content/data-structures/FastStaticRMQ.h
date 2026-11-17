@@ -6,6 +6,8 @@
  * Time: O(N + Q)
  * Status: tested
  */
+#pragma once
+
 template<typename T> struct RMQ {
 	vector<T> v;
 	int n; static const int b = 30;

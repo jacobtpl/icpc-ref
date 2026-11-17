@@ -7,6 +7,8 @@
  * Time: O(nlog n)
  * Status: tested
  */
+#pragma once
+
 struct PalTree {
     static const int ASZ = 26, INF = 1e9;
     struct node {

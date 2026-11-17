@@ -8,3 +8,5 @@
  *  Consider also: LineContainer (ch. Data structures), monotone queues, ternary search.
  * Time: O(N^2)
  */
+#pragma once
+

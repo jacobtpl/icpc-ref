@@ -10,6 +10,7 @@
  * Time: O(log(N))
  * Status: stress-tested for n <= 300
  */
+#pragma once
 
 struct Frac { ll p, q; };
 

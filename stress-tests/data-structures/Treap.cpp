@@ -2,6 +2,14 @@
 
 #include "../../content/data-structures/Treap.h"
 
+// The example application from Treap.h: move the range [l, r) to index k
+void move(Node*& t, int l, int r, int k) {
+	Node *a, *b, *c;
+	tie(a,b) = split(t, l); tie(b,c) = split(b, r - l);
+	if (k <= l) t = merge(ins(a, b, k), c);
+	else t = merge(a, ins(c, b, k - r));
+}
+
 pair<Node*, Node*> split2(Node* n, int v) {
 	if (!n) return {};
 	if (n->val >= v) {

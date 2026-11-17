@@ -7,6 +7,8 @@
  * Usage: just do it
  * Status: not super optimized
  */
+#pragma once
+
 struct SA {
 	vector<map<char, int> > adj;
 	vi link, dis;

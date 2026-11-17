@@ -14,7 +14,7 @@
 #include "../data-structures/UnionFindRollback.h"
 
 struct Edge { int a, b; ll w; };
-struct Node { /// lazy skew heap node
+struct Node { // lazy skew heap node
 	Edge key;
 	Node *l, *r;
 	ll delta;
@@ -52,7 +52,7 @@ pair<ll, vi> dmst(int n, int r, vector<Edge>& g) {
 			heap[u]->delta -= e.w, pop(heap[u]);
 			Q[qi] = e, path[qi++] = u, seen[u] = s;
 			res += e.w, u = uf.find(e.a);
-			if (seen[u] == s) { /// found cycle, contract
+			if (seen[u] == s) { // found cycle, contract
 				Node* cyc = 0;
 				int end = qi, time = uf.time();
 				do cyc = merge(cyc, heap[w = path[--qi]]);

@@ -31,7 +31,8 @@ int main() {
 			int c = rand() % 4;
 			int d = rand() % 4 == 0 ? rand() % 3 + 1 : 0;
 			pr.addEdge(a, b, c, d);
-			dinic.addEdge(a, b, c, d);
+			dinic.AddEdge(a, b, c);
+			dinic.AddEdge(b, a, d);
 			ek[a][b] += c;
 			ek[b][a] += d;
 		}
@@ -40,7 +41,7 @@ int main() {
 		ll flow = pr.calc(s, t);
 
 		// PushRelabel matches Dinic
-		ll dinicFlow = dinic.calc(s, t);
+		ll dinicFlow = dinic.MaxFlow(s, t);
 		assert(flow == dinicFlow);
 
 		// PushRelabel matches EdmondsKarp
@@ -60,12 +61,15 @@ int main() {
 
 		// Conservation of flow for Dinic
 		vector<ll> dinicFlows(n);
-		rep(i,0,n) for(auto &e: dinic.adj[i]) {
-			assert(e.flow() <= e.oc);
-			dinicFlows[i] += e.flow();
-			dinicFlows[e.to] -= e.flow();
+		for (int i = 0; i < sz(dinic.E); i += 2) {
+			auto &e = dinic.E[i];
+			assert(0 <= e.flow && e.flow <= e.cap);
+			dinicFlows[e.u] += e.flow;
+			dinicFlows[e.v] -= e.flow;
 		}
-		assert(flows == dinicFlows);
+		assert(flow == dinicFlows[s]);
+		assert(flow == -dinicFlows[t]);
+		rep(i,0,n) if (i != s && i != t) assert(dinicFlows[i] == 0);
 
 		// Conservation of flow for EdmondsKarp
 		vector<ll> ekFlows(n);

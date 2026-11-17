@@ -6,9 +6,12 @@
  * https://en.wikipedia.org/wiki/De_Bruijn_sequence
  * pg 241 of http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.93.5967&rep=rep1&type=pdf 
  * Status: tested https://codeforces.com/gym/102001/problem/C
- */ 
+ */
+#pragma once
 
-vi deBruijnSeq(int k, int n) { /// Recursive FKM 
+ 
+
+vi deBruijnSeq(int k, int n) { // Recursive FKM 
 	if (k == 1) return {0};
 	vi seq, aux(n+1); 
 	function<void(int,int)> gen = [&](int t, int p) {

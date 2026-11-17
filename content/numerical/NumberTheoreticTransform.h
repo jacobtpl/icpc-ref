@@ -18,7 +18,9 @@
 
 #include "../number-theory/ModPow.h"
 
-const ll mod = (119 << 23) + 1, root = 62; // = 998244353
+// mod is the one in ModPow.h and must be 998244353 = (119 << 23) + 1 for root = 62.
+const ll root = 62;
+static_assert(mod == 998244353, "change root together with mod");
 // For p < 2^30 there is also e.g. 5 << 25, 7 << 26, 479 << 21
 // and 483 << 21 (same root). The last two are > 10^9.
 typedef vector<ll> vl;

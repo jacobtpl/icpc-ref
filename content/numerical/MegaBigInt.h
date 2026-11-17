@@ -7,6 +7,8 @@
  * Usage: just do it
  * Status: prob works
  */
+#pragma once
+
 // NOTE:
 // - Base 10^k. If need base 2^k, see submissions in:
 //   https://www.spoj.com/problems/PBBN2/     (>= 0 only, operations: *, power, xor)

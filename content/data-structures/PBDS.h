@@ -7,6 +7,8 @@
  * Time: O(log N)
  * Status: tested
  */
+#pragma once
+
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 #include <ext/pb_ds/priority_queue.hpp>

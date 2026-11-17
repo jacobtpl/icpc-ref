@@ -5,6 +5,8 @@
  * Time: O(N log N)
  * For inverse fwht: call fwht and divide all elements by (2 ** L) (size of array)
  */
+#pragma once
+
 template<typename T>
 void fwht(vector<T>& a)
 {

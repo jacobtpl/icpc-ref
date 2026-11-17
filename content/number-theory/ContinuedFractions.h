@@ -13,6 +13,7 @@
  * Time: O(log N)
  * Status: stress-tested for n <= 300
  */
+#pragma once
 
 typedef double d; // for N ~ 1e7; long double for N ~ 1e9
 pair<ll, ll> approximate(d x, ll N) {

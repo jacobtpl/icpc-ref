@@ -7,6 +7,8 @@
  * Usage: just do it
  * Status: prob works
  */
+#pragma once
+
 #include <vector>
 
 template<int B = 20>

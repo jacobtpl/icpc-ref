@@ -10,6 +10,8 @@
  * faster for sparse graphs.
  * Status: stress-tested
  */
+#pragma once
+
 typedef vector<bitset<200>> vb;
 struct Maxclique {
 	double limit=0.025, pk=0;

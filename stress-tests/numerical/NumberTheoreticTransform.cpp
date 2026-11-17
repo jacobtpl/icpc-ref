@@ -1,17 +1,7 @@
 #include "../utilities/template.h"
 
 typedef vector<ll> vl;
-namespace ignore {
-#include "../../content/number-theory/ModPow.h"
-}
-ll modpow(ll a, ll e);
 #include "../../content/numerical/NumberTheoreticTransform.h"
-ll modpow(ll a, ll e) {
-    if (e == 0)
-        return 1;
-    ll x = modpow(a * a % mod, e >> 1);
-    return e & 1 ? x * a % mod : x;
-}
 
 vl simpleConv(vl a, vl b) {
 	int s = sz(a) + sz(b) - 1;

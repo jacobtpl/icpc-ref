@@ -8,6 +8,8 @@
  * Status: Stress-tested
  * Time: O(1), except O(log M) division and O(log b) power.
  */
+#pragma once
+
 int const MOD = 998244353;
 ll euclid(ll a, ll b, ll &x, ll &y) {
 	if (!b) return x = 1, y = 0, a;

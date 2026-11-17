@@ -3,7 +3,7 @@
  * Date: 2015-03-18
  * License: CC0
  * Source: https://software.intel.com/sites/landingpage/IntrinsicsGuide/
- * Description: Cheat sheet of SSE/AVX intrinsics, for doing arithmetic on several numbers at once.
+ * Description: x86-64 only (does not compile on Apple Silicon). Cheat sheet of SSE/AVX intrinsics, for doing arithmetic on several numbers at once.
  * Can provide a constant factor improvement of about 4, orthogonal to loop unrolling.
  * Operations follow the pattern "_mm(256)?_name_(si(128|256)|epi(8|16|32|64)|pd|ps)". Not all are described here;
  * grep for _mm_ in /usr/lib/gcc/{*}/4.9/include/ for more.
