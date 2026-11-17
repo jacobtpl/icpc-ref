@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test the 128-bit stream operators in content/contest/template.cpp.
+"""Test the 128-bit stream operators in content/contest/io128.cpp.
 
 Run: python3 stress-tests/various/Template128IO.py [compiler flags...]
 Exact rational arithmetic is the oracle for __float128.

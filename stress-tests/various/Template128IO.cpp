@@ -2,6 +2,7 @@
 #pragma GCC diagnostic ignored "-Wreturn-type"
 #define main template_main
 #include "../../content/contest/template.cpp"
+#include "../../content/contest/io128.cpp"
 #undef main
 
 void check(bool ok) { if (!ok) abort(); }

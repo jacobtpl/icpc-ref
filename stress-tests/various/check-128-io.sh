@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the 128-bit cin/cout operators in content/contest/template.cpp with
+# Checks the 128-bit cin/cout operators in content/contest/io128.cpp with
 # every C++ compiler found on this machine, under several flag sets.
 # Run from inside the repo:  bash stress-tests/various/check-128-io.sh
 # Paste the whole output back if anything says FAIL.
@@ -7,7 +7,7 @@
 root=""
 for d in "$(git rev-parse --show-toplevel 2>/dev/null)" "$(cd "$(dirname "$0")/../.." && pwd)"; do
 	if [ -n "$d" ] && [ -f "$d/stress-tests/various/Template128IO.py" ] &&
-		grep -q u128 "$d/content/contest/template.cpp" 2>/dev/null; then root=$d; break; fi
+		grep -q u128 "$d/content/contest/io128.cpp" 2>/dev/null; then root=$d; break; fi
 done
 if [ -z "$root" ]; then
 	echo "Cannot find the 128-bit I/O files. cd into your icpc-ref checkout, run"
