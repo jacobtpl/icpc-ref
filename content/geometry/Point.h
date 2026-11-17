@@ -26,7 +26,9 @@
 
 // Number types per coordinate type T. Keep all rows; edit one only to
 // change what Point<T> computes with:
-//  F = type of lengths and non-integer results, W = type of products
+//  F = type of lengths and non-integer results
+//  W = type algorithms form products of dot/cross/dist2 results in
+//      (dot, cross, dist2 themselves return T)
 #define GEO(T, FT, WT) \
 	template<> struct Geo<T> { typedef FT F; typedef WT W; };
 template<class T> struct Geo { // any other type, e.g. Fraction
