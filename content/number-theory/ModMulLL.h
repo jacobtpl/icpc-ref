@@ -10,14 +10,16 @@
  * This runs ~2x faster than the naive (__int128_t)a * b % M.
  * A proof of correctness is in doc/modmul-proof.tex. An earlier version of the proof,
  * from when the code used a * b / (long double)M, is in doc/modmul-proof.md.
- * The proof assumes that long doubles are implemented as x87 80-bit floats; if they
- * are 64-bit, as on e.g. MSVC, the implementation is only valid for
- * 0 <= a, b <= c < 2^52 ~4.5 * 10^15.
+ * The proof assumes that long doubles are x87 80-bit floats (x86-64 Linux). Where they
+ * are not (e.g. Apple Silicon, MSVC), the __int128 version is used instead.
  */
 #pragma once
 
 typedef unsigned long long ull;
 ull modmul(ull a, ull b, ull M) {
+#if __LDBL_MANT_DIG__ != 64
+	return ull((__uint128_t)a * b % M);
+#endif
 	ll ret = a * b - M * ull(1.L / M * a * b);
 	return ret + M * (ret < 0) - M * (ret >= (ll)M);
 }
