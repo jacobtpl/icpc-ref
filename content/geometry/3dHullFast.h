@@ -4,30 +4,18 @@
  * License: CC0
  * Source: randomized incremental hull with conflict lists
  *  (de Berg et al., Computational Geometry, chapter 11)
- * Description: Computes all faces of the 3-dimensional hull of a point set
- *  as index triples into A, counter-clockwise seen from outside.
- *  Works on any Point3D<T>. Point d sees face abc if
- *  (b-a) x (c-a) . (d-a) > eps (six times a tetrahedron volume).
- *  Integer T (eps = 0) is exact: coplanar, collinear and duplicate points
- *  are fine, coplanar facets come out triangulated, and points that are
- *  not corners of the hull may or may not be used.
- *  Floating T, general position: eps = 0.
- *  Floating T, exactly degenerate up to rounding (four coplanar points,
- *  e.g. a grid scaled by 0.1): eps around 1e-9 * D^3 for double, where
- *  D is the largest coordinate difference.
- *  Floating T, nearly degenerate (points between about eps / 10 and
- *  1e4 * eps off a plane through three others): NOT reliable for any
- *  eps, a point can end up far outside the result. Scale the input to
- *  integers instead (__int128 if needed), or if an error of 1e-6 * D is
- *  acceptable move every point randomly by that much and use eps = 0.
- *  The result is always a closed surface (every edge in exactly two
- *  faces, once in each direction), also in that last case.
- *  Fails (assert) if all points are coplanar.
- *  Every test uses coordinate differences, so only D matters, not the
- *  offset from the origin: exact while 6D^3 fits in T (long long:
- *  D <= 1e6, __int128: D <= 2e12, double with integer coordinates:
- *  D <= 1.1e5).
- *  For a hackable judge seed the shuffle from the clock.
+ * Description: Faces of the 3D convex hull as index triples into A,
+ *  counter-clockwise seen from outside. Any Point3D<T>.
+ *  d sees face abc if (b-a) x (c-a) . (d-a) > eps.
+ *  Integer T: exact with eps = 0 while 6D^3 fits in T, D = largest
+ *  coordinate difference (ll: 1e6, __int128: 2e12). Duplicate, collinear
+ *  and coplanar points are fine; coplanar facets come out triangulated.
+ *  Floating T: eps = 0 in general position; eps = 1e-9 * D^3 (double) if
+ *  the input is degenerate up to rounding (e.g. a grid times 0.1).
+ *  Points a little off a plane (eps/10 to 1e4*eps) can end up outside
+ *  the result for any eps: scale to integers instead.
+ *  The result is always a closed surface. Asserts if all points are
+ *  coplanar. On a hackable judge seed the shuffle from the clock.
  * Time: expected O(n log n)
  * Memory: expected O(n log n)
  * Usage: hull3dFast(A) or hull3dFast(A, 1e-9 * D*D*D)
