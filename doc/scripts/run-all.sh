@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
+# Builds and runs every stress test. CXX picks the compiler (default g++).
 DIR=${1:-.}
+CXX=${CXX:-g++}
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 
-# use a precompiled header for the template to improve perf
-g++ -Wall -Wfatal-errors -Wconversion -std=c++20 -O2 $DIR/stress-tests/utilities/template.h
-trap "rm -f $DIR/stress-tests/utilities/template.h.gch" EXIT
-
-tests="$(find $DIR/stress-tests -name '*.cpp')"
 declare -i pass=0
 declare -i fail=0
 failTests=""
-ulimit -s 524288 # For 2-sat test
-for test in $tests; do
+ulimit -s 524288 2>/dev/null || ulimit -s hard 2>/dev/null # For 2-sat test
+for test in $(find $DIR/stress-tests -name '*.cpp' | sort); do
     echo "$(basename $test): "
-    start=`date +%s.%N`
-    g++ -Wall -Wfatal-errors -Wconversion -std=c++20 -O2 $test && ./a.out
+    SECONDS=0
+    $CXX -Wall -Wfatal-errors -Wconversion -std=c++20 -O2 $CXXFLAGS $test -o $tmp/a.out && $tmp/a.out
     retCode=$?
     if (($retCode != 0)); then
         echo "Failed with $retCode"
@@ -22,10 +20,7 @@ for test in $tests; do
     else
         pass+=1
     fi
-    end=`date +%s.%N`
-    runtime=$( echo "$end - $start" | bc -l )
-    echo "Took $runtime seconds"
-    rm -f a.out
+    echo "Took $SECONDS seconds"
     echo
 done
 echo "$pass/$(($pass+$fail)) tests passed"
@@ -33,6 +28,6 @@ if (($fail == 0)); then
     echo "No tests failed"
     exit 0
 else
-    echo -e "These tests failed: \n $failTests"
+    echo -e "These tests failed: \n$failTests"
     exit 1
 fi

@@ -1,38 +1,34 @@
 #!/usr/bin/env bash
+# Compiles every header in content/ on its own, after the contest template.
+# CXX picks the compiler (default g++), CXXFLAGS adds flags.
 DIR=${1:-.}
-
-# use a precompiled header for the template to improve perf
-g++ -Wall -Wextra -Wfatal-errors -Wconversion -std=c++20 -x c++-header $DIR/content/contest/template.cpp
-trap "rm -f $DIR/content/contest/template.cpp.gch" EXIT
-
+CXX=${CXX:-g++}
 SCRIPT_DIR=$DIR/doc/scripts
-tests="$(find $DIR/content -name '*.h' | grep -vFf $SCRIPT_DIR/skip_headers)"
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+
 echo "skipped: "
 find $DIR/content -name '*.h' | grep -Ff $SCRIPT_DIR/skip_headers
 declare -i pass=0
 declare -i fail=0
 failHeaders=""
-for test in $tests; do
-    echo "$(basename $test): "
-    $SCRIPT_DIR/test-compiles.sh $test
-    retCode=$?
-    if (($retCode != 0)); then
-        echo $retCode
+for test in $(find $DIR/content -name '*.h' | grep -vFf $SCRIPT_DIR/skip_headers | sort); do
+    printf '#include "%s"\n#include "%s"\n' \
+        "$(cd $DIR && pwd)/content/contest/template.cpp" "$(cd "$(dirname $test)" && pwd)/$(basename $test)" > $tmp/t.cpp
+    if $CXX -Wall -Wextra -Wfatal-errors -Wconversion -std=c++20 $CXXFLAGS -fsyntax-only $tmp/t.cpp; then
+        pass+=1
+    else
+        echo "FAILED: $test"
         fail+=1
         failHeaders="$failHeaders$test\n"
-    else
-        pass+=1
     fi
-    echo
 done
-echo "$pass/$(($pass+$fail)) tests passed"
+echo "$pass/$(($pass+$fail)) headers compile"
 if (($pass == 0)); then
-    echo "No tests found (make sure skip_headers doesn't have whitespace lines)"
+    echo "No headers found (make sure skip_headers doesn't have whitespace lines)"
     exit 1
 elif (($fail == 0)); then
-    echo "No tests failed"
     exit 0
 else
-    echo -e "These tests failed: \n $failHeaders"
+    echo -e "These headers failed: \n$failHeaders"
     exit 1
 fi

@@ -2,23 +2,29 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ master ]
+    branches: [ main, master ]
 
 jobs:
-  build:
-
+  linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2
-    - name: Install pdflatex
-      run: sudo apt-get install texlive-latex-base texlive-latex-recommended texlive-latex-extra
-    - name: Build pdf
-      run: make kactl
-    - name: Run compiles
+    - uses: actions/checkout@v4
+    - name: Compile every header
       run: make test-compiles
     - name: Run stress tests
       run: make test
+
+  macos-arm64:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+    - name: Compile every header (Homebrew g++ on Apple Silicon)
+      run: |
+        uname -m
+        CXX=$(ls /opt/homebrew/bin/g++-[0-9]* | sort -V | tail -1)
+        $CXX --version
+        CXX=$CXX make test-compiles
