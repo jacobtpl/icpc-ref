@@ -27,7 +27,7 @@ void test(int N, int mxCost, int iters) {
                 mcmf.addEdge(i + 2, 2 + n + j, 1, cost[i][j]);
             }
         }
-        mcmf.setpi(s);
+        bool ok = mcmf.setpi(s); assert(ok);
         auto maxflow = mcmf.maxflow(s, t);
         auto matching = hungarian(cost);
         assert(maxflow.first == n);

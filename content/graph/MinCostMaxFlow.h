@@ -70,7 +70,7 @@ struct MCMF {
 
 	// If some costs can be negative, call this before maxflow.
 	// Returns false if there is a negative cost cycle (unsupported).
-	bool setpi(int s) {
+	[[nodiscard]] bool setpi(int s) {
 		fill(all(pi), INFC); pi[s] = 0;
 		int it = N, ch = 1;
 		while (ch-- && it--)

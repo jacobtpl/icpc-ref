@@ -149,7 +149,7 @@ void testMatching() {
 		rep(i,0,N) mcmf.addEdge(S, i, 1, 0);
 		rep(i,0,M) mcmf.addEdge(N+i, T, 1, 0);
 		rep(i,0,N) rep(j,0,M) mcmf.addEdge(i, N+j, 1, co[i][j] - 2);
-		mcmf.setpi(S);
+		bool ok = mcmf.setpi(S); assert(ok);
 		auto pa = mcmf.maxflow(S, T);
 		assert(pa.first == min(N, M));
 		assert(pa.second == v - 2 * pa.first);
