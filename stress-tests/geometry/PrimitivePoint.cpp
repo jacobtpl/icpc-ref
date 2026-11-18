@@ -119,16 +119,19 @@ void extended() {
 	assert(abs(PE(1, 1).angle() - atanl(1)) <= eps);
 	assert(abs(PE(1e-200L, 0).dist() / 1e-200L - 1) <= 4*eps);
 	assert(abs(PE(1e200L, 0).dist() / 1e200L - 1) <= 4*eps);
-	assert(abs(PE(3e3000L, 4e3000L).dist() / 5e3000L - 1) <= 4*eps);
-	assert(abs(PE(3e-3000L, 4e-3000L).dist() / 5e-3000L - 1) <= 4*eps);
+	// squares overflow / underflow: 1e3000 with an 80-bit long double
+	const ld big = powl(10, LDBL_MAX_10_EXP > 3000 ? 3000 : 300);
+	assert(abs(PE(3*big, 4*big).dist() / (5*big) - 1) <= 4*eps);
+	assert(abs(PE(3/big, 4/big).dist() / (5/big) - 1) <= 4*eps);
 	ld a = 1 / 3.0L;
 	PE r = PE(1, 0).rotate(a);
 	assert(abs(r.x - cosl(a)) <= eps && abs(r.y - sinl(a)) <= eps);
 	assert(abs(QE(1, 1, 1).dist() - sqrtl(3)) <= 2*eps);
 	QE q = QE(1, 2, 2).unit();
 	assert(abs(q.x - 1/3.0L) <= eps && abs(q.z - 2/3.0L) <= eps);
-	assert(abs(QE(1e-2000L, 0, 0).dist() / 1e-2000L - 1) <= 4*eps);
-	assert(abs(QE(0, 3e2000L, 4e2000L).dist() / 5e2000L - 1) <= 4*eps);
+	const ld mid = powl(10, LDBL_MAX_10_EXP > 3000 ? 2000 : 200);
+	assert(abs(QE(1/mid, 0, 0).dist() / (1/mid) - 1) <= 4*eps);
+	assert(abs(QE(0, 3*mid, 4*mid).dist() / (5*mid) - 1) <= 4*eps);
 	QE s = QE(1, 0, 0).rotate(a, QE(0, 0, 2));
 	assert(abs(s.x - cosl(a)) <= 2*eps && abs(s.y - sinl(a)) <= 2*eps);
 	assert(PE(0, 0).dist() == 0 && QE(0, 0, 0).dist() == 0);

@@ -1,6 +1,10 @@
 #include "../utilities/template.h"
 
+#if LDBL_MANT_DIG >= 64
 #define GEO_DOUBLE_W long double
+#else // long double is a double (Apple Silicon)
+#define GEO_DOUBLE_W __float128
+#endif
 #include "../../content/geometry/Point.h"
 // This file tests the documented opt-in of Point.h: double input with
 // intermediates in long double (exact counts for integers up to 1e9).
