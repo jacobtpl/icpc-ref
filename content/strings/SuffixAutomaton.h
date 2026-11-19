@@ -35,8 +35,6 @@ template<class T = char> struct SA {
 		else adj.push_back(adj[v]), link.push_back(link[v]), dis.push_back(dis[v]);
 		return N++;
 	}
-	// it = adj[p].find(c) (must exist); returns the state of
-	// (longest string of p) + c, cloning it->second if needed
 	int go(int p, T c, typename map<T, int>::iterator it) {
 		int q = it->second;
 		if (dis[q] == dis[p] + 1) return q;

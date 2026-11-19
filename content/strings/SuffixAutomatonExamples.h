@@ -39,31 +39,31 @@
 
 #include "SuffixAutomaton.h"
 
-template<class T> vi saOrder(SA<T>& sa) {
+vi saOrder(SA<>& sa) {
 	vi c(sa.N + 1), o(sa.N);
 	rep(i,0,sa.N) c[sa.dis[i] + 1]++;
 	rep(i,0,sa.N) c[i + 1] += c[i];
 	rep(i,0,sa.N) o[c[sa.dis[i]]++] = i;
 	return o;
 }
-template<class T> vi saOcc(SA<T>& sa, const basic_string<T>& s) {
+vi saOcc(SA<>& sa, const string& s) {
 	vi r(sa.N), o = saOrder(sa);
 	int p = 0;
-	for (T c : s) r[p = sa.adj[p][c]]++;
+	for (char c : s) r[p = sa.adj[p][c]]++;
 	for (int i = sa.N; --i;) r[sa.link[o[i]]] += r[o[i]];
 	return r;
 }
-template<class T> ll saDistinct(SA<T>& sa) {
+ll saDistinct(SA<>& sa) {
 	ll r = 0;
 	rep(i,1,sa.N) r += sa.dis[i] - sa.dis[sa.link[i]];
 	return r;
 }
-template<class T> basic_string<T> saKth(SA<T>& sa, ll k) {
+string saKth(SA<>& sa, ll k) {
 	vi o = saOrder(sa);
 	vector<ll> d(sa.N, 1); // # of paths from each state, incl. empty
 	for (int i = sa.N; i--;)
 		for (auto [c, v] : sa.adj[o[i]]) d[o[i]] += d[v];
-	basic_string<T> r;
+	string r;
 	int p = 0;
 	for (k++; k--;) for (auto [c, v] : sa.adj[p]) {
 		if (k < d[v]) { r += c, p = v; break; }
@@ -71,7 +71,7 @@ template<class T> basic_string<T> saKth(SA<T>& sa, ll k) {
 	}
 	return r;
 }
-template<class T> pii saLcs(SA<T>& sa, const basic_string<T>& t) {
+pii saLcs(SA<>& sa, const string& t) {
 	pii r;
 	int p = 0, l = 0;
 	rep(i,0,sz(t)) {
