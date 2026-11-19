@@ -26,6 +26,21 @@ ll divsum_naive(ll to, ll c, ll k, ll m) {
 	return res;
 }
 
+// sum of floor((a*i + b) / m) for 0 <= i < n; a, b >= 0
+typedef __int128 lll;
+lll floorsum(lll n, lll m, lll a, lll b) {
+	lll res = n * (n - 1) / 2 * (a / m) + n * (b / m);
+	a %= m; b %= m;
+	lll top = a * n + b;
+	if (top < m) return res;
+	return res + floorsum(top / m, a, m, top % m);
+}
+
+lll modsum_exact(ll to, ll c, ll k, ll m) {
+	c = rmod(c, m); k = rmod(k, m);
+	return (lll)to * c + (lll)k * to * (to - 1) / 2 - m * floorsum(to, m, k, c);
+}
+
 void compare() {
 	rep(to,0,30) {
 		rep(c,-30,30) {
@@ -37,6 +52,7 @@ void compare() {
 						cout << "differ! " << to << ' ' << c << ' ' << k << ' ' << m << ": " << a << " vs " << b << endl;
 						assert(false);
 					}
+					assert(modsum_exact(to, c, k, m) == b);
 				}
 			}
 		}
@@ -68,7 +84,7 @@ int main() {
 		ll c = (ll)rand() << 2;
 		ll k = (ll)rand() << 2;
 		ll m = (ll)rand() >> 2;
-		assert(abs(modsum(t, c, k, m) / ((long double)m/2 * t) - 1)<1e-5);
+		assert(modsum(t, c, k, m) == (ll)modsum_exact(t, c, k, m));
 	}
 	cout<<"Tests passed!"<<endl;
 	return 0;

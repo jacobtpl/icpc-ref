@@ -8,7 +8,11 @@
 
 // Translated / large-coordinate regressions for polygonArea2,
 // polygonCenter, polyUnion and polygonCut, with exact integer oracles.
+#if LDBL_MANT_DIG >= 64
 typedef long double ld;
+#else
+typedef __float128 ld; // long double is a double (Apple Silicon)
+#endif
 typedef __int128 lll;
 typedef Point<ll> IP;
 typedef Point<double> DP;
@@ -130,7 +134,7 @@ void testCenter() {
 		assert(c.x == 0 && c.y == 0);
 		vector<IP> tri = {IP(M,M), IP(M-3,M), IP(M,M-3)};
 		c = polygonCenter(tri);
-		assert(fabsl(c.x - (ld)(M-1)) < 1e-9L && fabsl(c.y - (ld)(M-1)) < 1e-9L);
+		assert(gfabs(c.x - (ld)(M-1)) < 1e-9L && gfabs(c.y - (ld)(M-1)) < 1e-9L);
 		// zero area: documented NaN, no crash
 		c = polygonCenter(vector<IP>{IP(0,0), IP(1,1), IP(2,2)});
 		assert(isnan(c.x) && isnan(c.y));
@@ -148,13 +152,13 @@ void testCenter() {
 		vector<IP> w = shift(v, o);
 		rotate(w.begin(), w.begin() + rnd(0, n - 1), w.end());
 		auto c = polygonCenter<ll, ld>(w);
-		assert(fabsl(c.x - (ld)o.x - cx) < 1e-8L && fabsl(c.y - (ld)o.y - cy) < 1e-8L);
+		assert(gfabs(c.x - (ld)o.x - cx) < 1e-8L && gfabs(c.y - (ld)o.y - cy) < 1e-8L);
 		// double path: error relative to the polygon plus one rounding of the sum
 		DP d = polygonCenter(toD(w));
-		assert(fabsl(d.x - (ld)o.x - cx) < 1e-6L && fabsl(d.y - (ld)o.y - cy) < 1e-6L);
+		assert(gfabs(d.x - (ld)o.x - cx) < 1e-6L && gfabs(d.y - (ld)o.y - cy) < 1e-6L);
 		reverse(all(w));
 		c = polygonCenter<ll, ld>(w);
-		assert(fabsl(c.x - (ld)o.x - cx) < 1e-8L && fabsl(c.y - (ld)o.y - cy) < 1e-8L);
+		assert(gfabs(c.x - (ld)o.x - cx) < 1e-8L && gfabs(c.y - (ld)o.y - cy) < 1e-8L);
 	}
 }
 
@@ -265,8 +269,8 @@ void testCut() {
 		assert(sz(got) == sz(want));
 		rep(i,0,sz(got)) {
 			// one ulp of the offset (1.5e-8 at 1e8) plus local rounding
-			assert(fabsl((ld)got[i].x - (ld)o.x - want[i].first) < 1e-7L);
-			assert(fabsl((ld)got[i].y - (ld)o.y - want[i].second) < 1e-7L);
+			assert(gfabs((ld)got[i].x - (ld)o.x - want[i].first) < 1e-7L);
+			assert(gfabs((ld)got[i].y - (ld)o.y - want[i].second) < 1e-7L);
 		}
 		cnt += sz(want) > 0;
 		// the cut part's area must agree too (local accumulation)
@@ -274,7 +278,7 @@ void testCut() {
 		ld ar = 0;
 		rep(i,1,sz(w)-1) ar += (w[i].first - w[0].first) * (w[i+1].second - w[0].second)
 			- (w[i].second - w[0].second) * (w[i+1].first - w[0].first);
-		assert(fabsl((ld)polygonArea2(got) - ar) < 1e-4L);
+		assert(gfabs((ld)polygonArea2(got) - ar) < 1e-4L);
 	}
 	assert(cnt > 50000);
 	assert(polygonCut({}, DP(0,0), DP(1,0)).empty());
@@ -304,7 +308,7 @@ int main() {
 		assert((polygonArea2<ll, lll>(v)) == shoelace(v));
 		auto c = polygonCenter(v);
 		ld cx, cy; exactCenter(v, cx, cy);
-		assert(fabsl(c.x - cx) < 1e-6L && fabsl(c.y - cy) < 1e-6L);
+		assert(gfabs(c.x - cx) < 1e-6L && gfabs(c.y - cy) < 1e-6L);
 		vector<vector<IP>> ps;
 		rep(i,0,300) ps.push_back(shift(star(4, 30), IP(rnd(-100, 100) + 1000000000, rnd(-100, 100))));
 		double u = polyUnion(ps);
