@@ -22,7 +22,8 @@
  *  ll s = pst::query(r1, 0, n, l, r).v;
  * Time: O(\log N) per op; $\le 4\log N$ new nodes per range op,
  * $2 \log N$ per point op (half that without lazy).
- * Status: stress-tested
+ * Status: tested on
+  * https://codeforces.com/contest/464/submission/398015255
  */
 #pragma once
 
