@@ -49,7 +49,7 @@ struct Node {
 vector<Node> N(1); int T = 0;
 void step() { ++T; }
 void reset() { N.assign(1, Node()); T = 0; }
-int make(Node n) { n.t = T; N.push_back(n); return sz(N) - 1; }
+int make(const Node& n) { N.push_back(n); N.back().t = T; return sz(N) - 1; }
 Node get(int x, int lo, int hi) {
 	return x ? N[x] : Node::empty_range(lo, hi);
 }
@@ -58,8 +58,9 @@ int clone(int x, int lo, int hi) {
 	return N[x].t == T ? x : make(N[x]);
 }
 void up(int x, int lo, int hi) {
-	int m = lo + (hi - lo) / 2;
-	N[x].up(get(N[x].c[0], lo, m), get(N[x].c[1], m, hi), lo, hi);
+	int m = lo + (hi - lo) / 2, a = N[x].c[0], b = N[x].c[1];
+	if (a && b) N[x].up(N[a], N[b], lo, hi);
+	else N[x].up(get(a, lo, m), get(b, m, hi), lo, hi);
 }
 void down(int x, int lo, int hi) { // x must be cloned
 	int m = lo + (hi - lo) / 2;
@@ -83,13 +84,13 @@ int add(int x, int lo, int hi, int l, int r, ll val) {
 	N[x].c[1] = add(N[x].c[1], m, hi, l, r, val);
 	return up(x, lo, hi), x;
 }
-Node query(Node x, int lo, int hi, int l, int r) {
+Node query(Node&& x, int lo, int hi, int l, int r) {
 	if (r <= lo || hi <= l) return Node();
 	if (l <= lo && hi <= r) return x;
 	int m = lo + (hi - lo) / 2;
 	Node a = get(x.c[0], lo, m), b = get(x.c[1], m, hi), res;
 	x.down(a, b, lo, hi);
-	res.up(query(a, lo, m, l, r), query(b, m, hi, l, r), lo, hi);
+	res.up(query(move(a), lo, m, l, r), query(move(b), m, hi, l, r), lo, hi);
 	return res;
 }
 Node query(int x, int lo, int hi, int l, int r) {
