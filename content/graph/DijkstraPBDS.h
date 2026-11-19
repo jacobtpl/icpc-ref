@@ -15,7 +15,8 @@
  * thin_heap_tag also works as the last template argument; rc_binomial_heap_tag
  * gives wrong answers with modify.
  * Time: O(E log V)
- * Status: stress-tested against Dijkstra.h and Bellman-Ford
+ * Status: stress-tested against Dijkstra.h and Bellman-Ford, tested on
+ * https://codeforces.com/contest/464/submission/399118456
  */
 #pragma once
 

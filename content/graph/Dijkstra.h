@@ -42,7 +42,8 @@
  *     if (2 * u < n) f(2 * u, 3);
  *   });
  * Time: O((V+E) log E)
- * Status: stress-tested against Bellman-Ford; solves CF 464E
+ * Status: stress-tested against Bellman-Ford, tested on
+ * https://codeforces.com/contest/464/submission/398015255
  */
 #pragma once
 
