@@ -9,6 +9,7 @@
  * edges go into the current bucket, so they are processed before moving on)
  * and is as fast as the usual deque 0-1 BFS, hence a single implementation.
  * Several sources allowed. Unreachable = -1; par[v] = predecessor (-1 for sources).
+ * Distances are int, so (V-1)K must be < 2^31 (always true when O(VK) is fast).
  *
  * Example: grid, moving along a row is free, changing row costs 1.
  *   vector<vector<pair<int, int>>> g(R * C);
