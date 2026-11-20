@@ -25,8 +25,9 @@
  *   auto r = dijkstra(g, {s}, HopsDist{});  // r.dist[t].first, r.dist[t].second
  *
  * Huge numbers, e.g. CF 464E (w = 2^x, x <= 1e5): make D a handle into a
- * persistent structure, kept in the struct through a pointer. BigBits (a
- * persistent bitset with +2^x and compare) is in stress-tests/graph/DijkstraBigNum.cpp.
+ * persistent structure, kept in the struct through a pointer. BigBits is a
+ * persistent segment tree over bit positions with hashes (+2^x and compare);
+ * full code in the CF 464E submission under Status.
  *   struct Big {
  *     BigBits* t; typedef int D;                     // D = root of a persistent bitset
  *     D zero() { return 0; }
