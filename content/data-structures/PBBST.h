@@ -12,14 +12,16 @@
  *  testcases (invalidates every existing tree).
  *  To augment, add fields to Node and fill in up (pull) and
  *  down (lazy push); down must first clone children:
- *  \texttt{c[i] = clone(c[i])}, or old versions get corrupted.
- *  clone may reallocate N: never keep a Node\& across it.
+ *  c[i] = clone(c[i]), or old versions get corrupted.
+ *  clone may reallocate N: never keep a Node& across it.
  * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
  *  PAVL b = a.step(); // a is now immutable
  *  auto [l, r] = b.split(1); // consumes b, not a
- * Time: O(\log N)
+ * Time: O(log N) per operation
  * Status: stress-tested
  */
+#pragma once
+
 struct PAVL {
 	struct Node {
 		int t;

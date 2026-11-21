@@ -14,18 +14,19 @@
  *  t = onRange(t, l, r, [&](pt x) { rev(x); }); // reverse
  *  t = onRange(t, l, r, [&](pt x) { upd(x, 5); }); // add 5
  *  t = onRange(t, l, r, [&](pt x) { ans = x->mn; }); // query
- * Time: $O(\log N)$
+ * Time: O(log N) per operation
  * Status: stress-tested
  */
 #pragma once
 
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 using pt = struct Node*;
 pt calc(pt x);
 struct Node {
-	int pri; ll val; pt c[2]; // essential
+	unsigned pri; ll val; pt c[2]; // essential
 	int sz; ll sum, mn; // aggregates, set by calc
 	bool flip = 0; ll add = 0; // lazy tags, pending for children
-	Node(ll v) : pri(rand()), val(v), c{} { calc(this); }
+	Node(ll v) : pri((unsigned)rng()), val(v), c{} { calc(this); }
 };
 int getsz(pt x) { return x ? x->sz : 0; }
 ll getsum(pt x) { return x ? x->sum : 0; }
@@ -45,7 +46,7 @@ pt prop(pt x) { // push tags to children (order can matter)
 }
 pt calc(pt x) { // pull aggregates from children
 	pt a = x->c[0], b = x->c[1];
-	assert(!x->flip && !x->add); prop(a), prop(b);
+	assert(!x->flip && !x->add); // prop(x) must come first
 	x->sz = 1 + getsz(a) + getsz(b);
 	x->sum = x->val + getsum(a) + getsum(b);
 	x->mn = min({x->val, getmn(a), getmn(b)});
