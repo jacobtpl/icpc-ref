@@ -26,6 +26,7 @@ jobs:
       run: |
         uname -m
         CXX=g++-16
+        command -v $CXX || brew install gcc@16 || brew install gcc
         $CXX --version
         echo "CXX=$CXX" >> $GITHUB_ENV
         CXX=$CXX make test-compiles
