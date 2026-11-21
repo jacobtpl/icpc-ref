@@ -1,12 +1,19 @@
 #include "../utilities/template.h"
 
+#if LDBL_MANT_DIG >= 64
+typedef long double ld;
+#else
+typedef __float128 ld; // long double is a double (Apple Silicon)
+#endif
+#define GEO_DOUBLE_W ld
 #include "../../content/geometry/Point.h"
+// This file tests the documented opt-in of Point.h: double input with
+// products formed in long double.
 #include "../../content/geometry/PolygonArea.h"
 #include "../../content/geometry/HalfPlaneIntersection.h"
 
 // Exact brute force for small integer rays: the bounded intersection is
 // the hull of all pairwise line intersections that satisfy every ray.
-typedef long double ld;
 typedef __int128 lll;
 typedef Point<ll> IP;
 typedef RayT<ll> IR;
@@ -62,7 +69,7 @@ vector<Fr> brute(const vector<IR>& rs) {
 
 template<class F>
 bool finite(const vector<Point<F>>& v) {
-	for (auto p : v) if (!isfinite(p.x) || !isfinite(p.y)) return false;
+	for (auto p : v) if (p.x - p.x != 0 || p.y - p.y != 0) return false;
 	return true;
 }
 // Same cyclic vertex sequence, within tol.
@@ -75,7 +82,7 @@ bool same(const vector<Point<F>>& got, const vector<Point<ld>>& want, ld tol) {
 		bool ok = 1;
 		rep(i,0,n) {
 			auto g = got[(i + s) % n];
-			if (fabsl((ld)g.x - want[i].x) > tol || fabsl((ld)g.y - want[i].y) > tol) ok = 0;
+			if (gfabs((ld)g.x - want[i].x) > tol || gfabs((ld)g.y - want[i].y) > tol) ok = 0;
 		}
 		if (ok) return true;
 	}
@@ -145,7 +152,7 @@ ll cntPoly = 0, cntEmpty = 0, cntSliver = 0;
 void checkSmall(const vector<IR>& rs) {
 	auto want = toLd(brute(rs));
 	(sz(want) ? cntPoly : cntEmpty)++;
-	auto gi = halfPlaneIsect(rs);
+	auto gi = halfPlaneIsect<ll, ld>(rs);
 	auto gd = halfPlaneIsect(toDouble(rs));
 	if (!finite(gi) || !finite(gd) || !same(gi, want, 1e-12L) || !same(gd, want, 1e-9L)) {
 		cerr << "small case mismatch: want " << sz(want) << " got " << sz(gi) << " / " << sz(gd) << endl;
@@ -217,9 +224,9 @@ void sliver() {
 	for (IP p : tri) want.push_back(Point<ld>((ld)p.x, (ld)p.y));
 	rep(it,0,3) {
 		shuffle(all(ccw), rng); shuffle(all(cw), rng);
-		auto g = halfPlaneIsect(ccw);
+		auto g = halfPlaneIsect<ll, ld>(ccw);
 		assert(same(g, want, 1e-6L));
-		assert(fabsl(polygonArea2(g) - 1) < 1e-6L);
+		assert(gfabs(polygonArea2(g) - 1) < 1e-6L);
 		assert(halfPlaneIsect(cw).empty());
 	}
 }
@@ -299,11 +306,11 @@ int main() {
 		assert(tot > 0);
 		int n = 200000;
 		vector<IR> big;
-		const ld PI = acosl(-1);
+		const long double PI = acosl(-1);
 		rep(i,0,n) {
-			ld a = 2 * PI * i / n;
+			long double a = 2 * PI * i / n;
 			IP p((ll)llround(1e9 * cosl(a)), (ll)llround(1e9 * sinl(a)));
-			ld b = a + PI / 2 + (ld)rnd(-1000, 1000) * 1e-7L;
+			long double b = a + PI / 2 + (long double)rnd(-1000, 1000) * 1e-7L;
 			big.push_back({p, IP((ll)llround(1e9 * cosl(b)), (ll)llround(1e9 * sinl(b)))});
 		}
 		shuffle(all(big), rng);

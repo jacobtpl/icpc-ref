@@ -6,11 +6,16 @@
  *  Coordinates are taken relative to a vertex, so the result does not degrade
  *  far from the origin. signedPolyVolume6 returns six times the volume in the
  *  coordinate type: exact for integers while (number of faces) * 6D^3 fits,
- *  D being the largest coordinate difference. signedPolyVolume returns a
- *  double for integer coordinates (also __int128) and otherwise the coordinate type (Fraction is exact).
+ *  D being the largest coordinate difference. signedPolyVolume returns
+ *  double for int and ll coordinates and otherwise the coordinate type.
+ * Usage:
+ *  vector<Point3D<double>> p = ...;
+ *  double vol = signedPolyVolume(p, hull3d(p));
  * Status: tested
  */
 #pragma once
+
+#include "Point.h"
 
 template<class F> auto triIdx(const F& f, int) ->
 	decltype(array<int,3>{{f.a, f.b, f.c}}) { return {{f.a, f.b, f.c}}; }
@@ -31,8 +36,6 @@ auto signedPolyVolume6(const V& p, const L& trilist) {
 }
 template<class V, class L>
 auto signedPolyVolume(const V& p, const L& trilist) {
-	typedef decltype(p[0].x) T;
-	typedef conditional_t<is_floating_point<T>::value ||
-		is_class<T>::value, T, double> R; // ll, __int128 -> double
+	typedef GeoR<decltype(p[0].x)> R;
 	return R(signedPolyVolume6(p, trilist)) / 6;
 }

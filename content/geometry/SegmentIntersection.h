@@ -6,7 +6,7 @@
  * Description:
 If a unique intersection point between the line segments going from s1 to e1 and from s2 to e2 exists then it is returned.
 If no intersection point exists an empty vector is returned. If infinitely many exist a vector with 2 elements is returned, containing the endpoints of the common line segment.
-For integer coordinates with absolute value at most 10^9, classification is exact using 128-bit intermediates. The output defaults to Point<long double>; choose segInter<T> for another floating type or Fraction. Fraction output throws if a reduced coordinate does not fit. Rounding never changes the vector size, even if overlap endpoints round to equal points.
+For integer coordinates (int, long long, __int128) with absolute value at most 10^9, classification is exact using 128-bit intermediates. The output defaults to Point<Geo<I>::F> (see Point.h; Point<double> for int and long long); choose segInter<T> for another floating type or Fraction, e.g. segInter<long double>(a,b,c,d). Fraction output throws if a reduced coordinate does not fit. Rounding never changes the vector size, even if overlap endpoints round to equal points.
 Floating-point input can misclassify nearly collinear segments. Fraction input is exact only while every intermediate fits. These inputs retain their scalar type. Requires C++17.
  * Usage:
  * auto inter = segInter(s1,e1,s2,e2);
@@ -21,7 +21,7 @@ Floating-point input can misclassify nearly collinear segments. Fraction input i
 #include "../number-theory/Fraction.h"
 
 template<class P> vector<P> segInter(P a, P b, P c, P d) {
-	static_assert(!numeric_limits<decltype(a.x)>::is_integer,
+	static_assert(!geoInt<decltype(a.x)>,
 		"Choose a floating scalar or Fraction for integer input");
 	auto oa = c.cross(d, a), ob = c.cross(d, b),
 	     oc = a.cross(b, c), od = a.cross(b, d);
@@ -36,11 +36,11 @@ template<class P> vector<P> segInter(P a, P b, P c, P d) {
 	return {all(s)};
 }
 
-template<class T = long double, class I, enable_if_t<
-	numeric_limits<I>::is_integer && (is_floating_point<T>::value ||
-	is_same<T, __float128>::value || is_same<T, Fraction>::value), int> = 0>
+template<class R = void, class I, class T = conditional_t<
+	is_void_v<R>, typename Geo<I>::F, R>, enable_if_t<geoInt<I> &&
+	(geoFloat<T> || is_same_v<T, Fraction>), int> = 0>
 vector<Point<T>> segInter(Point<I> a, Point<I> b, Point<I> c, Point<I> d) {
-	using W = __int128_t;
+	using W = __int128; // products of three differences: beyond Geo<I>::W
 	using P = Point<W>;
 	auto wide = [](Point<I> p) { return P(p.x,p.y); };
 	P A=wide(a), B=wide(b), C=wide(c), D=wide(d);

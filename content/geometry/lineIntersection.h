@@ -8,7 +8,7 @@ If a unique intersection point of the lines going through s1,e1 and s2,e2 exists
 If no intersection point exists {0, (0,0)} is returned and if infinitely many exists {-1, (0,0)} is returned.
 A degenerate line (s1 = e1) is treated as a point: -1 if it lies on the other line, else 0 (never 1).
 The point is built as an offset from s1, so doubles lose no digits to the absolute position.
-For Point<ll> coordinates must be at most 1e9 in absolute value and the answer must fit in ll (triple products are done in __int128); each coordinate of a non-integer intersection is truncated toward s1.
+For Point<ll> coordinates must be at most 1e9 in absolute value and the answer must fit in ll (triple products are done in Geo<T>::W, see Point.h: __int128 for ll; with Point<int> they are done in ll, so keep coordinates below 1e6); each coordinate of a non-integer intersection is truncated toward s1.
 With doubles the parallel test is exact, so nearly parallel lines give a far away point.
  * Usage:
  * 	auto res = lineInter(s1,e1,s2,e2);

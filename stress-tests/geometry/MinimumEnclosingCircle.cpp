@@ -1,6 +1,7 @@
 #include "../utilities/template.h"
 
 #include "../../content/geometry/MinimumEnclosingCircle.h"
+typedef Point<double> P;
 
 int main() {
 	srand(2);

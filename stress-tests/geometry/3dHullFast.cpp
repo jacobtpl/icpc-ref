@@ -10,6 +10,7 @@
 #include "../../content/geometry/PolyhedronVolume.h"
 
 typedef __int128 LL;
+typedef Point3D<double> P3;
 typedef array<LL,3> IP;
 typedef array<int,3> Tri;
 
@@ -103,6 +104,15 @@ template<class T> void testExact(const vector<IP>& p) {
 		fail("hull3dFast: not a sphere", p);
 }
 
+// Face set and structure only: for ranges where 3dHull.h and
+// PolyhedronVolume.h, which compute in T, would overflow.
+template<class T> void testWide(const vector<IP>& p) {
+	set<Tri> got;
+	for (auto& f : hull3dFast(conv<T>(p))) got.insert(canon(f));
+	if (got != bruteHull(p)) fail("hull3dFast: wrong faces (wide)", p);
+	testExact<T>(p);
+}
+
 bool coplanarAll(const vector<IP>& p) {
 	int n = sz(p);
 	rep(i,0,n) rep(j,0,i) rep(k,0,j) rep(l,0,k)
@@ -133,6 +143,14 @@ int main() {
 			testGeneral<ll>(q); testGeneral<LL>(q);
 			testExact<ll>(q);
 			cases++;
+		}
+		{ // products are formed in W: ll up to 1e12, int up to 5e5
+			auto q = p;
+			for (auto& a : q) rep(c,0,3) a[c] *= E12 / R;
+			testWide<ll>(q); testWide<__float128>(q);
+			for (auto& a : q) rep(c,0,3) a[c] /= 2000000;
+			testWide<int>(q);
+			cases += 2;
 		}
 		for (auto& a : p) rep(c,0,3) a[c] = a[c] * (E12 / R) + E12 * E12;
 		testGeneral<LL>(p); testExact<LL>(p); // __int128: D <= 2e12

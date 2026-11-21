@@ -16,7 +16,6 @@
 #include "sideOf.h"
 #include "OnSegment.h"
 
-typedef Point<ll> P;
 
 template<class P>
 bool inHull(const vector<P>& l, P p, bool strict = true) {

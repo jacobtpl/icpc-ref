@@ -15,6 +15,7 @@ typedef vector<int> vi;
 #include "../../content/geometry/sideOf.h"
 #include "../../content/geometry/PolygonArea.h"
 #include "../../content/geometry/PolygonUnion.h"
+typedef Point<double> P;
 #include "../utilities/genPolygon.h"
 #include "../utilities/random.h"
 

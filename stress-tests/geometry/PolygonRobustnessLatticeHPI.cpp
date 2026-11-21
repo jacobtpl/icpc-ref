@@ -11,11 +11,11 @@ int main() {
 		vector<IP> tri = {IP(), IP(n-1, n-2), IP(n, n-1)};
 		assert(tri[0].cross(tri[1], tri[2]) == 1);
 		for (int reflection : {-1, 1}) {
-			vector<Ray> rays;
+			vector<RayT<ll>> rays; // exact: slivers of area 1/2 at 1e9
 			vector<P> want;
 			rep(i,0,3) {
 				IP p = tri[i] * reflection, d = (tri[(i+1)%3] - tri[i]) * reflection;
-				rays.push_back({P((double)p.x, (double)p.y), P((double)d.x, (double)d.y)});
+				rays.push_back({p, d});
 				want.emplace_back((double)p.x, (double)p.y);
 			}
 			shuffle(all(rays), rng);
