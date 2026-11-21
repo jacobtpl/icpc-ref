@@ -3,9 +3,11 @@
  * Date: 2015-02-24
  * License: CC0
  * Source: Wikipedia, tinyKACTL
- * Description: Push-relabel using the highest label selection rule and the gap heuristic. Quite fast in practice.
- *  To obtain the actual flow, look at positive values only.
- * Time: $O(V^2\sqrt E)$
+ * Description: Max flow by push-relabel (highest label, gap heuristic). Same
+ *  addEdge / calc / leftOfMinCut interface as Dinic.h. Try Dinic first: this
+ *  is much slower on sparse unit graphs (TLE on Library Checker matching).
+ *  Flow on an edge is its f, if positive.
+ * Time: O(V^2 sqrt(E))
  * Status: Tested on Kattis and SPOJ, and stress-tested
  */
 #pragma once

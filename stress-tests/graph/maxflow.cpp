@@ -24,6 +24,7 @@ int main() {
 		Dinic dinic(n);
 		vector<unordered_map<int, int>> ek(n);
 
+		vector<array<int, 4>> des;
 		int m = rand() % 40;
 		rep(eit,0,m) {
 			int a = rand() % n;
@@ -31,7 +32,8 @@ int main() {
 			int c = rand() % 4;
 			int d = rand() % 4 == 0 ? rand() % 3 + 1 : 0;
 			pr.addEdge(a, b, c, d);
-			dinic.addEdge(a, b, c, d);
+			assert(dinic.addEdge(a, b, c, d) == sz(des));
+			des.push_back({a, b, c, d});
 			ek[a][b] += c;
 			ek[b][a] += d;
 		}
@@ -60,12 +62,37 @@ int main() {
 
 		// Conservation of flow for Dinic
 		vector<ll> dinicFlows(n);
-		rep(i,0,n) for(auto &e: dinic.adj[i]) {
-			assert(e.flow() <= e.oc);
-			dinicFlows[i] += e.flow();
-			dinicFlows[e.to] -= e.flow();
+		rep(id,0,sz(des)) {
+			auto [a, b, c, d] = des[id];
+			ll f = dinic.flow(id);
+			assert(-d <= f && f <= c);
+			dinicFlows[a] += f;
+			dinicFlows[b] -= f;
 		}
 		assert(flows == dinicFlows);
+		assert(dinic.leftOfMinCut(s) && !dinic.leftOfMinCut(t));
+		ll dinicCut = 0;
+		for (auto [a, b, c, d] : des) {
+			if (dinic.leftOfMinCut(a) && !dinic.leftOfMinCut(b)) dinicCut += c;
+			if (dinic.leftOfMinCut(b) && !dinic.leftOfMinCut(a)) dinicCut += d;
+		}
+		assert(dinicCut == flow);
+
+		// Flow limit, then continue after adding the edges in two halves
+		{
+			Dinic d2(n);
+			int half = sz(des) / 2;
+			auto add = [&](int lo, int hi) {
+				rep(id,lo,hi) d2.addEdge(des[id][0], des[id][1], des[id][2], des[id][3]);
+			};
+			add(0, half);
+			ll lim = rand() % 4, got = d2.calc(s, t, lim);
+			assert(got <= lim);
+			add(half, sz(des));
+			got += d2.calc(s, t, 1);
+			got += d2.calc(s, t);
+			assert(got == flow);
+		}
 
 		// Conservation of flow for EdmondsKarp
 		vector<ll> ekFlows(n);
