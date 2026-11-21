@@ -251,6 +251,30 @@ void testCircleLine(ll S, int iters) {
 			CHECK(hypotl(a.x + (b.x-a.x)*t - res[0].x, a.y + (b.y-a.y)*t - res[0].y) <= tol);
 		}
 	}
+	// tiny circle far from a and b: the points must be built from the
+	// foot of the perpendicular through c, not from a
+	{
+		auto res = circleLine(P(0, 0), 1e-12, P(1e9, 0), P(1e9 + 1, 0));
+		CHECK(sz(res) == 2 && res[0].x == -1e-12 && res[1].x == 1e-12);
+		CHECK(res[0].y == 0 && res[1].y == 0);
+		rep(it,0,20000) { // r >> ulp(1e9), the line's own uncertainty
+			double cx = (double)rnd(-1000000, 1000000), cy = (double)rnd(-1000000, 1000000);
+			double r = ldexp(1.0, -(int)rnd(5, 9)), far = 1e9 * (it & 1 ? 1 : -1);
+			P d = P((double)rnd(-1000, 1000), (double)rnd(-1000, 1000));
+			if (d == P(0, 0)) continue;
+			double h = r * (double)rnd(-9, 9) / 10; // signed distance of the line
+			P f = P(cx, cy) + d.perp().unit() * h;
+			P a = f + d.unit() * far, b = f - d.unit() * far; // both far
+			auto rs = circleLine(P(cx, cy), r, a, b);
+			CHECK(sz(rs) == 2);
+			for (P q : rs) { // h itself is only known to ~ulp(1e9)
+				CHECK(fabs((q - P(cx, cy)).dist() - r) <= 1e-6 * r);
+				ld cr = ((ld)b.x - a.x) * ((ld)q.y - a.y) - ((ld)b.y - a.y) * ((ld)q.x - a.x);
+				CHECK(fabsl(cr) <= 1e-7L * r * (b - a).dist());
+			}
+			CHECK((rs[0] - rs[1]).dist() >= 2 * sqrt(r*r - h*h) * (1 - 1e-2));
+		}
+	}
 	// zero length line
 	CHECK(circleLine(P(0, 0), 5, P(3, 4), P(3, 4)).empty());
 	CHECK(circleLine(P(1e9, 1e9), 0, P(1e9, 1e9), P(1e9, 1e9)).empty());
