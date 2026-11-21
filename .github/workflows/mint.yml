@@ -22,4 +22,4 @@ jobs:
         env:
           CXX: ${{ matrix.compiler }}
           CXXFLAGS: -O2 -g -Wall -Wextra -Wconversion -fsanitize=address,undefined -fno-sanitize-recover=all
-        run: doc/scripts/run-parallel.sh stress-tests/number-theory/ModInt.cpp stress-tests/numerical/PolyOps.cpp
+        run: doc/scripts/run-parallel.sh stress-tests/number-theory/ModInt.cpp stress-tests/numerical/PolyOps.cpp stress-tests/numerical/PolySamples.cpp
