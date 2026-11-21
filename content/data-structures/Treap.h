@@ -19,7 +19,7 @@
  */
 #pragma once
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937 rng((unsigned)chrono::steady_clock::now().time_since_epoch().count());
 using pt = struct Node*;
 pt calc(pt x);
 struct Node {
