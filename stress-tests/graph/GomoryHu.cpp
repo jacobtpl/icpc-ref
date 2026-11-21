@@ -3,7 +3,7 @@
 
 #include "../../content/graph/GlobalMinCut.h"
 #include "../../content/graph/GomoryHu.h"
-#include "../../content/graph/Dinic.h"
+#include "../../content/graph/PushRelabel.h"
 
 
 void test(int N, int mxFlow, int iters) {
@@ -22,7 +22,7 @@ void test(int N, int mxFlow, int iters) {
             mat[j][i] += w;
         }
         auto calc = [&](int s, int t) {
-            Dinic flow(n);
+            PushRelabel flow(n);
             for (auto e : edges) {
                 flow.addEdge((int)e[0], (int)e[1], e[2], e[2]);
             }

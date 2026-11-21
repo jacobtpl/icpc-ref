@@ -4,11 +4,6 @@
 
 #include "../../content/graph/WeightedMatching.h"
 #include <bits/extc++.h> /// include-line, keep-include
-template<class T> bool ckmin(T& a, const T& b) {
-    if (a <= b) return false;
-    a = b;
-    return true;
-}
 #include "../../content/graph/MinCostMaxFlow.h"
 
 void test(int N, int mxCost, int iters) {

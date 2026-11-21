@@ -1,74 +1,66 @@
 /**
- * Author: stanford
- * Date: idk
+ * Author: Devin
+ * Date: 2026-11-21
  * License: CC0
- * Source: stanford-notebook
- * Description: Dinic's without scaling. Self-loops are ignored; requires $S \ne T$.
- * The $i$-th added non-loop edge is E[2*i], with its flow in E[2*i].flow.
- * Usage: Dinic d(n); d.AddEdge(u, v, cap); ll f = d.MaxFlow(s, t);
+ * Description: Max flow (Dinic). addEdge returns an edge id; after calc,
+ *  flow(id) is the flow on that edge (negative = backwards, if rcap > 0).
+ *  For an undirected edge pass rcap = c. calc pushes at most lim more flow
+ *  and can be called again, also after adding edges.
+ *  leftOfMinCut is valid after a calc that was not stopped by lim.
+ *  Change F for another capacity type (not floating point).
+ * Usage: Dinic d(n); int id = d.addEdge(a, b, cap); ll f = d.calc(s, t);
+ * Time: O(V^2 E); O(E sqrt(V)) for unit capacities / bipartite matching.
+ *  dfs recurses once per path vertex: run with ulimit -s unlimited locally.
+ * Status: stress-tested against PushRelabel and EdmondsKarp
  */
+#pragma once
 
 struct Dinic {
-  struct Edge {
-    int u, v;
-    ll cap, flow;
-    Edge() {}
-    Edge(int u, int v, ll cap): u(u), v(v), cap(cap), flow(0) {}
-  };
-  int N;
-  vector<Edge> E;
-  vector<vector<int>> g;
-  vector<int> d, pt;
-  Dinic(int N): N(N), E(0), g(N), d(N), pt(N) {}
-  void AddEdge(int u, int v, ll cap) {
-    if (u != v) {
-      E.emplace_back(u, v, cap);
-      g[u].emplace_back(E.size() - 1);
-      E.emplace_back(v, u, 0);
-      g[v].emplace_back(E.size() - 1);
-    }
-  }
-  bool BFS(int S, int T) {
-    queue<int> q({S});
-    fill(d.begin(), d.end(), N + 1);
-    d[S] = 0;
-    while(!q.empty()) {
-      int u = q.front(); q.pop();
-      if (u == T) break;
-      for (int k: g[u]) {
-        Edge &e = E[k];
-        if (e.flow < e.cap && d[e.v] > d[e.u] + 1) {
-          d[e.v] = d[e.u] + 1;
-          q.emplace(e.v);
-        }
-      }
-    }
-    return d[T] != N + 1;
-  }
-  ll DFS(int u, int T, ll flow = -1) {
-    if (u == T || flow == 0) return flow;
-    for (int &i = pt[u]; i < g[u].size(); ++i) {
-      Edge &e = E[g[u][i]];
-      Edge &oe = E[g[u][i]^1];
-      if (d[e.v] == d[e.u] + 1) {
-        ll amt = e.cap - e.flow;
-        if (flow != -1 && amt > flow) amt = flow;
-        if (ll pushed = DFS(e.v, T, amt)) {
-          e.flow += pushed;
-          oe.flow -= pushed;
-          return pushed;
-        }
-      }
-    }
-    return 0;
-  }
-  ll MaxFlow(int S, int T) {
-    ll total = 0;
-    while (BFS(S, T)) {
-      fill(pt.begin(), pt.end(), 0);
-      while (ll flow = DFS(S, T))
-        total += flow;
-    }
-    return total;
-  }
+	using F = ll;
+	struct Edge { int to, rev; F c, cap; }; // c = residual capacity
+	vector<vector<Edge>> adj;
+	vector<pii> pos; // edge id -> (a, index in adj[a])
+	vi lvl, ptr, q;
+	Dinic(int n) : adj(n), lvl(n), ptr(n), q(n) {}
+	int addEdge(int a, int b, F c, F rcap = 0) {
+		pos.push_back({a, sz(adj[a])});
+		adj[a].push_back({b, sz(adj[b]) + (a == b), c, c});
+		adj[b].push_back({a, sz(adj[a]) - 1, rcap, rcap});
+		return sz(pos) - 1;
+	}
+	F flow(int id) {
+		Edge& e = adj[pos[id].first][pos[id].second];
+		return e.cap - e.c;
+	}
+	F dfs(int v, int s, F f) { // walks back from t, so only vertices reachable from s are visited
+		if (v == s) return f;
+		F left = f;
+		for (int& i = ptr[v]; i < sz(adj[v]); i++) {
+			Edge& e = adj[v][i], &r = adj[e.to][e.rev];
+			if (r.c && lvl[e.to] && lvl[e.to] == lvl[v] - 1) {
+				F p = dfs(e.to, s, min(left, r.c));
+				r.c -= p, e.c += p;
+				if (!(left -= p)) return f;
+			}
+		}
+		return f - left;
+	}
+	F calc(int s, int t, F lim = numeric_limits<F>::max()) {
+		assert(s != t);
+		F flow = 0;
+		while (flow < lim) {
+			fill(all(lvl), 0), fill(all(ptr), 0);
+			int qi = 0, qe = 0;
+			q[qe++] = s, lvl[s] = 1;
+			while (qi < qe && !lvl[t]) {
+				int v = q[qi++];
+				for (Edge& e : adj[v]) if (e.c && !lvl[e.to])
+					q[qe++] = e.to, lvl[e.to] = lvl[v] + 1;
+			}
+			if (!lvl[t]) break;
+			flow += dfs(t, s, lim - flow);
+		}
+		return flow;
+	}
+	bool leftOfMinCut(int v) { return lvl[v] != 0; }
 };

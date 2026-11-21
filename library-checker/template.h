@@ -1,0 +1,15 @@
+#include <bits/stdc++.h>
+#include <cassert>
+using namespace std;
+
+#define rep(i,a,b) for(int i = (a); i < (b); ++i)
+#define all(x) begin(x), end(x)
+#define sz(x) (int)(x).size()
+#define mp make_pair
+#define pb push_back
+using ll = long long;
+using pii = pair<int,int>;
+using vi = vector<int>;
+
+template<typename T> bool ckmax(T &a, T const& b) {return b>a?a=b,1:0;}
+template<typename T> bool ckmin(T &a, T const& b) {return b<a?a=b,1:0;}
