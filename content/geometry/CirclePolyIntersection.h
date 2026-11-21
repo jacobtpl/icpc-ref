@@ -4,29 +4,46 @@
  * License: CC0
  * Source: https://github.com/spaghetti-source/algorithm/blob/master/geometry/_geom.cc#L744
  * Description: Returns the area of the intersection of a circle with a
- * ccw polygon.
+ * ccw polygon. Chords are built from the foot of the perpendicular from
+ * the centre to each edge line, so small circles far from the vertices
+ * are fine (e.g. r=1, coordinates 1e9).
+ * P is a floating point Point; r and the result have its coordinate
+ * type. No eps is used.
+ * Usage:
+ *  typedef Point<double> P;
+ *  vector<P> sq = {P(0,0), P(2,0), P(2,2), P(0,2)};
+ *  double a = circlePoly(P(0,0), 1.0, sq); // quarter disc: pi/4
  * Time: O(n)
  * Status: Tested on GNYR 2019 Gerrymandering, stress-tested
  */
 #pragma once
 
-#include "../../content/geometry/Point.h"
+#include "Point.h"
 
-typedef Point<double> P;
-#define arg(p, q) atan2(p.cross(q), p.dot(q))
-double circlePoly(P c, double r, vector<P> ps) {
-	auto tri = [&](P p, P q) {
-		auto r2 = r * r / 2;
-		P d = q - p;
-		auto a = d.dot(p)/d.dist2(), b = (p.dist2()-r*r)/d.dist2();
-		auto det = a * a - b;
-		if (det <= 0) return arg(p, q) * r2;
-		auto s = max(0., -a-sqrt(det)), t = min(1., -a+sqrt(det));
-		if (t < 0 || 1 <= s) return arg(p, q) * r2;
-		P u = p + d * s, v = q + d * (t-1);
-		return arg(p,u) * r2 + u.cross(v)/2 + arg(v,q) * r2;
+template<class P>
+auto circlePoly(P c, decltype(P().x) r, const vector<P>& ps) {
+	typedef decltype(c.x) T; typedef typename Geo<T>::W W;
+	typedef Point<W> Q;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	W R = r, r2 = R * R / 2;
+	auto ang = [](Q p, Q q) {
+		return gatan2(p.cross(q), p.dot(q)); };
+	auto tri = [&](Q p, Q q) {
+		Q d = q - p, u = p, v = q;
+		W d2 = d.dist2(), cr = p.cross(d), h = gfabs(cr) / gsqrt(d2),
+		  det = (R - h) * (R + h) / d2; // nan if p == q
+		if (!(det > 0)) return ang(p, q) * r2;
+		W a = d.dot(p) / d2, e = gsqrt(det),
+		  s = -a - e, t = -a + e, k = -cr / d2;
+		if (t < 0 || 1 <= s) return ang(p, q) * r2;
+		// crossings = foot of the perpendicular d.perp()*k -+ d*e
+		if (s > 0) u = Q(-d.y*k - d.x*e, d.x*k - d.y*e);
+		if (t < 1) v = Q(-d.y*k + d.x*e, d.x*k + d.y*e);
+		return ang(p,u) * r2 + u.cross(v)/2 + ang(v,q) * r2;
 	};
-	auto sum = 0.0;
+	auto rel = [&](P p) { // p - c, formed in W
+		return Q(W(p.x) - W(c.x), W(p.y) - W(c.y)); };
+	W sum = 0;
 	rep(i,0,sz(ps))
-		sum += tri(ps[i] - c, ps[(i + 1) % sz(ps)] - c);
-	return sum; }
+		sum += tri(rel(ps[i]), rel(ps[(i + 1) % sz(ps)]));
+	return T(sum); }

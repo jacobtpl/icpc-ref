@@ -8,6 +8,14 @@
  * 1 if the circles are tangent to each other (in which case .first = .second and the tangent line is perpendicular to the line between the centers).
  * .first and .second give the tangency points at circle 1 and 2 respectively.
  * To find the tangents of a circle with a point set r2 to 0.
+ * P is a floating point Point; the radii have its coordinate type.
+ * The count is exact for integer-valued input up to 3e7 (double),
+ * 1e9 (long double).
+ * Eps: geoEps is compared to d^2 - (r1-r2)^2 (tangent circles).
+ * Usage:
+ *  typedef Point<double> P;
+ *  auto t = tangents(P(0,0), 1.0, P(4,0), 1.0);   // 2 external
+ *  auto in = tangents(P(0,0), 1.0, P(4,0), -1.0); // 2 internal
  * Status: tested
  */
 #pragma once
@@ -15,14 +23,19 @@
 #include "Point.h"
 
 template<class P>
-vector<pair<P, P>> tangents(P c1, double r1, P c2, double r2) {
-	P d = c2 - c1;
-	double dr = r1 - r2, d2 = d.dist2(), h2 = d2 - dr * dr;
-	if (d2 == 0 || h2 < 0)  return {};
+vector<pair<P, P>> tangents(P c1, decltype(P().x) r1,
+		P c2, decltype(P().x) r2) {
+	typedef decltype(c1.x) T; typedef typename Geo<T>::W W;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	W x = W(c2.x) - W(c1.x), y = W(c2.y) - W(c1.y), R1 = r1, R2 = r2,
+	  dr = R1 - R2, d2 = x*x + y*y, h2 = d2 - dr*dr;
+	if (d2 == 0 || sgn(h2) < 0) return {};
+	W h = h2 > 0 ? gsqrt(h2) : W(0);
 	vector<pair<P, P>> out;
-	for (double sign : {-1, 1}) {
-		P v = (d * dr + d.perp() * sqrt(h2) * sign) / d2;
-		out.push_back({c1 + v * r1, c2 + v * r2});
+	for (int sign : {-1, 1}) {
+		W vx = (x*dr - y*h*W(sign))/d2, vy = (y*dr + x*h*W(sign))/d2;
+		out.push_back({P(T(c1.x + vx*R1), T(c1.y + vy*R1)),
+		               P(T(c2.x + vx*R2), T(c2.y + vy*R2))});
 	}
-	if (h2 == 0) out.pop_back();
+	if (sgn(h2) == 0) out.pop_back();
 	return out; }

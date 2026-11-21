@@ -4,8 +4,16 @@
  * License: CC0
  * Source: https://vlecomte.github.io/cp-geo.pdf
  * Description: Finds the intersection between a circle and a line.
- * Returns a vector of either 0, 1, or 2 intersection points.
- * P is intended to be Point<double>.
+ * Returns a vector of either 0, 1, or 2 intersection points
+ * (empty if a = b). P is a floating point Point; r has its
+ * coordinate type. The count is exact for integer-valued input up to
+ * 3e7 (double), 1e9 (long double).
+ * Eps: geoEps is compared to r^2|ab|^2 - s^2 with s = (b-a)x(c-a),
+ * a length^4, so scale it by |ab|^2 (or normalise b-a).
+ * Usage:
+ *  typedef Point<double> P;
+ *  vector<P> v = circleLine(P(0,0), 5.0, P(-10,3), P(10,3));
+ *  // v = {(-4,3), (4,3)}, ordered along a -> b
  * Status: unit tested
  */
 
@@ -13,10 +21,15 @@
 
 #include "Point.h"
 
-template<class P> vector<P> circleLine(P c, double r, P a, P b) {
-	P ab = b - a, p = a + ab * (c-a).dot(ab) / ab.dist2();
-	double s = a.cross(b, c), h2 = r*r - s*s / ab.dist2();
-	if (h2 < 0) return {};
-	if (h2 == 0) return {p};
-	P h = ab.unit() * sqrt(h2);
-	return {p - h, p + h}; }
+template<class P>
+vector<P> circleLine(P c, decltype(P().x) r, P a, P b) {
+	typedef decltype(a.x) T; typedef typename Geo<T>::W W;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	W x = W(b.x) - W(a.x), y = W(b.y) - W(a.y), u = W(c.x) - W(a.x),
+	  v = W(c.y) - W(a.y), L = x*x + y*y, s = x*v - y*u,
+	  t = x*u + y*v, R = r, N = geoDet(R*R, L, s, s);
+	if (L == 0 || sgn(N) < 0) return {};
+	auto at = [&](W k) { return P(T(a.x+x*k), T(a.y+y*k)); };
+	if (sgn(N) == 0) return {at(t / L)};
+	W q = gsqrt(N);
+	return {at((t - q) / L), at((t + q) / L)}; }

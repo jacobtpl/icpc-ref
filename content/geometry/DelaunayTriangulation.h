@@ -4,7 +4,14 @@
  * Source: Geometry in C
  * Description: Computes the Delaunay triangulation of a set of points.
  *  Each circumcircle contains none of the input points.
- *  If any three points are collinear or any four are on the same circle, behavior is undefined.
+ *  Calls trifun(i,j,k) with the indices of every triangle, counter-clockwise.
+ *  If any three points are collinear or any four are on the same circle, behavior is undefined
+ *  (use FastDelaunay for such input).
+ *  Exact for Point<ll> up to 1e9 and Point<int> up to 1e4.
+ *  Floating T is not exact and no eps is used.
+ * Usage:
+ *  vector<Point<ll>> ps = ...;
+ *  delaunay(ps, [&](int i, int j, int k) { tris.push_back({i,j,k}); });
  * Time: O(n^2)
  * Status: stress-tested
  */
@@ -15,11 +22,19 @@
 
 template<class P, class F>
 void delaunay(vector<P>& ps, F trifun) {
+	typedef decltype(ps[0].x) T;
+	typedef typename Geo<T>::W S;
 	if (sz(ps) == 3) { int d = (ps[0].cross(ps[1], ps[2]) < 0);
 		trifun(0,1+d,2-d); }
-	vector<P3> p3;
-	for (P p : ps) p3.emplace_back(p.x, p.y, p.dist2());
-	if (sz(ps) > 3) for(auto t:hull3d(p3)) if ((p3[t.b]-p3[t.a]).
-			cross(p3[t.c]-p3[t.a]).dot(P3(0,0,1)) < 0)
+	if (sz(ps) <= 3) return;
+	P lo = ps[0], hi = lo; // centre: keeps |coords| and helps doubles
+	for (P p : ps) lo = P(min(lo.x, p.x), min(lo.y, p.y)),
+		hi = P(max(hi.x, p.x), max(hi.y, p.y));
+	P o = (lo + hi) / 2;
+	vector<Point3D<S>> p3;
+	for (P p : ps) { S x = S(p.x) - S(o.x), y = S(p.y) - S(o.y);
+		p3.emplace_back(x, y, x*x + y*y); }
+	for (auto t : hull3d(p3)) if ((p3[t.b]-p3[t.a]).
+			cross(p3[t.c]-p3[t.a]).z < 0)
 		trifun(t.a, t.c, t.b);
 }

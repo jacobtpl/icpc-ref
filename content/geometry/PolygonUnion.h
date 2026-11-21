@@ -5,8 +5,18 @@
  * Source: https://codeforces.com/gym/101673/submission/50481926
  * Description: Calculates the area of the union of $n$ polygons (not necessarily
  * convex). The points within each polygon must be given in CCW order.
- * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
- * Time: $O(N^2)$, where $N$ is the total number of points
+ * Returns double for int and ll input, else T. With integer T all side
+ * tests are exact (ll: |x|,|y| < 2^30, int: < 2^14), so prefer it for
+ * integer input (in double the tests are only exact up to about 3e7).
+ * Eps: side tests are cross products through sgn, so geoEps applies;
+ * it shouldn't be needed. The area is summed relative to a
+ * polygon vertex, so far-away input does not cancel.
+ * Usage:
+ *  typedef Point<ll> P;
+ *  vector<vector<P>> polys = {{P(0,0),P(2,0),P(2,2),P(0,2)},
+ *                             {P(1,1),P(3,1),P(3,3),P(1,3)}};
+ *  double area = polyUnion(polys); // 7
+ * Time: O(N^2), where N is the total number of points
  * Status: stress-tested, Submitted on ECNA 2017 Problem A
  */
 #pragma once
@@ -14,16 +24,20 @@
 #include "Point.h"
 #include "sideOf.h"
 
-typedef Point<double> P;
+template<class P> using PolyUnionT = GeoR<decltype(P().x)>;
+template<class P> PolyUnionT<P> rat(P a, P b) {
+	typedef PolyUnionT<P> R;
+	return sgn(b.x) ? R(a.x) / R(b.x) : R(a.y) / R(b.y);
+}
 template<class P>
-auto rat(P a, P b) { return sgn(b.x) ? a.x/b.x : a.y/b.y; }
-template<class P>
-auto polyUnion(vector<vector<P>>& poly) {
-	using T = decltype(P().x);
-	T ret = 0;
+PolyUnionT<P> polyUnion(vector<vector<P>>& poly) {
+	typedef decltype(P().x) T; typedef PolyUnionT<P> R;
+	R ret = 0;
+	P O;
+	for (auto& p : poly) if (sz(p)) O = p[0];
 	rep(i,0,sz(poly)) rep(v,0,sz(poly[i])) {
 		P A = poly[i][v], B = poly[i][(v + 1) % sz(poly[i])];
-		vector<pair<T, int>> segs = {{0, 0}, {1, 0}};
+		vector<pair<R, int>> segs = {{0, 0}, {1, 0}};
 		rep(j,0,sz(poly)) if (i != j) {
 			rep(u,0,sz(poly[j])) {
 				P C = poly[j][u], D = poly[j][(u + 1) % sz(poly[j])];
@@ -31,7 +45,7 @@ auto polyUnion(vector<vector<P>>& poly) {
 				if (sc != sd) {
 					T sa = C.cross(D, A), sb = C.cross(D, B);
 					if (min(sc, sd) < 0)
-						segs.emplace_back(sa / (sa - sb), sgn(sc - sd));
+						segs.emplace_back(R(sa) / R(sa - sb), sgn(sc - sd));
 				} else if (!sc && !sd && j<i && sgn((B-A).dot(D-C))>0){
 					segs.emplace_back(rat(C - A, B - A), 1);
 					segs.emplace_back(rat(D - A, B - A), -1);
@@ -39,14 +53,14 @@ auto polyUnion(vector<vector<P>>& poly) {
 			}
 		}
 		sort(all(segs));
-		for (auto& s : segs) s.first = min(max(s.first, T(0)), T(1));
-		T sum = 0;
+		for (auto& s : segs) s.first = min(max(s.first, R(0)), R(1));
+		R sum = 0;
 		int cnt = segs[0].second;
 		rep(j,1,sz(segs)) {
 			if (!cnt) sum += segs[j].first - segs[j - 1].first;
 			cnt += segs[j].second;
 		}
-		ret += A.cross(B) * sum;
+		ret += R((A - O).cross(B - O)) * sum;
 	}
 	return ret / 2;
 }

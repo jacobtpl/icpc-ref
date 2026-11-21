@@ -4,6 +4,16 @@
  * License: CC0
  * Source: folklore
  * Description: Computes the minimum circle that encloses a set of points.
+ * P must be a floating point Point; returns {center, radius}.
+ * Works in coordinates relative to one of the points, so the tolerance is
+ * relative to the spread of the points, not to their distance from the
+ * origin. Duplicate and collinear points are fine; empty input gives radius 0.
+ * Eps (geoEps is not used): points up to eps * r outside the circle
+ * are accepted. It is relative: 1e-12 for double, 1e-15 for
+ * long double, 1e-28 for __float128.
+ * Usage:
+ *  typedef Point<double> P;
+ *  auto [o, r] = mec(v);        // or mec(v, eps)
  * Time: expected O(n)
  * Status: stress-tested
  */
@@ -11,10 +21,17 @@
 
 #include "circumcircle.h"
 
-pair<P, double> mec(vector<P> ps) {
-	shuffle(all(ps), mt19937(time(0)));
-	P o = ps[0];
-	double r = 0, EPS = 1 + 1e-8;
+template<class P>
+pair<P, decltype(P().x)> mec(vector<P> ps,
+		decltype(P().x) eps = 1e-12) {
+	typedef decltype(P().x) T;
+	static_assert(geoFloat<T>, "use a floating point Point");
+	if (ps.empty()) return {P(), 0};
+	static mt19937 rng((unsigned)time(0));
+	shuffle(all(ps), rng);
+	P s = ps[0], o;
+	for (P& p : ps) p = p - s;
+	T r = 0, EPS = 1 + eps;
 	rep(i,0,sz(ps)) if ((o - ps[i]).dist() > r * EPS) {
 		o = ps[i], r = 0;
 		rep(j,0,i) if ((o - ps[j]).dist() > r * EPS) {
@@ -22,9 +39,14 @@ pair<P, double> mec(vector<P> ps) {
 			r = (o - ps[i]).dist();
 			rep(k,0,j) if ((o - ps[k]).dist() > r * EPS) {
 				o = ccCenter(ps[i], ps[j], ps[k]);
-				r = (o - ps[i]).dist();
+				T f = o.x + o.y;
+				if (!(f - f == 0)) { // inf/nan: collinear, farthest pair
+					P a = ps[i] - ps[k], b = ps[j] - ps[k];
+					o = ps[k] + (a.dist2() > b.dist2() ? a : b) / 2;
+				}
+				r = (o - ps[k]).dist();
 			}
 		}
 	}
-	return {o, r};
+	return {o + s, r};
 }

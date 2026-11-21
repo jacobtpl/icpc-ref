@@ -7,32 +7,41 @@
  * to contain a minimum spanning tree for the graph with edge weights w(p, q) =
  * |p.x - q.x| + |p.y - q.y|. Edges are in the form (distance, src, dst). Use a
  * standard MST algorithm on the result to find the final MST.
- * Time: O(N \log N)
+ * Takes any Point<T>. Weights are T, but at least long long; they are
+ * at most 4 max|coord|: exact for any int input, and for ll input
+ * with |x|, |y| <= 2e18. The MST total is the caller's sum.
+ * Usage:
+ *  vector<Point<int>> pts = ...;
+ *  for (auto [w, i, j] : manhattanMST(pts)) ...; // w, i, j are ll
+ * Time: O(N log N)
  * Status: Stress-tested
  */
 #pragma once
 #include "Point.h"
 
-typedef Point<int> P;
-vector<array<int, 3>> manhattanMST(vector<P> ps) {
-	vi id(sz(ps));
+template<class T, class D = common_type_t<T, ll>>
+vector<array<D, 3>> manhattanMST(const vector<Point<T>>& in) {
+	int n = sz(in);
+	vector<array<D, 2>> ps(n);
+	rep(i,0,n) ps[i] = {D(in[i].x), D(in[i].y)};
+	vi id(n);
 	iota(all(id), 0);
-	vector<array<int, 3>> edges;
+	vector<array<D, 3>> edges;
 	rep(k,0,4) {
 		sort(all(id), [&](int i, int j) {
-		     return (ps[i]-ps[j]).x < (ps[j]-ps[i]).y;});
-		map<int, int> sweep;
+		     return ps[i][0] + ps[i][1] < ps[j][0] + ps[j][1];});
+		map<D, int> sweep;
 		for (int i : id) {
-			for (auto it = sweep.lower_bound(-ps[i].y);
+			for (auto it = sweep.lower_bound(-ps[i][1]);
 				        it != sweep.end(); sweep.erase(it++)) {
 				int j = it->second;
-				P d = ps[i] - ps[j];
-				if (d.y > d.x) break;
-				edges.push_back({d.y + d.x, i, j});
+				D dx = ps[i][0] - ps[j][0], dy = ps[i][1] - ps[j][1];
+				if (dy > dx) break;
+				edges.push_back({dx + dy, D(i), D(j)});
 			}
-			sweep[-ps[i].y] = i;
+			sweep[-ps[i][1]] = i;
 		}
-		for (P& p : ps) if (k & 1) p.x = -p.x; else swap(p.x, p.y);
+		for (auto& p : ps) if (k & 1) p[0] = -p[0]; else swap(p[0], p[1]);
 	}
 	return edges;
 }

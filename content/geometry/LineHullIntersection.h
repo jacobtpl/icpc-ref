@@ -60,3 +60,6 @@ array<int, 2> lineHull(P a, P b, vector<P>& poly) {
 		}
 	return res;
 }
+#undef cmp
+#undef extr
+#undef cmpL

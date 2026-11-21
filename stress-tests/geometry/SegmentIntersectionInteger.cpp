@@ -34,6 +34,8 @@ int main(int argc, char**) {
 		return 0;
 	}
 	static_assert(is_same<decltype(segInter(Z(),Z(),Z(),Z())),
+		vector<Point<double>>>::value); // Geo<ll>::F
+	static_assert(is_same<decltype(segInter<long double>(Z(),Z(),Z(),Z())),
 		vector<Point<long double>>>::value);
 	const ll N=1000000000;
 	check((segInter<Fraction>(Z(0,0),Z(N,N),Z(N,0),Z(0,N)) ==
@@ -71,7 +73,7 @@ int main(int argc, char**) {
 		check(segInter<Fraction>(a,b,c,d)==exact);
 		check(segInter<Fraction>(b,a,d,c)==exact);
 		check(segInter<Fraction>(c,d,a,b)==exact);
-		auto approx=segInter(a,b,c,d);
+		auto approx=segInter<long double>(a,b,c,d);
 		check(approx.size()==exact.size());
 		for (size_t j=0; j<exact.size(); ++j) {
 			long double x=(long double)exact[j].x, y=(long double)exact[j].y;

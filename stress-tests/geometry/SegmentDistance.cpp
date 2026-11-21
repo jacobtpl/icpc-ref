@@ -1,5 +1,6 @@
 #include "../utilities/template.h"
 #include "../../content/geometry/SegmentDistance.h"
+typedef Point<double> P;
 
 int main() {
 	const P s(0,0), e(2,0), p(1,1);
