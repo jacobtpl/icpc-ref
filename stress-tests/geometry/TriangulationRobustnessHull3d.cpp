@@ -124,6 +124,21 @@ int main() {
 		assert(signedPolyVolume(B, fs) == 1.0 / 6);
 		assert(signedPolyVolume(B, vector<Fc>()) == 0);
 	}
+	{ // cube [0,S]^3 in ll: every face determinant (S^3 = 1.728e18) fits
+	  // in ll but their sum 6 S^3 does not, so signedPolyVolume must not
+	  // sum in ll
+		const ll S = 1200000;
+		vector<Point3D<ll>> C; vector<Point3D<LL>> W;
+		rep(i,0,8) {
+			ll x = S * (i & 1), y = S * (i >> 1 & 1), z = S * (i >> 2);
+			C.emplace_back(x, y, z); W.emplace_back(x, y, z);
+		}
+		vector<Tri> fa = {{0,2,3}, {0,3,1}, {4,5,7}, {4,7,6}, {0,1,5}, {0,5,4},
+			{2,6,7}, {2,7,3}, {0,4,6}, {0,6,2}, {1,3,7}, {1,7,5}};
+		assert(signedPolyVolume(C, fa) == 1.728e18);
+		assert(signedPolyVolume6(W, fa) == (LL)6 * S * S * S);
+		assert(signedPolyVolume(W, fa) == 1.728e18);
+	}
 	int cases = 0;
 	const LL E12 = 1000000000000LL;
 	rep(it,0,400) for (ll R : {4LL, 50LL, 1000LL, 50000LL}) rep(slab,0,2) {

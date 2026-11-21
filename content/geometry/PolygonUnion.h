@@ -10,7 +10,9 @@
  * integer input (in double the tests are only exact up to about 3e7).
  * Eps: side tests are cross products through sgn, so geoEps applies;
  * it shouldn't be needed. The area is summed relative to a
- * polygon vertex, so far-away input does not cancel.
+ * polygon vertex O, so far-away input does not cancel. For floats
+ * the error per edge is about 1e-16 |A-O| |B-O|: polygons far from
+ * each other lose digits (use integer T).
  * Usage:
  *  typedef Point<ll> P;
  *  vector<vector<P>> polys = {{P(0,0),P(2,0),P(2,2),P(0,2)},
@@ -35,6 +37,13 @@ PolyUnionT<P> polyUnion(vector<vector<P>>& poly) {
 	R ret = 0;
 	P O;
 	for (auto& p : poly) if (sz(p)) O = p[0];
+	auto crs = [&](P a, P b) { // (a-O).cross(b-O)
+		if constexpr (geoFloat<T>) { // products may cancel: geoDet
+			typedef typename Geo<T>::W W;
+			W x = W(a.x) - W(O.x), y = W(a.y) - W(O.y);
+			return R(geoDet(x, W(b.y) - W(O.y), y, W(b.x) - W(O.x)));
+		} else return R((a - O).cross(b - O));
+	};
 	rep(i,0,sz(poly)) rep(v,0,sz(poly[i])) {
 		P A = poly[i][v], B = poly[i][(v + 1) % sz(poly[i])];
 		vector<pair<R, int>> segs = {{0, 0}, {1, 0}};
@@ -60,7 +69,7 @@ PolyUnionT<P> polyUnion(vector<vector<P>>& poly) {
 			if (!cnt) sum += segs[j].first - segs[j - 1].first;
 			cnt += segs[j].second;
 		}
-		ret += R((A - O).cross(B - O)) * sum;
+		ret += crs(A, B) * sum;
 	}
 	return ret / 2;
 }

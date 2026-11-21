@@ -176,6 +176,17 @@ void testUnion() {
 		ps.push_back({DP(a+5,b+5), DP(a+6,b+5), DP(a+5,b+6)});
 		assert(polyUnion(ps) == 2);
 	}
+	{ // disjoint polygons far apart, any order
+		vector<DP> small = {DP(0,0), DP(4,0), DP(4,4), DP(0,4)};
+		for (double o : {1e9, -1e9, 1e12}) {
+			vector<DP> big = {DP(o,o), DP(o+1024,o), DP(o+1024,o+1024), DP(o,o+1024)};
+			vector<vector<DP>> ps = {small, big}, qs = {big, small};
+			assert(polyUnion(ps) == 1048592);
+			assert(polyUnion(qs) == 1048592);
+			vector<vector<DP>> three = {big, small, big};
+			assert(polyUnion(three) == 1048592);
+		}
+	}
 	{
 		vector<vector<DP>> none;
 		assert(polyUnion(none) == 0);
