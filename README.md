@@ -41,7 +41,8 @@ The `chapter.tex` files are left over from the KACTL PDF; they still hold the ma
   (`doc/scripts/skip_headers` lists the few that are snippets rather than complete code).
 - `make test` builds and runs the stress tests in `stress-tests/`, which compare against
   naive implementations on random cases.
-- Set `CXX` to choose the compiler, e.g. `CXX=g++-16 make test-compiles` with Homebrew g++ on macOS.
+- Set `CXX` and `CXXFLAGS` to choose the compiler and add flags. On macOS use Homebrew g++-16:
+  `CXX=g++-16 CXXFLAGS="-include cassert" make test` (its `bits/stdc++.h` lacks `cassert`).
 
 CI runs both on Linux and on an Apple Silicon macOS runner. The macOS stress-test step is
 informational for now: some geometry tests still assume an 80-bit long double.

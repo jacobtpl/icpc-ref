@@ -27,8 +27,10 @@ jobs:
         uname -m
         CXX=g++-16
         $CXX --version
-        CXX=$CXX make test-compiles
+        # g++-16's bits/stdc++.h no longer includes cassert
         echo "CXX=$CXX" >> $GITHUB_ENV
+        echo "CXXFLAGS=-include cassert" >> $GITHUB_ENV
+        CXX=$CXX CXXFLAGS="-include cassert" make test-compiles
     # Known to fail on main: some geometry tests assume an 80-bit long double.
     - name: Run stress tests
       continue-on-error: true
