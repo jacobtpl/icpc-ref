@@ -223,6 +223,36 @@ int main() {
 		cerr << "200000 five-point triangulations: " << s << " s" << endl;
 		assert(s < 5);
 	}
+	{ // delaunay on non-integer doubles: ccw triangles tiling the hull
+		typedef Point<double> PD;
+		uniform_real_distribution<double> U(-1, 1);
+		rep(it,0,20000) {
+			int n = (int)rnd(4, 11);
+			vector<PD> ps;
+			rep(i,0,n) ps.emplace_back(U(rng), U(rng));
+			vector<PD> q = ps, h;
+			sort(all(q));
+			rep(pass,0,2) {
+				size_t start = h.size();
+				for (PD r : q) {
+					while (h.size() >= start + 2 &&
+						h[h.size()-2].cross(h.back(), r) <= 0) h.pop_back();
+					h.push_back(r);
+				}
+				h.pop_back(); reverse(all(q));
+			}
+			double hull = 0, sum = 0; int cnt = 0; bool ccw = true;
+			rep(i,0,sz(h)) hull += h[i].cross(h[(i+1)%sz(h)]);
+			delaunay(ps, [&](int i, int j, int k) {
+				double a = ps[i].cross(ps[j], ps[k]);
+				ccw &= a > 0; sum += a; cnt++; });
+			if (!ccw || cnt != 2*n - 2 - sz(h) ||
+				abs(sum - hull) > 1e-9) {
+				cout << "delaunay<double>: wrong triangles, case " << it
+					<< endl; abort(); }
+			cases++;
+		}
+	}
 	cout << "Tests passed! (" << cases << " random cases, " << nKactl
 		<< " in general position for delaunay())" << endl;
 }

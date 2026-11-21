@@ -173,5 +173,34 @@ int main() {
 		cerr << "100000 six-point hulls: " << s << " s" << endl;
 		assert(s < 5);
 	}
+	{ // non-integer doubles: every face must point away from the centroid
+		uniform_real_distribution<double> U(-1, 1);
+		typedef long double ld;
+		rep(it,0,20000) {
+			int n = (int)rnd(4, 11);
+			double off = it % 2 ? 1e6 : 0;
+			vector<P3> A;
+			rep(i,0,n) A.emplace_back(U(rng)+off, U(rng)+off, U(rng)+off);
+			ld c[3] = {0, 0, 0};
+			for (auto& q : A) c[0] += q.x, c[1] += q.y, c[2] += q.z;
+			auto fs = hull3d(A);
+			for (auto& f : fs) {
+				ld u[3] = {(ld)A[f.b].x-A[f.a].x, (ld)A[f.b].y-A[f.a].y,
+					(ld)A[f.b].z-A[f.a].z};
+				ld v[3] = {(ld)A[f.c].x-A[f.a].x, (ld)A[f.c].y-A[f.a].y,
+					(ld)A[f.c].z-A[f.a].z};
+				ld w[3] = {c[0]/n-A[f.a].x, c[1]/n-A[f.a].y, c[2]/n-A[f.a].z};
+				ld d = (u[1]*v[2] - u[2]*v[1]) * w[0]
+					+ (u[2]*v[0] - u[0]*v[2]) * w[1]
+					+ (u[0]*v[1] - u[1]*v[0]) * w[2];
+				if (d > 0) { cout << "hull3d<double>: inward face, case "
+					<< it << endl; abort(); }
+			}
+			if (!(signedPolyVolume(A, fs) > 0)) {
+				cout << "hull3d<double>: volume, case " << it << endl;
+				abort(); }
+			cases++;
+		}
+	}
 	cout << "Tests passed! (" << cases << " random point sets)" << endl;
 }
