@@ -22,10 +22,10 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
-    - name: Compile every header (Homebrew g++ on Apple Silicon)
+    - name: Compile every header (Homebrew g++-15 on Apple Silicon)
       run: |
         uname -m
-        CXX=$(ls /opt/homebrew/bin/g++-[0-9]* | sort -V | tail -1)
+        CXX=g++-15
         $CXX --version
         CXX=$CXX make test-compiles
         echo "CXX=$CXX" >> $GITHUB_ENV
