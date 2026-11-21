@@ -11,9 +11,11 @@
  *  copy. Nodes are never freed: call PAVL::reset() between
  *  testcases (invalidates every existing tree).
  *  To augment, add fields to Node and fill in up (pull) and
- *  down (lazy push); down must first clone children:
- *  c[i] = clone(c[i]), or old versions get corrupted.
- *  clone may reallocate N: never keep a Node& across it.
+ *  down (lazy push). down must clone each child before
+ *  changing it, or old versions get corrupted. clone may
+ *  move N, which invalidates this and every Node&: in down,
+ *  first take int me = int(this - N.data()), then use only
+ *  N[me]: int x = clone(N[me].c[i]); N[me].c[i] = x;
  * Usage: PAVL a = PAVL(Node(1)) + PAVL(Node(2));
  *  PAVL b = a.step(); // a is now immutable
  *  auto [l, r] = b.split(1); // consumes b, not a
