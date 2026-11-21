@@ -77,12 +77,12 @@ int main() {
 		int n = rnd(0, 30); poly a = rp(rnd(0, 20));
 		rep(i,0,min(rnd(0, 4), sz(a))) a[i] = 0;
 		poly sq = naiveMul(a, a, 2*sz(a)+1), r = sqrt(sq, n);
-		assert(sz(r) == n && eq(naiveMul(r, r, n), RSZ(sq, n)));
+		assert(eq(r, RSZ(a, n)) || eq(r, RSZ(-a, n)));
 		// a random series has a root iff its first nonzero term is an even power with a residue coefficient
-		a.resize(n); r = sqrt(a, n);
-		int t = 0; while (t < n && !a[t].v) t++;
-		bool has = t == n || (t % 2 == 0 && pow(a[t], (MOD-1)/2).v == 1);
-		assert(has ? sz(r) == n && eq(naiveMul(r, r, n), a) : r.empty());
+		r = sqrt(a, n);
+		int t = 0; while (t < sz(a) && !a[t].v) t++;
+		bool has = t == sz(a) || (t % 2 == 0 && pow(a[t], (MOD-1)/2).v == 1);
+		assert(has ? sz(r) == n && eq(naiveMul(r, r, n+t/2), RSZ(a, n+t/2)) : r.empty());
 	}
 	rep(it,0,3000) {
 		poly f = rp(rnd(0, 40)), g = rp(rnd(1, 40));

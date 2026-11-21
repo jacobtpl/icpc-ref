@@ -103,14 +103,15 @@ T sqrt(T a) { // a root of a != 0, or 0 if there is none
 	return x;
 } // 6ab367
 poly sqrt(poly A, int n) { // {} if there is none; Q-(Q^2-A)/(2Q)
-	A.resize(n); int t = 0; while (t < n && !A[t].v) t++;
-	if (t == n) return A;
+	int t = 0; while (t < sz(A) && !A[t].v) t++;
+	if (t == sz(A)) return poly(n);
 	T c = sqrt(A[t]); if (t%2 || !c.v) return {};
+	if (t/2 >= n) return poly(n);
 	A.erase(begin(A),begin(A)+t); poly B{c};
 	for (int x = 2; x/2 < n-t/2; x *= 2)
 		B = invert(T(2))*RSZ(B+conv(RSZ(A,x),inv(B,x)),x);
 	B.resize(n-t/2); return shift(B,t/2);
-} // 0dbfbb
+} // a59092
 // return {quotient, remainder}; needs g.back() != 0
 pair<poly,poly> quoRem(const poly& f, const poly& g) {
 	if (sz(f) < sz(g)) return {{},f};
