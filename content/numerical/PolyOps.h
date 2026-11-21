@@ -1,7 +1,10 @@
 /**
  * Author: jacobtpl, Benq
  * Date: 2024
- * Description: Operations on formal power series
+ * Description: Operations on formal power series mod 998244353.
+ *   Needs ModInt.h. A poly is its coefficient list, lowest degree first;
+ *   f(A, n) returns the first n coefficients of f(A).
+ *   Whole file is O(n log n) per operation unless noted.
  */
 int const RT = 5;
 using T = mint;
@@ -74,30 +77,53 @@ poly operator*(const poly& l, const poly& r) {
 // 	rep(i,0,sz(l)) rep(j,0,sz(r)) x[i+j] += l[i]*r[j];
 // 	return x;
 // }
+// Other prime MOD (e.g. 1e9+7): replace conv by this, which needs
+// FastFourierTransform.h and FastFourierTransformMod.h, and drop the
+// assert in operator*. Everything below then works unchanged.
+// vector<T> conv(const vector<T>& A, const vector<T>& B) {
+// 	vl a, b; for (T x : A) a.pb(x.v); for (T x : B) b.pb(x.v);
+// 	vl c = convMod<MOD>(a,b); return poly(all(c));
+// }
 poly& operator*=(poly& l, const poly& r) { return l = l*r; }
-poly inv(poly A, int n) { // Q-(1/Q-A)/(-Q^{-2})
+poly inv(poly A, int n) { // needs A[0] != 0; Q-(1/Q-A)/(-Q^{-2})
 	poly B{invert(A[0])};
 	for (int x = 2; x/2 < n; x *= 2)
 		B = 2*B-RSZ(conv(RSZ(A,x),conv(B,B)),x);
 	return RSZ(B,n);
 } // 455ce0
-poly sqrt(const poly& A, int n) {  // Q-(Q^2-A)/(2Q)
-	assert(A[0].v == 1); poly B{1};
-	for (int x = 2; x/2 < n; x *= 2)
+T sqrt(T a) { // a root of a != 0, or 0 if there is none
+	if (pow(a,(MOD-1)/2).v != 1) return 0;
+	int s = __builtin_ctz(MOD-1), m; T z = 2;
+	while (pow(z,(MOD-1)/2).v == 1) z += 1;
+	T c = pow(z,MOD>>s), x = pow(a,((MOD>>s)+1)/2), t = pow(a,MOD>>s);
+	for (; t.v != 1; s = m) {
+		T u = t; for (m = 0; u.v != 1; m++) u *= u;
+		T b = pow(c,1<<(s-m-1)); x *= b, c = b*b, t *= c;
+	}
+	return x;
+} // 6ab367
+poly sqrt(poly A, int n) { // {} if there is none; Q-(Q^2-A)/(2Q)
+	A.resize(n); int t = 0; while (t < n && !A[t].v) t++;
+	if (t == n) return A;
+	T c = sqrt(A[t]); if (t%2 || !c.v) return {};
+	A.erase(begin(A),begin(A)+t); poly B{c};
+	for (int x = 2; x/2 < n-t/2; x *= 2)
 		B = invert(T(2))*RSZ(B+conv(RSZ(A,x),inv(B,x)),x);
-	return RSZ(B,n);
-} // ecb486
-// return {quotient, remainder}
+	B.resize(n-t/2); return shift(B,t/2);
+} // 0dbfbb
+// return {quotient, remainder}; needs g.back() != 0
 pair<poly,poly> quoRem(const poly& f, const poly& g) {
 	if (sz(f) < sz(g)) return {{},f};
 	poly q = conv(inv(rev(g),sz(f)-sz(g)+1),rev(f));
 	q = rev(RSZ(q,sz(f)-sz(g)+1));
 	poly r = RSZ(f-conv(q,g),sz(g)-1); return {q,r};
 } // bffc5b
-poly log(poly A, int n) { assert(A[0].v == 1); // (ln A)' = A'/A
-	A.resize(n); return integ(RSZ(conv(dif(A),inv(A,n-1)),n-1));
-} // bda418
-poly exp(poly A, int n) { assert(A[0].v == 0);
+poly log(poly A, int n) { // needs A[0] == 1; (ln A)' = A'/A
+	if (!n) return {};
+	assert(A[0].v == 1); A.resize(n);
+	return integ(RSZ(conv(dif(A),inv(A,n-1)),n-1));
+} // 970f4a
+poly exp(poly A, int n) { assert(A.empty() || A[0].v == 0);
 	poly B{1}, IB{1}; // inverse of B
 	for (int x = 1; x < n; x *= 2) {
 		IB = 2*IB-RSZ(conv(B,conv(IB,IB)),x);
@@ -106,8 +132,9 @@ poly exp(poly A, int n) { assert(A[0].v == 0);
 		B = B+RSZ(conv(B,RSZ(A,2*x)-integ(Q)),2*x); 
 	} /// We know that Q=A' is B'/B to x-1 places, we want to find B'/B to 2x-1 places
 	return RSZ(B,n);
-} // 203953
-poly pow(poly A, ll b, int n) { // A^b mod x^n
+} // 07e710
+poly pow(poly A, ll b, int n) { // A^b mod x^n, any A, b >= 0
+	if (!n) return {};
 	A.resize(n); int t = 0; while (t < n && !A[t].v) t++;
 	if (!b) { poly r(n); r[0] = 1; return r; }
 	if (t == n || (t && b >= n) || t*b >= n) return poly(n);
@@ -115,9 +142,9 @@ poly pow(poly A, ll b, int n) { // A^b mod x^n
 	poly p = RSZ(poly(begin(A)+t, end(A))/c, k);
 	p = exp(log(p,k)*mint(b),k)*pow(c,b);
 	p.insert(begin(p), t*b, 0); return p;
-} // d0547e
+} // 0f5d41
 poly mod(const poly& f, const poly& g) { return quoRem(f,g).second; }
-poly xkmodf(ll k, poly f) {
+poly xkmodf(ll k, poly f) { // x^k mod f
     poly r{1}, a{0,1};
     for(;k;k>>=1) {
         if(k&1) r = mod(conv(r,a), f);
@@ -138,14 +165,24 @@ T kthCoef(poly P, poly Q, ll k) {
 // solve recurrence with initial vals s[0], s[1]... s[n-1]
 // a[k] = c[1]*a[k-1] + c[2]*a[k-2] + ... c[n]*a[k-n]
 mint solve_linrec(vector<mint> s, vector<mint> c, int n, ll k) {
-    poly f(n+1, 0);
-    f[n] = 1;
-    for (int i=0;i<n;i++) f[i] = mint(-c[n-i]);
-    poly r = xkmodf(k, f); r.resize(n);
-    mint ans(0);
-    for (int i = 0; i < n; i++) ans += r[i] * mint(s[i]);
-    return ans;
-} // 902e38
+	poly Q(n+1); Q[0] = 1; rep(i,1,n+1) Q[i] = -c[i];
+	return kthCoef(RSZ(conv(RSZ(s,n),Q),n),Q,k);
+} // dc8033
+// shortest c (c[0] = 0) with s[i] = sum of c[j]*s[i-j] over j >= 1
+// for all i >= sz(c)-1, O(n^2). Feed at least 2x the order, then
+// solve_linrec(s, c, sz(c)-1, k) is s[k].
+poly berlekampMassey(const poly& s) {
+	int n = sz(s), L = 0, m = 0; poly C(n+1), B(n+1), t;
+	C[0] = B[0] = 1; T b = 1;
+	rep(i,0,n) { ++m;
+		T d = s[i]; rep(j,1,L+1) d += C[j]*s[i-j];
+		if (!d.v) continue;
+		t = C; T q = d/b; rep(j,m,n+1) C[j] -= q*B[j-m];
+		if (2*L > i) continue;
+		L = i+1-L, B = t, b = d, m = 0;
+	}
+	C.resize(L+1); C[0] = 0; return -C;
+} // c1cead
 // returns f(x+c)
 poly taylorShift(poly f, T c) {
 	int n = sz(f); poly F(n+1,1), A(n), B(n); T p = 1;

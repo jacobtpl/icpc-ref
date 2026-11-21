@@ -1,7 +1,7 @@
 /**
  * Author: Benq
  * Description: Multipoint evaluation and interpolation
- * Time: O(N\log^2 N)
+ * Time: O(N log^2 N). Needs PolyOps.h.
  */
 void segProd(vector<poly>& stor, poly& v, int ind, int l, int r) { // v -> places to evaluate at
 	if (l == r) { stor[ind] = {-v[l],1}; return; }
