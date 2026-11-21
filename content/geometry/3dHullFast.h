@@ -6,12 +6,14 @@
  *  (de Berg et al., Computational Geometry, chapter 11)
  * Description: Faces of the 3D convex hull as index triples into A,
  *  counter-clockwise seen from outside. Any Point3D<T>.
- *  d sees face abc if (b-a) x (c-a) . (d-a) > eps.
- *  Integer T: exact with eps = 0 while 6D^3 fits in T, D = largest
- *  coordinate difference (ll: 1e6, __int128: 2e12). Duplicate, collinear
- *  and coplanar points are fine; coplanar facets come out triangulated.
- *  Floating T: eps = 0 in general position; eps = 1e-9 * D^3 (double) if
- *  the input is degenerate up to rounding (e.g. a grid times 0.1).
+ *  d sees face abc if (b-a) x (c-a) . (d-a) > eps, computed in W of
+ *  Point.h on coordinate differences.
+ *  Integer T: exact with eps = 0 for Point3D<ll> up to 1e12 and
+ *  Point3D<int> up to 5e5. Duplicate, collinear and coplanar points
+ *  are fine; coplanar facets come out triangulated.
+ *  Floating T: eps = 0 in general position; if the input is degenerate
+ *  up to rounding (e.g. a grid times 0.1) eps = 1e-9 * D^3 for double,
+ *  D = largest coordinate difference.
  *  Points a little off a plane (eps/10 to 1e4*eps) can end up outside
  *  the result for any eps: scale to integers instead.
  *  The result is always a closed surface. Asserts if all points are
@@ -28,18 +30,21 @@
 template<class P3>
 vector<array<int,3>> hull3dFast(const vector<P3>& A,
 		decltype(P3().x) eps = 0) {
+	typedef Point3D<typename Geo<decltype(P3().x)>::W> Q;
 	int n = sz(A);
 	vi o(n); iota(all(o), 0); shuffle(all(o), mt19937(5));
+	auto vec = [&](int a, int b) { // A[b] - A[a], in W
+		P3 d = A[b] - A[a]; return Q(d.x, d.y, d.z); };
 	auto vol = [&](int a, int b, int c, int d) { // >eps: d sees abc
-		return (A[b]-A[a]).cross(A[c]-A[a]).dot(A[d]-A[a]); };
+		return vec(a, b).cross(vec(a, c)).dot(vec(a, d)); };
 	auto ab = [](auto x) { return x < 0 ? -x : x; };
 	// start from a fat tetrahedron: farthest point, then farthest
 	// from that line, then farthest from that plane
 	auto far = [&](int k, auto f) {
 		rep(i,k+1,n) if (f(o[k]) < f(o[i])) swap(o[k], o[i]); };
-	far(1, [&](int i) { return (A[i]-A[o[0]]).dist2(); });
+	far(1, [&](int i) { return vec(o[0], i).dist2(); });
 	far(2, [&](int i) {
-		P3 c = (A[o[1]]-A[o[0]]).cross(A[i]-A[o[0]]);
+		Q c = vec(o[0], o[1]).cross(vec(o[0], i));
 		return max({ab(c.x), ab(c.y), ab(c.z)}); });
 	far(3, [&](int i) { return ab(vol(o[0], o[1], o[2], i)); });
 	assert(n >= 4 && ab(vol(o[0], o[1], o[2], o[3])) > eps);
