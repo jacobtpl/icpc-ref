@@ -12,7 +12,8 @@ int main() {
 	for (ll scale : {1LL, 1000000LL, 1000000000LL}) {
 		IP a(-scale, -scale), b(scale, scale);
 		IP c(-scale, scale), d(scale, -scale);
-		assert(segInter(a, b, c, d) == vector<LP>{LP(0, 0)});
+		assert(segInter<long double>(a, b, c, d) == vector<LP>{LP(0, 0)});
+		assert(segInter(a, b, c, d) == vector<DP>{DP(0, 0)});
 		assert(segInter<Fraction>(a, b, c, d) == vector<FP>{FP(0, 0)});
 	}
 	rep(it,0,100000) {

@@ -1,10 +1,19 @@
 #include "../utilities/template.h"
 
+#if LDBL_MANT_DIG >= 64
+#define GEO_DOUBLE_W long double
+#else // long double is a double (Apple Silicon)
+#define GEO_DOUBLE_W __float128
+#endif
+#include "../../content/geometry/Point.h"
+// This file tests the documented opt-in of Point.h: double input with
+// intermediates in long double (exact counts for integers up to 1e9).
 #include "../../content/geometry/CircleIntersection.h"
 #include "../../content/geometry/CircleLine.h"
 #include "../../content/geometry/CircleTangents.h"
 #include "../../content/geometry/CirclePolyIntersection.h"
 #include "../../content/geometry/MinimumEnclosingCircle.h"
+typedef Point<double> P;
 
 // Regression tests for precision and degeneracy defects in the circle
 // headers. Inputs are integers, decisions are checked against exact
@@ -380,9 +389,9 @@ ld bruteMec(vector<PL> p) {
 }
 
 void testMec(int iters) {
-	CHECK(mec({}).second == 0);
-	CHECK(mec({P(1e9, -1e9)}).second == 0);
-	CHECK(mec({P(1e9, -1e9)}).first == P(1e9, -1e9));
+	CHECK(mec(vector<P>{}).second == 0);
+	CHECK(mec(vector<P>{P(1e9, -1e9)}).second == 0);
+	CHECK(mec(vector<P>{P(1e9, -1e9)}).first == P(1e9, -1e9));
 	for (ll G : {1LL, 3LL, 10LL, 1000LL, 50000000LL}) rep(it,0,iters) {
 		int n = (int)rnd(1, 8), mode = it % 5;
 		vector<PL> p(n);

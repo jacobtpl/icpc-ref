@@ -1,6 +1,7 @@
 #include "../utilities/template.h"
 
 #include "../../content/geometry/ConvexHull.h"
+typedef Point<ll> P;
 #include "../utilities/bench.h"
 
 namespace old {

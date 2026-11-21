@@ -5,21 +5,22 @@
    * by a point p and a nonzero direction dp.
    * Returns {} unless the intersection is bounded with positive area
    * (so also when it is empty, a point, a segment or unbounded).
-   * With RayT<ll> every decision is exact (__int128 products) for
-   * |p| <= 1e9, |dp| <= 2e9 and only the returned vertices
-   * are rounded (long double); use it for integer input.
-   * Floating rays with integer-valued coordinates within these bounds
-   * also use the exact integer predicates.
-   * RayT<Fraction> is exact throughout and returns Fraction vertices.
-   * With floating point rays products are formed in long double and a
-   * determinant within eps times the sum of the magnitudes of
-   * its terms counts as zero, i.e. the configuration as degenerate
-   * (parallel rays, or a vertex on a third line). Keep eps near
-   * rounding error: features smaller than eps times the distance
-   * between the origins p are lost. The tests are invariant under
-   * translation and under scaling of the input or of any dp.
-   * add_bounds clips to [0,1e9]^2 (not to negative coordinates).
- * Time: O(N\log N)
+   * Integer T: every decision is exact; only the returned vertices
+   * are rounded. Limits: RayT<ll> |p| <= 1e9, |dp| <= 2e9;
+   * RayT<int> |p|,|dp| <= 1e4. Vertices are Point<double>; for more
+   * use halfPlaneIsect<ll, long double>(rays).
+   * Eps (floating T only; geoEps is not used): the eps argument is
+   * relative, independent of coordinate size. Use ~500 ulp: 1e-13 for
+   * double, 1e-16 for long double, 1e-31 for __float128.
+   * add_bounds clips to [0,bound]^2 (not to negative coordinates).
+ * Usage:
+   * typedef Point<double> P;
+   * vector<Ray> rs = {{P(0,0),P(1,0)}, {P(1,0),P(0,1)},
+   *                   {P(0,1),P(-1,0)}, {P(0,1),P(0,-1)}};
+   * vector<P> poly = halfPlaneIsect(rs); // unit square, ccw
+   * vector<RayT<long double>> rl = ...;
+   * auto pl = halfPlaneIsect(rl, false, 1e-16L);
+ * Time: O(N log N)
  * Source: Own
  * Status: stress-tested against exact brute force; older version tested on
 	* https://open.kattis.com/problems/bigbrother 
@@ -33,33 +34,18 @@
 template<class T> struct RayT { Point<T> p, dp; };
 typedef RayT<double> Ray;
 
-template<class T, class F =
-	conditional_t<is_integral_v<T>, long double, T>>
+template<class T, class F = GeoR<T>>
 vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
-	bool add_bounds = false, long double eps = 1e-13) {
+	bool add_bounds = false, typename Geo<T>::F eps = 1e-13,
+	common_type_t<T> bound = 1000000000) {
 	typedef Point<T> P; typedef RayT<T> R;
-	if constexpr (is_floating_point_v<T>) {
-		auto integer = [](T x, T bound) {
-			return abs(x) <= bound && trunc(x) == x; };
-		if (all_of(all(rays), [&](const R& r) {
-			return integer(r.p.x, T(1e9)) && integer(r.p.y, T(1e9)) &&
-				integer(r.dp.x, T(2e9)) && integer(r.dp.y, T(2e9)); })) {
-			vector<RayT<ll>> exact;
-			for (const R& r : rays) exact.push_back({
-				Point<ll>((ll)r.p.x, (ll)r.p.y), Point<ll>((ll)r.dp.x, (ll)r.dp.y)});
-			vector<Point<F>> res;
-			for (auto p : halfPlaneIsect(exact, add_bounds))
-				res.emplace_back(F(p.x), F(p.y));
-			return res;
-		}
-	}
-	const bool I = !is_floating_point_v<T>; // exact arithmetic
-	typedef conditional_t<is_integral_v<T>, __int128,
-		conditional_t<I, T, long double>> W;
+	const bool I = !geoFloat<T>; // exact arithmetic
+	typedef typename Geo<T>::W W;
+	typedef conditional_t<geoInt<T>, F, W> C; // vertex arithmetic
 	W E = 0;
 	if constexpr (!I) E = W(eps);
 	if (add_bounds) { // bound input by rectangle [0,D] x [0,D]
-		T D = 1000000000;
+		T D = bound;
 		rays.push_back({P(0,0),P(1,0)});
 		rays.push_back({P(D,0),P(0,1)});
 		rays.push_back({P(D,D),P(-1,0)});
@@ -70,7 +56,8 @@ vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
 		W x = (W)a.x * (W)b.y, y = (W)a.y * (W)b.x;
 		return (x < 0 ? -x : x) + (y < 0 ? -y : y); };
 	// -1 if lower half or +x axis, 1 if upper half or -x axis
-	auto half = [](P x) { return x.y != 0 ? sgn(x.y) : -sgn(x.x); };
+	auto half = [](P x) { return x.y != 0 ? (x.y > 0) - (x.y < 0)
+		: (x.x < 0) - (x.x > 0); };
 	sort(all(rays), [&](const R& a, const R& b) {
 		int A = half(a.dp), B = half(b.dp);
 		return A == B ? cr(a.dp, b.dp) > 0 : A < B; });
@@ -83,7 +70,7 @@ vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
 	// is isect(a,b) not strictly left of c? needs turn(a.dp,b.dp) = 1
 	auto out = [&](const R& a, const R& b, const R& c) {
 		P ca = a.p - c.p, ab_ = b.p - a.p;
-		if constexpr (I && !is_integral_v<T>) { // exact rationals:
+		if constexpr (I && !geoInt<T>) { // exact rationals:
 			W s = cr(ab_, b.dp) / cr(a.dp, b.dp); // use the point itself
 			return cr(c.dp, ca + a.dp * T(s)) <= 0;
 		} else {
@@ -116,9 +103,9 @@ vector<Point<F>> halfPlaneIsect(vector<RayT<T>> rays,
 	vector<Point<F>> res;
 	if (t - h > 2) rep(i,h,t) {
 		const R &a = d[i], &b = d[i + 1 == t ? h : i + 1];
-		F s = F(cr(b.p - a.p, b.dp)) / F(cr(a.dp, b.dp));
-		res.push_back(Point<F>(F(a.p.x) + F(a.dp.x) * s,
-			F(a.p.y) + F(a.dp.y) * s));
+		C s = C(cr(b.p - a.p, b.dp)) / C(cr(a.dp, b.dp));
+		res.push_back(Point<F>(F(C(a.p.x) + C(a.dp.x) * s),
+			F(C(a.p.y) + C(a.dp.y) * s)));
 	}
 	return res;
 }

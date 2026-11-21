@@ -5,9 +5,9 @@
 #include "../../content/geometry/ConvexHull.h"
 #include "../../content/geometry/PolygonArea.h"
 
-#define P P2
 #include "../../content/geometry/circumcircle.h"
-#undef P
+typedef Point<ll> P;
+typedef Point<double> P2;
 
 P2 top(P x) { return P2((double)x.x, (double)x.y); }
 
@@ -50,7 +50,9 @@ void dela(A& v, F f) {
 
 int main1() {
 	srand(2);
+#ifdef __GLIBC__
 	feenableexcept(29);
+#endif
 	rep(it,0,3000000) {{
 		bumpalloc.reset();
 		// if (it % 200 == 0) cerr << endl;

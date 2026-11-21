@@ -5,10 +5,14 @@
  * Description: KD-tree (2d, can be extended to 3d). Nodes live in a vector
  * owned by the tree and refer to each other by index, so trees are freed on
  * destruction and can be copied, moved and assigned freely.
- * Squared distances are ll: tree points and queries need
- * |x|, |y| <= 2^30-1 (about 1.07e9), so that
- * dist2 <= 8 * (2^30-1)^2 < 2^63. Duplicate points are fine.
- * nearest on an empty tree returns {INF, P()}.
+ * KDTree<P> works on any P = Point<T>. Squared distances are
+ * evaluated in T: with long long, tree points and queries need
+ * |x|, |y| <= 2^30-1. Duplicate points are fine.
+ * nearest on an empty tree returns {-1, P()}.
+ * Usage:
+ *  typedef Point<ll> P;
+ *  KDTree<P> tree(pts);
+ *  auto [d2, q] = tree.nearest(P(3, 4)); // squared distance, point
  * Time: build O(N log N). nearest is O(log N) on average for random
  * points, but O(N) in the worst case (e.g. points on a circle or diagonal).
  * Status: Stress-tested
@@ -17,26 +21,23 @@
 
 #include "Point.h"
 
-typedef long long T;
-typedef Point<T> P;
-const T INF = numeric_limits<T>::max();
+template<class P> struct KDTree {
+	typedef decltype(P().x) T;
+	static bool on_x(const P& a, const P& b) { return a.x < b.x; }
+	static bool on_y(const P& a, const P& b) { return a.y < b.y; }
 
-bool on_x(const P& a, const P& b) { return a.x < b.x; }
-bool on_y(const P& a, const P& b) { return a.y < b.y; }
+	struct Node {
+		P pt; // if this is a leaf, the single point in it
+		T x0, x1, y0, y1; // bounds
+		int first = -1, second = -1; // children (indices), -1 if leaf
 
-struct Node {
-	P pt; // if this is a leaf, the single point in it
-	T x0 = INF, x1 = -INF, y0 = INF, y1 = -INF; // bounds
-	int first = -1, second = -1; // children (indices), -1 if leaf
+		T distance(const P& p) const { // min squared distance to a point
+			T x = (p.x < x0 ? x0 : p.x > x1 ? x1 : p.x);
+			T y = (p.y < y0 ? y0 : p.y > y1 ? y1 : p.y);
+			return (P(x,y) - p).dist2();
+		}
+	};
 
-	T distance(const P& p) const { // min squared distance to a point
-		T x = (p.x < x0 ? x0 : p.x > x1 ? x1 : p.x);
-		T y = (p.y < y0 ? y0 : p.y > y1 ? y1 : p.y);
-		return (P(x,y) - p).dist2();
-	}
-};
-
-struct KDTree {
 	vector<Node> t; // t[0] is the root (if any)
 
 	int build(vector<P>& vp, int l, int r) { // builds from vp[l, r)
@@ -44,6 +45,7 @@ struct KDTree {
 		t.emplace_back();
 		Node n;
 		n.pt = vp[l];
+		n.x0 = n.x1 = vp[l].x; n.y0 = n.y1 = vp[l].y;
 		for (int i = l; i < r; i++) {
 			n.x0 = min(n.x0, vp[i].x); n.x1 = max(n.x1, vp[i].x);
 			n.y0 = min(n.y0, vp[i].y); n.y1 = max(n.y1, vp[i].y);
@@ -72,7 +74,7 @@ struct KDTree {
 		const Node& node = t[i];
 		if (node.first < 0) {
 			// uncomment if we should not find the point itself:
-			// if (p == node.pt) return {INF, P()};
+			// if (p == node.pt) return {infinity, P()};
 			return make_pair((p - node.pt).dist2(), node.pt);
 		}
 
@@ -90,6 +92,6 @@ struct KDTree {
 	// find nearest point to a point, and its squared distance
 	// (requires an arbitrary operator< for Point)
 	pair<T, P> nearest(const P& p) const {
-		return t.empty() ? make_pair(INF, P()) : search(0, p);
+		return t.empty() ? make_pair(T(-1), P()) : search(0, p);
 	}
 };

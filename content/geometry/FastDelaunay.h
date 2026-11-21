@@ -7,35 +7,42 @@
  * Each circumcircle contains none of the input points.
  * There must be no duplicate points.
  * If all points are on a line, no triangles will be returned.
- * Exact for integer coordinates of absolute value up to 1e9 (cocircular points give any valid triangulation).
- * Should work for doubles as well, though there may be precision issues in 'circ'.
- * Returns triangles in order \{t[0][0], t[0][1], t[0][2], t[1][0], \dots\}, all counter-clockwise.
- * All edge records live in quads and are freed when triangulate returns.
- * Time: O(n \log n)
+ * Exact for Point<ll> up to 1e9 and Point<int> up to 2e4; cocircular
+ * points give any valid triangulation. Floating T works but the
+ * in-circle test is then not exact, and no eps is used.
+ * Returns triangles in order {t[0][0], t[0][1], t[0][2], t[1][0], ...}, all counter-clockwise.
+ * Usage:
+ *  typedef Point<ll> P;
+ *  vector<P> pts = ...;                // distinct points
+ *  vector<P> t = triangulate(pts);     // t[3i..3i+2] is triangle i
+ * Time: O(n log n)
  * Status: stress-tested
  */
 #pragma once
 
 #include "Point.h"
 
-typedef Point<ll> P;
-typedef struct Quad* Q;
-typedef __int128_t lll; // (can be ll if coords are < 2e4)
-P arb(LLONG_MAX,LLONG_MAX); // not equal to any other point
+template<class P> struct FastDelaunay {
+struct Quad; typedef Quad* Q;
+typedef typename Geo<decltype(P().x)>::W lll;
+P arb; // placeholder origin of unused (dual) edge records
 
 struct Quad {
-	Q rot = 0, o = 0; P p = arb; bool mark = 0;
+	Q rot = 0, o = 0; P p; bool mark = 0;
 	P& F() { return r()->p; }
 	Q& r() { return rot->rot; }
 	Q prev() { return rot->o->rot; }
 	Q next() { return r()->prev(); }
-} *H;
-deque<Quad> quads; // owns all edge records of the current call
+};
+Q H = 0;
+deque<Quad> quads; // owns all edge records
 
 bool circ(P p, P a, P b, P c) { // is p in the circumcircle?
-	lll p2 = p.dist2(), A = a.dist2()-p2,
-	    B = b.dist2()-p2, C = c.dist2()-p2;
-	return p.cross(a,b)*C + p.cross(b,c)*A + p.cross(c,a)*B > 0;
+	auto d2 = [&](P q) { lll x = lll(q.x) - lll(p.x),
+		y = lll(q.y) - lll(p.y); return x*x + y*y; };
+	lll A = d2(a), B = d2(b), C = d2(c);
+	return lll(p.cross(a,b))*C + lll(p.cross(b,c))*A
+		+ lll(p.cross(c,a))*B > 0;
 }
 Q makeEdge(P orig, P dest) {
 	Q r = H;
@@ -99,7 +106,7 @@ pair<Q,Q> rec(const vector<P>& s) {
 	return { ra, rb };
 }
 
-vector<P> triangulate(vector<P> pts) {
+vector<P> run(vector<P> pts) {
 	sort(all(pts));  assert(unique(all(pts)) == pts.end());
 	if (sz(pts) < 2) return {};
 	Q e = rec(pts).first;
@@ -110,9 +117,11 @@ vector<P> triangulate(vector<P> pts) {
 	q.push_back(c->r()); c = c->next(); } while (c != e); }
 	ADD; pts.clear();
 	while (qi < sz(q)) if (!(e = q[qi++])->mark) ADD;
-	quads.clear(); H = 0;
 	return pts;
 }
+};
+template<class P> vector<P> triangulate(vector<P> pts) {
+	return FastDelaunay<P>().run(pts); }
 #undef H
 #undef valid
 #undef DEL
