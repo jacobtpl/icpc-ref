@@ -269,8 +269,9 @@ void testCircleLine(ll S, int iters) {
 			CHECK(sz(rs) == 2);
 			for (P q : rs) { // h itself is only known to ~ulp(1e9)
 				CHECK(fabs((q - P(cx, cy)).dist() - r) <= 1e-6 * r);
-				ld cr = ((ld)b.x - a.x) * ((ld)q.y - a.y) - ((ld)b.y - a.y) * ((ld)q.x - a.x);
-				CHECK(fabsl(cr) <= 1e-7L * r * (b - a).dist());
+				typedef __float128 Q; // long double is a double (Apple Silicon)
+				Q cr = ((Q)b.x - a.x) * ((Q)q.y - a.y) - ((Q)b.y - a.y) * ((Q)q.x - a.x);
+				CHECK((cr < 0 ? -cr : cr) <= 1e-7 * r * (b - a).dist());
 			}
 			CHECK((rs[0] - rs[1]).dist() >= 2 * sqrt(r*r - h*h) * (1 - 1e-2));
 		}
