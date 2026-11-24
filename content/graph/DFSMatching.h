@@ -15,22 +15,22 @@
  */
 #pragma once
 
+bool find(int j, vector<vi>& g, vi& btoa, vi& vis) {
+	if (btoa[j] == -1) return 1;
+	vis[j] = 1; int di = btoa[j];
+	for (int e : g[di])
+		if (!vis[e] && find(e, g, btoa, vis)) {
+			btoa[e] = di;
+			return 1;
+		}
+	return 0;
+}
 int dfsMatching(vector<vi>& g, vi& btoa) {
 	vi vis;
-	auto go = [&](auto& self, int j) -> bool {
-		if (btoa[j] == -1) return 1;
-		vis[j] = 1; int di = btoa[j];
-		for (int e : g[di])
-			if (!vis[e] && self(self, e)) {
-				btoa[e] = di;
-				return 1;
-			}
-		return 0;
-	};
 	rep(i,0,sz(g)) {
 		vis.assign(sz(btoa), 0);
 		for (int j : g[i])
-			if (go(go, j)) {
+			if (find(j, g, btoa, vis)) {
 				btoa[j] = i;
 				break;
 			}
