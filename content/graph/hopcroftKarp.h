@@ -3,13 +3,14 @@
  * Date: 2009-10-13
  * License: CC0
  * Source: N/A
- * Description: Fast bipartite matching. g[a] lists the right neighbours of
- *  left vertex a; btoa has one entry per right vertex, all -1 (or a valid
- *  partial matching). Returns the matching size; btoa[b] becomes the left
- *  vertex matched to b, or -1.
+ * Description: Fast bipartite matching algorithm. Graph $g$ should be a list
+ * of neighbors of the left partition, and $btoa$ should be a vector full of
+ * -1's of the same size as the right partition. Returns the size of
+ * the matching. $btoa[i]$ will be the match for vertex $i$ on the right side,
+ * or $-1$ if it's not matched.
  * Usage: vi btoa(m, -1); hopcroftKarp(g, btoa);
- * Time: O(sqrt(V) E)
- * Status: stress-tested by MinimumVertexCover, Library Checker bipartitematching
+ * Time: O(\sqrt{V}E)
+ * Status: stress-tested by MinimumVertexCover, and tested on oldkattis.adkbipmatch and SPOJ:MATCHING
  */
 #pragma once
 

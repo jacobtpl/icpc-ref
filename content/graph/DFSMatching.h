@@ -3,15 +3,14 @@
  * Date: 2009-10-28
  * License: CC0
  * Source:
- * Description: Simple bipartite matching (Kuhn). Same interface as
- *  hopcroftKarp.h: g[a] lists the right neighbours of left vertex a, btoa has
- *  one entry per right vertex, all -1. Returns the matching size; btoa[b]
- *  becomes the left vertex matched to b, or -1.
- *  Left vertices are tried in order 0..n-1 and a matched left vertex stays
- *  matched, so sorting the left side gives a greedy / weighted-by-left match.
+ * Description: Simple bipartite matching algorithm. Graph $g$ should be a list
+ * of neighbors of the left partition, and $btoa$ should be a vector full of
+ * -1's of the same size as the right partition. Returns the size of
+ * the matching. $btoa[i]$ will be the match for vertex $i$ on the right side,
+ * or $-1$ if it's not matched.
  * Time: O(VE)
  * Usage: vi btoa(m, -1); dfsMatching(g, btoa);
- * Status: stress-tested by MinimumVertexCover
+ * Status: works
  */
 #pragma once
 

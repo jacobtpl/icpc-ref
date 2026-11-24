@@ -3,9 +3,8 @@
  * Date: 2009-10-13
  * License: CC0
  * Source: N/A
- * Description: Max flow on graph[a][b] = capacity, which is modified into the
- *  residual graph. Edge flow = capacity before - after, if positive.
- *  Prefer Dinic.h; this is only useful as an O(VE^2) / O(E * flow) fallback.
+ * Description: Flow algorithm with guaranteed complexity $O(VE^2)$. To get edge flow values, compare
+ * capacities before and after, and take the positive values only.
  * Status: stress-tested
  */
 #pragma once
