@@ -187,7 +187,7 @@ void testNeg() {
 			continue;
 		auto pa = mcmf.maxflow(S, T);
 		auto pa2 = mcmf2.maxflow(S, T);
-		assert(pa == pa2);
+		assert(pa.first == pa2.first && pa.second == pa2.second);
 		::i = lasti;
 	}
 	cout<<"Tests passed!"<<endl;
