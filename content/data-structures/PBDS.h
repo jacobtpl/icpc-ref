@@ -4,7 +4,7 @@
  * License: CC0
  * Source: me
  * Description: examples for PBDS BBST, mergeable heaps and rope.
- * Time: O(log N), except split: linear in the size of the part split off.
+ * Time: O(log N), except split before GCC 16: linear in the size of the part split off.
  * Status: tested
  */
 #include <ext/pb_ds/assoc_container.hpp>
@@ -61,7 +61,7 @@ void pbds() {
 	// join is O(log N); throws join_error if the key ranges overlap
 
 	// split: keys > 3 move to b (old contents of b are dropped).
-	// Linear in the size of b afterwards, not O(log N).
+	// GCC 16+: O(log N). GCC <= 15: linear in the size of b afterwards.
 	Tree<int> a, b;
 	for (int x : {1, 2, 3, 4, 5, 6}) a.insert(x);
 	a.split(3, b);
