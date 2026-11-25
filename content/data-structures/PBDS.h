@@ -23,8 +23,9 @@ using Heap = __gnu_pbds::priority_queue<T, less<T>, pairing_heap_tag>;
 
 // Custom subtree aggregate: here a map int -> ll with the sum of values.
 // operator() recomputes a node from its children (called on insert/erase).
-// Changing a mapped value in place (t[k] = v, it->second = v) does NOT
-// recompute: erase and re-insert instead.
+// Only t.insert({k, v}) and t.erase(k) recompute. t[k] = v is WRONG even
+// for a new key (aggregate is computed before v is assigned), and so is
+// it->second = v: to change a value, erase and re-insert.
 template<class CIt, class It, class Cmp, class Alloc>
 struct SumUpdate {
 	typedef ll metadata_type; // aggregate stored per node
@@ -76,7 +77,7 @@ void pbds() {
 	ms.erase(ms.lower_bound({5, 0})); // erase one copy of 5
 
 	SumTree st;
-	st[1] = 10; st[5] = 20; st[9] = 30; // new keys: fine
+	st.insert({1, 10}); st.insert({5, 20}); st.insert({9, 30});
 	assert(st.prefSum(6) == 30);
 	st.erase(5); st.insert({5, 1}); // change a value
 	assert(st.prefSum(6) == 11);
