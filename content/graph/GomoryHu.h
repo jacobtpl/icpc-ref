@@ -3,29 +3,25 @@
  * Date: 2020-04-03
  * License: CC0
  * Source: https://github.com/spaghetti-source/algorithm/blob/master/graph/gomory_hu_tree.cc#L102
- * Description: Given a list of edges representing an undirected flow graph,
- * returns edges of the Gomory-Hu tree. The max flow between any pair of
- * vertices is given by minimum edge weight along the Gomory-Hu tree path.
- * Time: $O(V)$ Flow Computations
+ * Description: Given the edges {a, b, cap} of an undirected flow graph,
+ *  returns the edges {a, b, cut} of the Gomory-Hu tree. The min cut between
+ *  two vertices is the minimum edge weight on their tree path.
+ *  Any flow struct with addEdge(a, b, c, rcap), calc and leftOfMinCut works
+ *  (PushRelabel.h has the same interface).
+ * Time: V - 1 max flows
  * Status: Tested on CERC 2015 J, stress-tested
- *
- * Details: The implementation used here is not actually the original
- * Gomory-Hu, but Gusfield's simplified version: "Very simple methods for all
- * pairs network flow analysis". PushRelabel is used here, but any flow
- * implementation that supports `leftOfMinCut` also works (the Dinic.h in
- * this notebook does not: it has no leftOfMinCut/calc).
  */
 #pragma once
 
-#include "PushRelabel.h"
+#include "Dinic.h"
 
 typedef array<ll, 3> Edge;
 vector<Edge> gomoryHu(int N, vector<Edge> ed) {
 	vector<Edge> tree;
 	vi par(N);
 	rep(i,1,N) {
-		PushRelabel D(N);
-		for (Edge t : ed) D.addEdge(t[0], t[1], t[2], t[2]);
+		Dinic D(N);
+		for (Edge t : ed) D.addEdge((int)t[0], (int)t[1], t[2], t[2]);
 		tree.push_back({i, par[i], D.calc(i, par[i])});
 		rep(j,i+1,N)
 			if (par[j] == par[i] && D.leftOfMinCut(j)) par[j] = i;

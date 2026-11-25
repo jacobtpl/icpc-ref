@@ -3,9 +3,11 @@
  * Date: 2015-02-24
  * License: CC0
  * Source: Wikipedia, tinyKACTL
- * Description: Push-relabel using the highest label selection rule and the gap heuristic. Quite fast in practice.
- *  To obtain the actual flow, look at positive values only.
- * Time: $O(V^2\sqrt E)$
+ * Description: Max flow by push-relabel (highest label, gap heuristic). Same
+ *  addEdge / calc / leftOfMinCut interface as Dinic.h. Try Dinic first: this
+ *  is much slower on sparse unit graphs (TLE on Library Checker matching).
+ *  Flow on an edge is its f, if positive.
+ * Time: O(V^2 sqrt(E))
  * Status: Tested on Kattis and SPOJ, and stress-tested
  */
 #pragma once
@@ -35,12 +37,16 @@ struct PushRelabel {
 		back.f -= f; back.c += f; ec[back.dest] -= f;
 	}
 	ll calc(int s, int t) {
-		int v = sz(g); H[s] = v; ec[t] = 1;
-		vi co(2*v); co[0] = v-1;
-		rep(i,0,v) cur[i] = g[i].data();
+		int v = sz(g); ec[t] = 1;
+		vi co(2*v), q = {t};
+		fill(all(H), v); H[t] = 0; // start heights = distance to t
+		rep(i,0,sz(q)) for (Edge& e : g[q[i]])
+			if (e.dest != s && H[e.dest] == v && g[e.dest][e.back].c)
+				H[e.dest] = H[q[i]] + 1, q.push_back(e.dest);
+		rep(i,0,v) co[H[i]]++, cur[i] = g[i].data();
 		for (Edge& e : g[s]) addFlow(e, e.c);
 
-		for (int hi = 0;;) {
+		for (int hi = v;;) {
 			while (hs[hi].empty()) if (!hi--) return -ec[s];
 			int u = hs[hi].back(); hs[hi].pop_back();
 			while (ec[u] > 0)  // discharge u

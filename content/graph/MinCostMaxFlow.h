@@ -32,7 +32,7 @@ struct MCMF {
 		ed[v].push_back({u, 0, -c, ed[u].size()-1});
 	}
 
-	void path(int s) { // 417ab0
+	void path(int s, int t) { // 417ab0
 		fill(all(amt), 0); amt[s] = INFF;
 		fill(all(dist), INFC); dist[s] = 0;
 
@@ -42,6 +42,7 @@ struct MCMF {
 
 		while (!q.empty()) {
 			s = q.top().second; q.pop();
+			if (s == t) break; // dist > dist[t] is not final
 			C di = dist[s] + pi[s];
 			for (auto [n, f, c, rev]: ed[s])
 				if (f < 0 && ckmin(dist[n], di + c - pi[n])) {
@@ -50,12 +51,13 @@ struct MCMF {
 					else q.modify(its[n], {-dist[n], n});
 				}
 		}
-		rep(i,0,N) pi[i] = amt[i] ? pi[i] + dist[i] : INFC;
+		if (amt[t]) rep(i,0,N) if (pi[i] != INFC)
+			pi[i] += min(dist[i], dist[t]);
 	}
 
 	pair<F, R> maxflow(int s, int t) { // 2126d0
 		F totflow = 0; R totcost = 0;
-		while (path(s), amt[t]) {
+		while (path(s, t), amt[t]) {
 			F fl = amt[t]; totflow += fl;
 			for(int n = t;n != s;) {
 				auto &[p, f, c, rev] = ed[n][par[n]];
