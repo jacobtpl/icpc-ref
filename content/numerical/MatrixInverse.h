@@ -1,16 +1,18 @@
 /**
  * Author: Max Bennedich
  * Date: 2004-02-08
- * Description: Invert matrix $A$. Returns rank; result is stored in $A$ unless singular (rank < n).
- * Can easily be extended to prime moduli; for prime powers, repeatedly
- * set $A^{-1} = A^{-1} (2I - AA^{-1})\  (\text{mod }p^k)$ where $A^{-1}$ starts as
- * the inverse of A mod p, and k is doubled in each step.
+ * Description: Inverts a square matrix A over double, mint (prime modulus)
+ *  or Fraction. Returns the rank; the inverse is stored in A unless A is
+ *  singular (rank < n), in which case A is destroyed.
+ *  For a prime power modulus p^k, start from B = inverse of A mod p and
+ *  repeat B = B (2I - A B) mod p^k, doubling k each step.
+ * Usage: vector<vector<mint>> A(n, vector<mint>(n));
+ *  if (matInv(A) == n) // A now holds the inverse
  * Time: O(n^3)
- * Status: Slightly tested
+ * Status: tested by multiplying back for double, mint and Fraction
  */
 #pragma once
 
-using T = double; // or mint
 template<class T>
 int matInv(vector<vector<T>>& A) {
 	int n = sz(A); vi col(n);
@@ -19,9 +21,12 @@ int matInv(vector<vector<T>>& A) {
 
 	rep(i,0,n) {
 		int r = i, c = i;
-		rep(j,i,n) rep(k,i,n)
-			if (abs(A[j][k]) > abs(A[r][c]))
-				r = j, c = k;
+		rep(j,i,n) rep(k,i,n) {
+			// Types without abs (mint) take any nonzero pivot.
+			if constexpr (requires { abs(A[j][k]) > abs(A[r][c]); }) {
+				if (abs(A[j][k]) > abs(A[r][c])) r = j, c = k;
+			} else if (A[r][c] == 0) r = j, c = k;
+		}
 		bool zero = A[r][c] == 0;
 		if constexpr (is_floating_point<T>::value)
 			zero = abs(A[r][c]) < 1e-12;
@@ -30,15 +35,15 @@ int matInv(vector<vector<T>>& A) {
 		rep(j,0,n)
 			swap(A[j][i], A[j][c]), swap(tmp[j][i], tmp[j][c]);
 		swap(col[i], col[c]);
-		T v = A[i][i];
+		T v = 1 / A[i][i];
 		rep(j,i+1,n) {
-			T f = A[j][i] / v;
+			T f = A[j][i] * v;
 			A[j][i] = 0;
 			rep(k,i+1,n) A[j][k] -= f*A[i][k];
 			rep(k,0,n) tmp[j][k] -= f*tmp[i][k];
 		}
-		rep(j,i+1,n) A[i][j] /= v;
-		rep(j,0,n) tmp[i][j] /= v;
+		rep(j,i+1,n) A[i][j] *= v;
+		rep(j,0,n) tmp[i][j] *= v;
 		A[i][i] = 1;
 	}
 	/// forget A at this point, just eliminate tmp backward
