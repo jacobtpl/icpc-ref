@@ -43,6 +43,12 @@ int main() {
 	// p(1) rounds to a value with the sign of the interior.
 	check(polyRoots({{-0.1,-0.4,0.4,0.1}}, 0.9, 1), {1});
 	for (double r : polyRoots({{-0.1,-0.4,0.4,0.1}}, 0.9, 1)) assert(r <= 1);
+	{ // Both turning points lie within the endpoint slack past xmax.
+		double a = -1e-12, b = 0.5e-9, c = 2.1e-9;
+		auto r = polyRoots({{-a*b*c, a*b + a*c + b*c, -(a + b + c), 1}}, -1, 0);
+		assert(!r.empty() && abs(r[0] - a) < 1e-15);
+		for (double x : r) assert(-1 <= x && x <= 0);
+	}
 	// Degenerate polynomials.
 	check(polyRoots({{}}, -1, 1), {});
 	check(polyRoots({{0}}, -1, 1), {});

@@ -28,7 +28,7 @@ vector<double> polyRoots(Poly p, double xmin, double xmax) {
 	}
 	Poly der = p;
 	der.diff();
-	auto dr = polyRoots(der, xmin, xmax);
+	auto dr = polyRoots(der, xmin - d, xmax + d);
 	dr.insert(dr.begin(), xmin - d);
 	dr.push_back(xmax + d);
 	rep(i,0,sz(dr)-1) {
