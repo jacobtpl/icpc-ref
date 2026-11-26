@@ -8,6 +8,8 @@
  *  If ker is given it is set to a basis of the null space (m - rank vectors):
  *  the solutions are exactly x plus any combination of ker, and x[j] is
  *  uniquely determined iff ker[k][j] is zero for every k.
+ *  For double, eps is absolute (pivots, residuals and ker entries below it
+ *  count as 0), so scale the system to values around 1 if it may be singular.
  *  Destroys A and b.
  * Usage: vector<vector<mint>> ker;
  *  int rank = solveLinear(A, b, x, &ker);
