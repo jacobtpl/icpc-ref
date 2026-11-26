@@ -11,7 +11,7 @@
  *  Destroys A and b.
  * Usage: vector<vector<mint>> ker;
  *  int rank = solveLinear(A, b, x, &ker);
- * Time: O(n m min(n, m))
+ * Time: O(n m min(n, m)); ker adds O(rank^2 (m - rank))
  * Status: brute-force tested mod 2, 3 and 5 for n m <= 4, stress-tested for double and Fraction
  */
 #pragma once
@@ -24,19 +24,20 @@ int solveLinear(vector<vector<T>>& A, vector<T>& b, vector<T>& x,
 	int n = sz(A), m = sz(x), rank = 0, br = 0, bc = 0;
 	if (n) assert(sz(A[0]) == m);
 	vi col(m); iota(all(col), 0);
-	// Pivot weight: 0 for zero; exact types take the first nonzero.
-	auto mag = [](const T& v) -> double {
-		if constexpr (is_floating_point<T>::value)
-			return abs(v) > eps ? (double)abs(v) : 0;
+	// Pivot weight; types without abs (mint) take any nonzero pivot.
+	auto mag = [](const T& v) {
+		if constexpr (requires { abs(v) > abs(v); }) return abs(v);
 		else return v != 0;
 	};
+	auto tol = mag(T()); // weights <= tol count as zero
+	if constexpr (is_floating_point<T>::value) tol = T(eps);
 	rep(i,0,n) {
-		double v, bv = 0;
+		auto v = tol, bv = tol;
 		rep(r,i,n) rep(c,i,m)
 			if ((v = mag(A[r][c])) > bv)
 				br = r, bc = c, bv = v;
-		if (bv == 0) {
-			rep(j,i,n) if (mag(b[j]) != 0) return -1;
+		if (!(bv > tol)) {
+			rep(j,i,n) if (mag(b[j]) > tol) return -1;
 			break;
 		}
 		swap(A[i], A[br]);
@@ -44,10 +45,8 @@ int solveLinear(vector<vector<T>>& A, vector<T>& b, vector<T>& x,
 		swap(col[i], col[bc]);
 		rep(j,0,n) swap(A[j][i], A[j][bc]);
 		T inv = 1 / A[i][i];
-		b[i] *= inv;
-		rep(k,i,m) A[i][k] *= inv;
-		rep(j,0,n) if (j != i) {
-			T fac = A[j][i];
+		rep(j,i+1,n) {
+			T fac = A[j][i] * inv;
 			b[j] -= fac * b[i];
 			rep(k,i+1,m) A[j][k] -= fac * A[i][k];
 		}
@@ -55,13 +54,19 @@ int solveLinear(vector<vector<T>>& A, vector<T>& b, vector<T>& x,
 	}
 
 	x.assign(m, 0);
-	rep(i,0,rank) x[col[i]] = b[i];
 	if (ker) {
 		ker->assign(m - rank, vector<T>(m));
-		rep(j,rank,m) {
-			auto& w = (*ker)[j - rank];
-			w[col[j]] = 1;
-			rep(i,0,rank) w[col[i]] = -A[i][j];
+		rep(k,rank,m) (*ker)[k - rank][col[k]] = 1;
+	}
+	for (int i = rank; i--;) {
+		T inv = 1 / A[i][i];
+		b[i] *= inv;
+		x[col[i]] = b[i];
+		rep(j,0,i) b[j] -= A[j][i] * b[i];
+		if (ker) { // the same back substitution for each free column
+			rep(k,rank,m) if (mag(A[i][k] *= inv) > tol)
+				(*ker)[k - rank][col[i]] = -A[i][k];
+			rep(j,0,i) rep(k,rank,m) A[j][k] -= A[j][i] * A[i][k];
 		}
 	}
 	return rank; // (multiple solutions if rank < m)

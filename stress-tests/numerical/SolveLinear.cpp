@@ -125,8 +125,31 @@ void testDouble() {
 	}
 }
 
+// Repeated equations must cancel exactly, and a determined variable
+// must have exact zeros in the null space.
+void testDoubleExact() {
+	{
+		vector<vector<double>> A{{7, 21}, {7, 21}, {0, 7}}, ker;
+		vector<double> b{10001, 10001, 14}, x(2);
+		assert(solveLinear(A, b, x, &ker) == 2 && ker.empty());
+		assert(abs(x[1] - 2) < 1e-9 && abs(x[0] - (10001 / 7.0 - 6)) < 1e-9);
+	}
+	mt19937 rng(5);
+	uniform_real_distribution<double> un(-10, 10);
+	rep(it,0,20000) {
+		// x0 is fixed by row 0; rows 1, 2 are dependent in x1..x3.
+		double a = un(rng), c = un(rng), d = un(rng), e = un(rng), f = un(rng);
+		vector<vector<double>> A{{a, 0, 0, 0}, {a, c, d, e}, {f * a, f * c, f * d, f * e}}, ker;
+		vector<double> b{a, a, f * a}, x(4);
+		assert(solveLinear(A, b, x, &ker) == 2 && sz(ker) == 2);
+		assert(abs(x[0] - 1) < 1e-9);
+		for (auto& w : ker) assert(w[0] == 0);
+	}
+}
+
 int main() {
 	ll cases = bruteForce<2>(12) + bruteForce<3>(8) + bruteForce<5>(4);
 	testDouble();
+	testDoubleExact();
 	cout << "Tests passed! (" << cases << " exhaustive systems)" << endl;
 }
