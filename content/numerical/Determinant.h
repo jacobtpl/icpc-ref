@@ -16,7 +16,8 @@ T det(vector<vector<T>>& a) {
 	rep(i,0,n) {
 		int b = i;
 		rep(j,i+1,n) {
-			if constexpr (is_floating_point<T>::value) {
+			// Types without abs (mint) take any nonzero pivot.
+			if constexpr (requires { abs(a[j][i]) > abs(a[b][i]); }) {
 				if (abs(a[j][i]) > abs(a[b][i])) b = j;
 			} else if (a[b][i] == 0) b = j;
 		}

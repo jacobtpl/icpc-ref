@@ -21,7 +21,8 @@ int matInv(vector<vector<T>>& A) {
 	rep(i,0,n) {
 		int r = i, c = i;
 		rep(j,i,n) rep(k,i,n) {
-			if constexpr (is_floating_point<T>::value) {
+			// Types without abs (mint) take any nonzero pivot.
+			if constexpr (requires { abs(A[j][k]) > abs(A[r][c]); }) {
 				if (abs(A[j][k]) > abs(A[r][c])) r = j, c = k;
 			} else if (A[r][c] == 0) r = j, c = k;
 		}
