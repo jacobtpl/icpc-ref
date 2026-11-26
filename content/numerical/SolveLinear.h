@@ -3,16 +3,28 @@
  * Date: 2004-02-08
  * License: CC0
  * Description: Solves A x = b for an n by m matrix A over double, mint or Fraction.
- *  Returns the rank, or -1 if there is no solution. x (which must have size m)
- *  is set to one solution, with the free variables 0.
- *  If ker is given it is set to a basis of the null space (m - rank vectors):
- *  the solutions are exactly x plus any combination of ker, and x[j] is
- *  uniquely determined iff ker[k][j] is zero for every k.
+ *  Returns the rank, or -1 if there is no solution. Destroys A and b.
  *  For double, eps is absolute (pivots, residuals and ker entries below it
  *  count as 0), so scale the system to values around 1 if it may be singular.
- *  Destroys A and b.
- * Usage: vector<vector<mint>> ker;
- *  int rank = solveLinear(A, b, x, &ker);
+ * Usage:
+ *  vector<vector<mint>> A(n, vector<mint>(m)), ker;
+ *  vector<mint> b(n), x(m); // x must have size m
+ *
+ *  One solution:
+ *   int r = solveLinear(A, b, x);
+ *   r == -1: no solution. Otherwise x is a solution with the free
+ *   variables 0; it is the only one iff r == m.
+ *
+ *  All solutions:
+ *   int r = solveLinear(A, b, x, &ker);
+ *   ker has m - r vectors of size m, a basis of the null space. Every
+ *   solution is x + c[0] * ker[0] + ... for arbitrary c, so over mint
+ *   there are mod^(m - r) solutions.
+ *   x[j] is the same in every solution iff ker[k][j] == 0 for all k.
+ *
+ *  Rank and solvability only: put "return rank;" at the line marked
+ *   STOP HERE below. x and ker are then not touched.
+ *  Rank of A alone: pass b all zero.
  * Time: O(n m min(n, m)); ker adds O(rank^2 (m - rank))
  * Status: brute-force tested mod 2, 3 and 5 for n m <= 4, stress-tested for double and Fraction
  */
@@ -54,6 +66,7 @@ int solveLinear(vector<vector<T>>& A, vector<T>& b, vector<T>& x,
 		}
 		rank++;
 	}
+	// STOP HERE for rank and solvability only: return rank;
 
 	x.assign(m, 0);
 	if (ker) {

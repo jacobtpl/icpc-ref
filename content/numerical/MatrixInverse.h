@@ -6,12 +6,13 @@
  *  singular (rank < n), in which case A is destroyed.
  *  For a prime power modulus p^k, start from B = inverse of A mod p and
  *  repeat B = B (2I - A B) mod p^k, doubling k each step.
+ * Usage: vector<vector<mint>> A(n, vector<mint>(n));
+ *  if (matInv(A) == n) // A now holds the inverse
  * Time: O(n^3)
  * Status: tested by multiplying back for double, mint and Fraction
  */
 #pragma once
 
-using T = double; // or mint
 template<class T>
 int matInv(vector<vector<T>>& A) {
 	int n = sz(A); vi col(n);

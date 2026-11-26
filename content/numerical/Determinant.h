@@ -5,6 +5,8 @@
  * Source: folklore
  * Description: Determinant of a square matrix over double, mint (prime modulus)
  *  or Fraction. Destroys the matrix. For a non-prime modulus use IntDeterminant.h.
+ * Usage: vector<vector<mint>> a(n, vector<mint>(n));
+ *  mint d = det(a); // pass a copy to keep the matrix
  * Time: O(N^3)
  * Status: tested against permutation expansion for mint and Fraction
  */
