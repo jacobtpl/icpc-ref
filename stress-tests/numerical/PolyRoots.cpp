@@ -40,6 +40,9 @@ int main() {
 	check(polyRoots({{-6,11,-6,1}}, 2, 2), {2});
 	check(polyRoots({{-5,1}}, 0, 1), {});
 	check(polyRoots({{-5,1}}, 0, 5), {5});
+	// p(1) rounds to a value with the sign of the interior.
+	check(polyRoots({{-0.1,-0.4,0.4,0.1}}, 0.9, 1), {1});
+	for (double r : polyRoots({{-0.1,-0.4,0.4,0.1}}, 0.9, 1)) assert(r <= 1);
 	// Degenerate polynomials.
 	check(polyRoots({{}}, -1, 1), {});
 	check(polyRoots({{0}}, -1, 1), {});
