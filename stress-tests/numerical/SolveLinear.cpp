@@ -1,110 +1,132 @@
 #include "../utilities/template.h"
+#include "../../content/number-theory/ModInt.h"
+#include "../../content/numerical/SolveLinear.h"
 
-const int mod = 3;
-const int nmax = 4, mmax = 4, nmmax = 10;
-
-const int lut[9] = {-4,-2,-3,-1,-100,1,3,2,4};
-
-int modinv(int x) {
-	assert(x);
-	return x;
-	// return lut[x+4];
-}
-
-typedef vector<int> vd;
-
-int solveLinear(vector<vd>& A, vd& b, vd& x) {
-	int n = sz(A), m = sz(x), rank = 0, br, bc;
-	if (n) assert(sz(A[0]) == m);
-	vi col(m); iota(all(col), 0);
-
-	rep(i,0,n) {
-		int v, bv = -1;
-		rep(r,i,n) rep(c,i,m)
-			if ((v = A[r][c])) {
-				br = r, bc = c, bv = v;
-				goto found;
+template<int P> ll bruteForce(int nmmax) {
+	using M = ModInt<P>;
+	ll cases = 0;
+	rep(n,0,5) rep(m,0,5) {
+		if (n * m > nmmax) continue;
+		int cells = n * m + n; ll total = 1, xs = 1;
+		rep(i,0,cells) total *= P;
+		rep(i,0,m) xs *= P;
+		for (ll code = 0; code < total; code++) {
+			vector<vector<M>> A(n, vector<M>(m));
+			vector<M> b(n), x(m, 7);
+			ll c = code;
+			rep(i,0,n) rep(j,0,m) A[i][j] = c % P, c /= P;
+			rep(i,0,n) b[i] = c % P, c /= P;
+			auto holds = [&](const vector<M>& v, bool homogeneous) {
+				rep(i,0,n) {
+					M s = 0;
+					rep(j,0,m) s += A[i][j] * v[j];
+					if (s != (homogeneous ? M(0) : b[i])) return false;
+				}
+				return true;
+			};
+			// Solutions, and which coordinates take a single value.
+			ll sols = 0; vector<M> first(m); vector<bool> unique(m, true);
+			for (ll xc = 0; xc < xs; xc++) {
+				vector<M> v(m); ll t = xc;
+				rep(j,0,m) v[j] = t % P, t /= P;
+				if (!holds(v, false)) continue;
+				if (!sols++) first = v;
+				rep(j,0,m) if (v[j] != first[j]) unique[j] = false;
 			}
-		rep(j,i,n) if (b[j]) return -1;
-		break;
-found:
-		swap(A[i], A[br]);
-		swap(b[i], b[br]);
-		swap(col[i], col[bc]);
-		rep(j,0,n) swap(A[j][i], A[j][bc]);
-		bv = modinv(A[i][i]);
-		rep(j,i+1,n) {
-			int fac = A[j][i] * bv % mod;
-			b[j] = (b[j] - fac * b[i]) % mod;
-			rep(k,i+1,m) A[j][k] = (A[j][k] - fac*A[i][k]) % mod;
+			auto A2 = A; auto b2 = b; vector<vector<M>> ker(3);
+			int r = solveLinear(A2, b2, x, &ker);
+			A2 = A; b2 = b; vector<M> x1(m);
+			assert(solveLinear(A2, b2, x1) == r);
+			cases++;
+			if (!sols) { assert(r == -1); continue; }
+			assert(x1 == x && holds(x, false));
+			assert(0 <= r && r <= min(n, m) && sz(ker) == m - r);
+			ll want = 1;
+			rep(i,0,m-r) want *= P;
+			assert(sols == want);
+			// ker spans the null space: P^(m-r) distinct combinations, all in it.
+			set<vector<int>> seen;
+			for (ll kc = 0; kc < want; kc++) {
+				vector<M> v(m); ll t = kc;
+				for (auto& w : ker) {
+					rep(j,0,m) v[j] += M(t % P) * w[j];
+					t /= P;
+				}
+				assert(holds(v, true));
+				vector<int> key;
+				for (M e : v) key.push_back(e.val());
+				seen.insert(key);
+			}
+			assert((ll)sz(seen) == want);
+			rep(j,0,m) {
+				bool zero = true;
+				for (auto& w : ker) if (w[j] != 0) zero = false;
+				assert(zero == unique[j]);
+			}
 		}
-		rank++;
 	}
-
-	x.assign(m, 0);
-	for (int i = rank; i--;) {
-		b[i] = ((b[i] * modinv(A[i][i]) % mod) + mod) % mod;
-		x[col[i]] = b[i];
-		rep(j,0,i)
-			b[j] = (b[j] - A[j][i] * b[i]);
-	}
-	return rank;
+	return cases;
 }
 
-template<class F>
-void rec(int i, int j, vector<vd>& A, F f) {
-	if (i == sz(A)) {
-		f();
-	}
-	else if (j == sz(A[i])) {
-		rec(i+1, 0, A, f);
-	}
-	else {
-		rep(v,0,mod) {
-			A[i][j] = v;
-			rec(i, j+1, A, f);
-		}
-	}
-}
+typedef vector<double> vd;
+double rnd(mt19937& rng) { return uniform_real_distribution<double>(-1, 1)(rng); }
 
-template<class F>
-void rec2(int i, vd& A, F f) {
-	if (i == sz(A)) f();
-	else {
-		rep(v,0,mod) {
-			A[i] = v;
-			rec2(i+1, A, f);
+void testDouble() {
+	mt19937 rng(12345);
+	rep(it,0,2000) {
+		int n = (int)(rng() % 8) + 1, m = (int)(rng() % 8) + 1;
+		int k = (int)(rng() % (min(n, m) + 1));
+		// A = L R has rank k almost surely.
+		vector<vd> L(n, vd(k)), R(k, vd(m)), A(n, vd(m));
+		for (auto& row : L) for (auto& v : row) v = rnd(rng);
+		for (auto& row : R) for (auto& v : row) v = rnd(rng);
+		rep(i,0,n) rep(j,0,m) rep(t,0,k) A[i][j] += L[i][t] * R[t][j];
+		vd x0(m), b(n), x(m);
+		for (auto& v : x0) v = rnd(rng);
+		rep(i,0,n) rep(j,0,m) b[i] += A[i][j] * x0[j];
+		auto A2 = A; auto b2 = b; vector<vd> ker;
+		assert(solveLinear(A2, b2, x, &ker) == k);
+		assert(sz(ker) == m - k);
+		rep(i,0,n) {
+			double s = 0;
+			rep(j,0,m) s += A[i][j] * x[j];
+			assert(abs(s - b[i]) < 1e-7);
+			for (auto& w : ker) {
+				s = 0;
+				rep(j,0,m) s += A[i][j] * w[j];
+				assert(abs(s) < 1e-7);
+			}
 		}
+		if (k == m) rep(j,0,m) assert(abs(x[j] - x0[j]) < 1e-6);
+		if (k < n) {
+			// b outside the column space: no solution.
+			A2 = A; b2 = b;
+			vd y(n); // y orthogonal to the columns, from the left null space
+			vector<vd> At(m, vd(n)), lker;
+			rep(i,0,n) rep(j,0,m) At[j][i] = A[i][j];
+			vd zero(m), tmp(n);
+			solveLinear(At, zero, tmp, &lker);
+			assert(sz(lker) == n - k);
+			rep(i,0,n) b2[i] += lker[0][i];
+			assert(solveLinear(A2, b2, x) == -1);
+		}
+	}
+	int n = 400;
+	vector<vd> A(n, vd(n));
+	vd b(n), x(n);
+	for (auto& row : A) for (auto& v : row) v = rnd(rng) * 1000;
+	for (auto& v : b) v = rnd(rng) * 1000;
+	auto A2 = A; auto b2 = b;
+	assert(solveLinear(A2, b2, x) == n);
+	rep(i,0,n) {
+		double s = 0;
+		rep(j,0,n) s += A[i][j] * x[j];
+		assert(abs(s - b[i]) < 1e-6);
 	}
 }
 
 int main() {
-	rep(n,0,nmax+1) rep(m,0,mmax+1) {
-		int nm = n*m;
-		if (nm > nmmax) continue;
-		vector<vd> A(n, vd(m));
-		vd b(n), x(m), theX(m);
-		rec(0, 0, A, [&]() {
-			rec2(0, b, [&]() {
-				int sols = 0;
-				rec2(0, x, [&]() {
-					rep(i,0,n) {
-						int v = 0;
-						rep(j,0,m) v += A[i][j] * x[j];
-						if (v % mod != b[i]) return;
-					}
-					sols++;
-					if (sols == 1) theX = x;
-				});
-				vector<vd> A2 = A;
-				vd x2 = x, b2 = b;
-				int r = solveLinear(A2, b2, x2);
-				if (sols == 0) assert(r == -1);
-				else if (sols == 1) assert(r == m);
-				else assert(r < m);
-				if (sols == 1) assert(x2 == theX);
-			});
-		});
-	}
-	cout<<"Tests passed!"<<endl;
+	ll cases = bruteForce<2>(12) + bruteForce<3>(8) + bruteForce<5>(4);
+	testDouble();
+	cout << "Tests passed! (" << cases << " exhaustive systems)" << endl;
 }

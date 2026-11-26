@@ -1,8 +1,12 @@
 /**
  * Author: Benq
- * Description: Converts A to rref using Gaussian elim.
- * Time: O(N^3)
+ * Description: Converts m to reduced row echelon form, for double, mint or
+ *  Fraction. Returns {determinant (meaningful if square), rank}.
+ * Time: O(R C min(R, C))
+ * Status: tested for double, mint and Fraction
  */
+#pragma once
+
 using T = double; // or mint
 const double EPS = 1e-9; // adjust?
 template<class T>

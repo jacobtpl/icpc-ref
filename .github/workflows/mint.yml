@@ -18,8 +18,8 @@ jobs:
         compiler: [g++, clang++]
     steps:
       - uses: actions/checkout@v4
-      - name: Test modular arithmetic and FPS integration
+      - name: Test modular arithmetic, FPS integration and equation solvers
         env:
           CXX: ${{ matrix.compiler }}
           CXXFLAGS: -O2 -g -Wall -Wextra -Wconversion -fsanitize=address,undefined -fno-sanitize-recover=all
-        run: doc/scripts/run-parallel.sh stress-tests/number-theory/ModInt.cpp stress-tests/numerical/PolyOps.cpp stress-tests/numerical/PolySamples.cpp
+        run: doc/scripts/run-parallel.sh stress-tests/number-theory/ModInt.cpp stress-tests/numerical/PolyOps.cpp stress-tests/numerical/PolySamples.cpp stress-tests/numerical/SolveLinear.cpp stress-tests/numerical/Determinant.cpp stress-tests/numerical/Fraction.cpp stress-tests/numerical/PolyRoots.cpp stress-tests/numerical/SolveLinearBinary.cpp
