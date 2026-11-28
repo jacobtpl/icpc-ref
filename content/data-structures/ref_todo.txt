@@ -1,5 +1,4 @@
 todo:
 
 test fenwicks
-decide on treap
 test mo's
